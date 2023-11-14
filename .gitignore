@@ -1,0 +1,14 @@
+*~
+*.cfg
+*.iml
+target/
+graalvm/
+.settings/
+./.project
+.factorypath
+.classpath
+.idea/
+.project
+/bin/
+language/dependency-reduced-pom.xml
+antlr-*-complete.jar

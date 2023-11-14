@@ -1,0 +1,37 @@
+package gh.marad.chi.language.nodes.expr.operators.arithmetic;
+
+import com.oracle.truffle.api.CompilerDirectives;
+import com.oracle.truffle.api.dsl.Cached;
+import com.oracle.truffle.api.dsl.Specialization;
+import com.oracle.truffle.api.interop.InteropLibrary;
+import com.oracle.truffle.api.library.CachedLibrary;
+import com.oracle.truffle.api.strings.TruffleString;
+import gh.marad.chi.language.nodes.expr.operators.BinaryOperatorWithFallback;
+
+public abstract class PlusOperator extends BinaryOperatorWithFallback {
+    @Specialization
+    public long doLongs(long left, long right) {
+        return Math.addExact(left, right);
+    }
+
+    @Specialization
+    public float doFloats(float left, float right) {
+        return left + right;
+    }
+
+    @Specialization
+    public TruffleString doTruffleStrings(TruffleString left, TruffleString right,
+                                          @Cached @Cached.Shared TruffleString.ConcatNode concatNode) {
+        return concatNode.execute(left, right, TruffleString.Encoding.UTF_8, false);
+    }
+
+    @Specialization
+    @CompilerDirectives.TruffleBoundary
+    public TruffleString doTruffleStringLeft(TruffleString left, Object right,
+                                             @Cached @Cached.Shared TruffleString.ConcatNode concatNode,
+                                             @CachedLibrary(limit = "3") InteropLibrary interop
+    ) {
+        var rightString = TruffleString.fromJavaStringUncached(String.valueOf(interop.toDisplayString(right)), TruffleString.Encoding.UTF_8);
+        return concatNode.execute(left, rightString, TruffleString.Encoding.UTF_8, false);
+    }
+}
