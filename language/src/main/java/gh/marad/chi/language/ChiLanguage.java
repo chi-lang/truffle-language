@@ -13,7 +13,6 @@ import gh.marad.chi.core.VariantType;
 import gh.marad.chi.core.analyzer.Level;
 import gh.marad.chi.core.analyzer.Message;
 import gh.marad.chi.language.compilation.CompilationFailed;
-import gh.marad.chi.language.nodes.ChiNode;
 import gh.marad.chi.language.runtime.ChiObject;
 
 import java.io.PrintWriter;

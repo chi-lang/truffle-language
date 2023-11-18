@@ -5,7 +5,7 @@ module gh.marad.chi.language {
   requires org.antlr.antlr4.runtime;
   requires org.graalvm.polyglot;
   requires org.graalvm.truffle;
-  requires chi.compiler;
+  requires compiler;
   requires kotlin.stdlib;
   requires org.jgrapht.core;
 
