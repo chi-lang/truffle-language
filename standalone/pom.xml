@@ -49,6 +49,7 @@
                                     <directory>${project.basedir}/</directory>
                                     <includes>
                                         <include>chi</include>
+                                        <include>chi.bat</include>
                                     </includes>
                                 </resource>
                             </resources>

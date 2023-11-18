@@ -42,7 +42,7 @@ public class ChiMain {
     }
 
     private static Context prepareContext(String[] contextArgs, HashMap<String, String> options) {
-        var context = Context.newBuilder("chi")
+        return Context.newBuilder("chi")
                               .in(System.in)
                               .out(System.out)
                               .err(System.err)
@@ -51,7 +51,6 @@ public class ChiMain {
                               .allowAllAccess(true)
                               .options(options)
                               .build();
-        return context;
     }
 
     private static boolean parseOption(HashMap<String, String> options, String arg) {

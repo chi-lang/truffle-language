@@ -25,6 +25,8 @@ public class Repl {
             } catch (PolyglotException ex) {
                 if (!ex.getMessage().contains("Compilation failed")) {
                     ex.printStackTrace();
+                } else {
+                    System.err.println(ex.getMessage());
                 }
             }
         }
