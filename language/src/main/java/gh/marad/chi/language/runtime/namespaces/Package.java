@@ -2,12 +2,11 @@ package gh.marad.chi.language.runtime.namespaces;
 
 import com.oracle.truffle.api.Assumption;
 import com.oracle.truffle.api.CompilerDirectives;
+import gh.marad.chi.core.FnType;
 import gh.marad.chi.core.Type;
 import gh.marad.chi.language.runtime.ChiFunction;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class Package {
     private final String name;
@@ -25,23 +24,24 @@ public class Package {
     }
 
     @CompilerDirectives.TruffleBoundary
-    public Iterable<FunctionLookupResult> listFunctions() {
+    public Collection<FunctionLookupResult> listFunctions() {
         return functions.values();
     }
 
     @CompilerDirectives.TruffleBoundary
-    public void defineFunction(ChiFunction function, Type[] paramTypes) {
-        defineNamedFunction(function.getExecutableName(), function, paramTypes);
+    public void defineFunction(ChiFunction function, FnType type, boolean isPublic) {
+        defineNamedFunction(function.getExecutableName(), function, type, isPublic);
     }
 
     @CompilerDirectives.TruffleBoundary
-    public void defineNamedFunction(String name, ChiFunction function, Type[] paramTypes) {
+    public void defineNamedFunction(String name, ChiFunction function, FnType type, boolean isPublic) {
+        var paramTypes = type.getParamTypes().toArray(new Type[0]);
         var key = new FunctionKey(name, Objects.hash((Object[]) paramTypes));
         var oldDefinition = functions.get(key);
         if (oldDefinition != null) {
             oldDefinition.assumption.invalidate();
         }
-        functions.put(key, new FunctionLookupResult(function, Assumption.create("function redefined")));
+        functions.put(key, new FunctionLookupResult(function, type, isPublic, Assumption.create("function redefined")));
     }
 
     @CompilerDirectives.TruffleBoundary
@@ -72,6 +72,10 @@ public class Package {
     public record FunctionKey(String name, int paramTypesHash) {
     }
 
-    public record FunctionLookupResult(ChiFunction function, Assumption assumption) {
+    public record FunctionLookupResult(
+            ChiFunction function,
+            FnType type,
+            boolean isPublic,
+            Assumption assumption) {
     }
 }

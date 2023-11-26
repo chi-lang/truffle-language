@@ -13,6 +13,7 @@ import gh.marad.chi.language.ChiLanguage;
 import gh.marad.chi.language.ChiTypes;
 import gh.marad.chi.language.ChiTypesGen;
 import gh.marad.chi.language.runtime.ChiFunction;
+import gh.marad.chi.language.runtime.TODO;
 
 @Introspectable
 @TypeSystemReference(ChiTypes.class)
@@ -59,4 +60,9 @@ public abstract class ChiNode extends Node {
     }
 
     public abstract Object executeGeneric(VirtualFrame frame);
+
+    public void accept(ChiNodeVisitor visitor) throws Exception {
+        var className = this.getClass().getName();
+        throw new TODO(String.format("Visiting node %s is not implemented", className));
+    }
 }

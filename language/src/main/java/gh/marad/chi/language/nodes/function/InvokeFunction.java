@@ -12,6 +12,7 @@ import com.oracle.truffle.api.interop.UnsupportedTypeException;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import gh.marad.chi.language.nodes.ChiNode;
+import gh.marad.chi.language.nodes.ChiNodeVisitor;
 import gh.marad.chi.language.nodes.expr.ExpressionNode;
 import gh.marad.chi.language.runtime.TODO;
 
@@ -20,17 +21,17 @@ import java.util.Collection;
 public class InvokeFunction extends ExpressionNode {
     @SuppressWarnings("FieldMayBeFinal")
     @Child
-    private ChiNode function;
+    public ChiNode function;
     @Children
-    private final ChiNode[] arguments;
+    public final ChiNode[] arguments;
     @SuppressWarnings("FieldMayBeFinal")
     @Child
     private InteropLibrary library;
 
 
-    public InvokeFunction(ChiNode function, Collection<ChiNode> arguments) {
+    public InvokeFunction(ChiNode function, ChiNode[] arguments) {
         this.function = function;
-        this.arguments = arguments.toArray(new ChiNode[0]);
+        this.arguments = arguments;
         library = InteropLibrary.getFactory().createDispatched(3);
     }
 
@@ -57,5 +58,14 @@ public class InvokeFunction extends ExpressionNode {
     @Override
     public boolean hasTag(Class<? extends Tag> tag) {
         return tag == StandardTags.CallTag.class || super.hasTag(tag);
+    }
+
+    @Override
+    public void accept(ChiNodeVisitor visitor) throws Exception {
+        visitor.visitInvokeFunction(this);
+        for (ChiNode argument : arguments) {
+            argument.accept(visitor);
+        }
+        function.accept(visitor);
     }
 }

@@ -45,7 +45,6 @@ import gh.marad.chi.language.runtime.ChiFunction;
 import gh.marad.chi.language.runtime.TODO;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -168,18 +167,21 @@ public class Converter {
                                 constructor.getName());
                         if (constructor.getFields().isEmpty()) {
                             return WriteModuleVariableNodeGen.create(
-                                    new InvokeFunction(new LambdaValue(constructorFunction), Collections.emptyList()),
+                                    new InvokeFunction(new LambdaValue(constructorFunction), new ChiNode[0]),
                                     currentModule,
                                     currentPackage,
                                     constructor.getName()
                             );
                         } else {
+                            var returnType = expr.getBaseVariantType().withVariant(constructor.toVariant());
                             var paramTypes = constructor.getFields().stream().map(VariantTypeField::getType).toList().toArray(new Type[0]);
+                            var fnType = Type.fn(returnType, paramTypes);
                             return new DefinePackageFunction(
                                     currentModule,
                                     currentPackage,
                                     new ChiFunction(constructorFunction),
-                                    paramTypes);
+                                    fnType,
+                                    constructor.getPublic());
                         }
                     }).collect(Collectors.toList());
         constructorDefinitions.add(new UnitValue());
@@ -211,13 +213,15 @@ public class Converter {
             return convertModuleFunctionDefinitionFromFunctionNode(
                     nameDeclaration.getName(),
                     convertFnExpr(fn, nameDeclaration.getName()),
-                    (FnType) fn.getType()
+                    (FnType) fn.getType(),
+                    nameDeclaration.getPublic()
             );
         } else if (symbol.getScopeType() == ScopeType.Package && nameDeclaration.getValue().getType() instanceof FnType fnType) {
             return convertModuleFunctionDefinitionFromFunctionNode(
                     nameDeclaration.getName(),
                     convertExpression(nameDeclaration.getValue()),
-                    fnType
+                    fnType,
+                    nameDeclaration.getPublic()
             );
         } else if (symbol.getScopeType() == ScopeType.Package) {
             return WriteModuleVariableNodeGen.create(
@@ -395,9 +399,9 @@ public class Converter {
         return convertFnExpr(fn, "[lambda]");
     }
 
-    private ChiNode convertModuleFunctionDefinitionFromFunctionNode(String name, ChiNode fnExprNode, FnType type) {
+    private ChiNode convertModuleFunctionDefinitionFromFunctionNode(String name, ChiNode fnExprNode, FnType type, boolean isPublic) {
         var paramTypes = type.getParamTypes().toArray(new Type[0]);
-        return DefinePackageFunctionFromNodeGen.create(fnExprNode, currentModule, currentPackage, name, paramTypes);
+        return DefinePackageFunctionFromNodeGen.create(fnExprNode, currentModule, currentPackage, name, type, isPublic);
     }
 
     private RootCallTarget createFunctionFromNode(ExpressionNode body, String name) {
@@ -440,7 +444,11 @@ public class Converter {
         }
         assert fnType != null;
         var paramTypes = fnType.getParamTypes().toArray(new Type[0]);
-        var parameters = fnCall.getParameters().stream().map(this::convertExpression).toList();
+        ChiNode[] parameters = new ChiNode[fnCall.getParameters().size()];
+        var i = 0;
+        for (Expression parameter : fnCall.getParameters()) {
+            parameters[i++] = convertExpression(parameter);
+        }
         if (functionExpr instanceof VariableAccess variableAccess) {
             var scope = variableAccess.getDefinitionScope();
             var symbol = scope.getSymbol(variableAccess.getName(), true);
@@ -487,7 +495,8 @@ public class Converter {
         return new DefinePackageFunction(
                 currentModule, currentPackage,
                 new ChiFunction(callTarget),
-                fnType.getParamTypes().toArray(new Type[0])
+                fnType,
+                definition.getPublic()
         );
     }
 

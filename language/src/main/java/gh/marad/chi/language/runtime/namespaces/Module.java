@@ -1,10 +1,13 @@
 package gh.marad.chi.language.runtime.namespaces;
 
 import com.oracle.truffle.api.CompilerDirectives;
+import gh.marad.chi.core.FnType;
 import gh.marad.chi.core.Type;
 import gh.marad.chi.language.runtime.ChiFunction;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Set;
 
 public class Module {
     private final String name;
@@ -25,25 +28,25 @@ public class Module {
     }
 
     @CompilerDirectives.TruffleBoundary
-    public Iterable<String> listPackages() {
+    public Set<String> listPackages() {
         return packages.keySet();
     }
 
-    public Iterable<Package.FunctionLookupResult> listFunctions(String packageName) {
+    public Collection<Package.FunctionLookupResult> listFunctions(String packageName) {
         return getPackage(packageName)
                        .listFunctions();
     }
 
     @CompilerDirectives.TruffleBoundary
-    public void defineFunction(String packageName, ChiFunction function, Type[] paramTypes) {
+    public void defineFunction(String packageName, ChiFunction function, FnType type, boolean isPublic) {
         getOrCreatePackage(packageName)
-                .defineFunction(function, paramTypes);
+                .defineFunction(function, type, isPublic);
     }
 
     @CompilerDirectives.TruffleBoundary
-    public void defineNamedFunction(String packageName, String name, ChiFunction function, Type[] paramTypes) {
+    public void defineNamedFunction(String packageName, String name, ChiFunction function, FnType type, boolean isPublic) {
         getOrCreatePackage(packageName)
-                .defineNamedFunction(name, function, paramTypes);
+                .defineNamedFunction(name, function, type, isPublic);
     }
 
     public Package.FunctionLookupResult findFunctionOrNull(String packageName, String functionName, Type[] paramTypes) {

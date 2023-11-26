@@ -4,7 +4,6 @@ import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.nodes.Node;
-import gh.marad.chi.core.Type;
 import gh.marad.chi.core.namespace.GlobalCompilationNamespace;
 import gh.marad.chi.core.namespace.SymbolType;
 import gh.marad.chi.language.builtin.Builtin;
@@ -13,6 +12,8 @@ import gh.marad.chi.language.builtin.collections.ArrayBuiltin;
 import gh.marad.chi.language.builtin.collections.SizeBuiltin;
 import gh.marad.chi.language.builtin.io.*;
 import gh.marad.chi.language.builtin.lang.EvalBuiltin;
+import gh.marad.chi.language.builtin.lang.LoadModuleBuiltin;
+import gh.marad.chi.language.builtin.lang.SaveModuleBuiltin;
 import gh.marad.chi.language.builtin.lang.interop.LookupHostSymbolBuiltin;
 import gh.marad.chi.language.builtin.lang.interop.array.HasArrayElementsBuiltin;
 import gh.marad.chi.language.builtin.lang.interop.members.*;
@@ -28,7 +29,6 @@ import gh.marad.chi.language.runtime.namespaces.Modules;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 public class ChiContext {
     private static final TruffleLanguage.ContextReference<ChiContext> REFERENCE = TruffleLanguage.ContextReference.create(ChiLanguage.class);
@@ -56,6 +56,9 @@ public class ChiContext {
         List<Builtin> builtins = List.of(
                 // lang
                 new EvalBuiltin(chiLanguage),
+                // lang.image
+                new SaveModuleBuiltin(),
+                new LoadModuleBuiltin(),
                 // lang.unsafe
                 new UnsafeArrayBuiltin(),
                 // lang.interop
@@ -117,7 +120,7 @@ public class ChiContext {
         var rootNode = new FnRootNode(chiLanguage, FrameDescriptor.newBuilder().build(), node, node.name());
         var fn = new ChiFunction(rootNode.getCallTarget());
         modules.getOrCreateModule(node.getModuleName())
-               .defineFunction(node.getPackageName(), fn, node.type().getParamTypes().toArray(new Type[0]));
+               .defineFunction(node.getPackageName(), fn, node.type(), true);
         var compilationScope = compilationNamespace.getOrCreatePackage(
                 node.getModuleName(),
                 node.getPackageName()
