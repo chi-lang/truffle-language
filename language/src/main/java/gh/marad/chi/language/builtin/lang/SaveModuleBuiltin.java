@@ -85,8 +85,7 @@ public class SaveModuleBuiltin extends Builtin {
         var imageWritingVisitor = new ImageWritingVisitor(stream);
         for (Package.FunctionLookupResult function : functions) {
             var rootNode = function.function().getCallTarget().getRootNode();
-            if (rootNode instanceof FnRootNode) {
-                FnRootNode node = (FnRootNode) rootNode;
+            if (rootNode instanceof FnRootNode node) {
                 std.out.println("|  |- Function " + node.getName());
                 std.out.flush();
                 stream.writeUTF(node.getName());

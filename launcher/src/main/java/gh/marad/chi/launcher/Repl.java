@@ -8,7 +8,7 @@ import org.graalvm.polyglot.Value;
 import java.util.Scanner;
 
 public class Repl {
-    private Context context;
+    private final Context context;
 
     public Repl(Context context) {
         this.context = context;
@@ -17,7 +17,7 @@ public class Repl {
     private String imports = "";
     private boolean shouldContinue = true;
 
-    void loop() throws InterruptedException {
+    void loop() {
         while(true) {
             try {
                 step();

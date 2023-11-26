@@ -400,7 +400,6 @@ public class Converter {
     }
 
     private ChiNode convertModuleFunctionDefinitionFromFunctionNode(String name, ChiNode fnExprNode, FnType type, boolean isPublic) {
-        var paramTypes = type.getParamTypes().toArray(new Type[0]);
         return DefinePackageFunctionFromNodeGen.create(fnExprNode, currentModule, currentPackage, name, type, isPublic);
     }
 

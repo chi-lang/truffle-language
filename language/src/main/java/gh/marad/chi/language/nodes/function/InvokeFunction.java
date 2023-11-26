@@ -16,8 +16,6 @@ import gh.marad.chi.language.nodes.ChiNodeVisitor;
 import gh.marad.chi.language.nodes.expr.ExpressionNode;
 import gh.marad.chi.language.runtime.TODO;
 
-import java.util.Collection;
-
 public class InvokeFunction extends ExpressionNode {
     @SuppressWarnings("FieldMayBeFinal")
     @Child

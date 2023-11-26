@@ -8,9 +8,9 @@ import java.io.IOException;
 import java.util.*;
 
 public class ChiMain {
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException {
         if(args.length == 0 || args[0].equals("repl")) {
-            String[] contextArgs = null;
+            String[] contextArgs;
             if (args.length == 0) {
                 contextArgs = new String[] {};
             } else {
@@ -31,6 +31,11 @@ public class ChiMain {
                         programArgs.add(arg);
                     }
                 }
+            }
+
+            if (file == null) {
+                System.err.println("No file specified.");
+                System.exit(1);
             }
 
             var source = Source.newBuilder("chi", new File(file)).build();

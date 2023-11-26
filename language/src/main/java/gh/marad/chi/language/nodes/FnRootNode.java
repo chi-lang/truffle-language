@@ -7,9 +7,6 @@ import com.oracle.truffle.api.nodes.RootNode;
 import com.oracle.truffle.api.source.Source;
 import com.oracle.truffle.api.source.SourceSection;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 public class FnRootNode extends RootNode {
     @Child
     private ChiNode body;

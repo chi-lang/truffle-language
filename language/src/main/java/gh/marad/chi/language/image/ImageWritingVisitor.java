@@ -13,7 +13,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class ImageWritingVisitor implements ChiNodeVisitor {
-    private DataOutputStream stream;
+    private final DataOutputStream stream;
 
     public ImageWritingVisitor(DataOutputStream stream) {
         this.stream = stream;
