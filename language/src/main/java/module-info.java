@@ -10,6 +10,8 @@ module gh.marad.chi.language {
   requires org.jgrapht.core;
 
   exports gh.marad.chi.language;
+  exports gh.marad.chi.language.runtime;
+  exports gh.marad.chi.language.nodes;
 
   provides com.oracle.truffle.api.provider.TruffleLanguageProvider with
     gh.marad.chi.language.ChiLanguageProvider;
