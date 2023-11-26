@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class ChiMain {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         if(args.length == 0 || args[0].equals("repl")) {
             String[] contextArgs = null;
             if (args.length == 0) {
