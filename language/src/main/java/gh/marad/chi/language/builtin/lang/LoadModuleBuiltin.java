@@ -15,9 +15,11 @@ import gh.marad.chi.language.image.TypeWriter;
 import gh.marad.chi.language.nodes.ChiNode;
 import gh.marad.chi.language.nodes.FnRootNode;
 import gh.marad.chi.language.nodes.expr.BlockExpr;
+import gh.marad.chi.language.nodes.expr.operators.arithmetic.PlusOperatorNodeGen;
 import gh.marad.chi.language.nodes.expr.variables.ReadLocalArgument;
 import gh.marad.chi.language.nodes.function.GetDefinedFunction;
 import gh.marad.chi.language.nodes.function.InvokeFunction;
+import gh.marad.chi.language.nodes.value.LongValue;
 import gh.marad.chi.language.nodes.value.StringValue;
 import gh.marad.chi.language.runtime.ChiFunction;
 import gh.marad.chi.language.runtime.StdStreams;
@@ -123,8 +125,10 @@ public class LoadModuleBuiltin extends Builtin {
             case Block -> readBlock(stream);
             case ReadLocalArgument -> readLocalArgument(stream);
             case InvokeFunction -> readInvokeFunction(stream);
+            case LongValue -> readLongValue(stream);
             case StringValue -> readStringValue(stream);
             case GetDefinedFunction -> readGetDefinedFunction(stream);
+            case PlusOperator -> readPlusOperator(stream);
         };
     }
 
@@ -152,6 +156,9 @@ public class LoadModuleBuiltin extends Builtin {
         return new InvokeFunction(function, arguments);
     }
 
+    private ChiNode readLongValue(DataInputStream stream) throws IOException {
+        return new LongValue(stream.readLong());
+    }
     private ChiNode readStringValue(DataInputStream stream) throws IOException {
         return new StringValue(stream.readUTF());
     }
@@ -162,6 +169,12 @@ public class LoadModuleBuiltin extends Builtin {
         var functionName = stream.readUTF();
         var paramTypes = TypeWriter.readTypes(stream);
         return new GetDefinedFunction(moduleName, packageName, functionName, paramTypes);
+    }
+
+    private ChiNode readPlusOperator(DataInputStream stream) throws IOException {
+        var left = readNode(stream);
+        var right = readNode(stream);
+        return PlusOperatorNodeGen.create(left, right);
     }
 
 }

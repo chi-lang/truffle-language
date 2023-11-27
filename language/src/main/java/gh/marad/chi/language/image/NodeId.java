@@ -4,8 +4,10 @@ public enum NodeId {
     Block,
     ReadLocalArgument,
     InvokeFunction,
+    LongValue,
     StringValue,
     GetDefinedFunction,
+    PlusOperator
 
     ;
 

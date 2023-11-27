@@ -7,17 +7,15 @@ import gh.marad.chi.core.Type;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.ChiContext;
 import gh.marad.chi.language.builtin.Builtin;
-import gh.marad.chi.language.image.ImageWritingVisitor;
-import gh.marad.chi.language.image.TypeWriter;
-import gh.marad.chi.language.nodes.FnRootNode;
-import gh.marad.chi.language.runtime.StdStreams;
+import gh.marad.chi.language.image.ModuleWriter;
 import gh.marad.chi.language.runtime.TODO;
 import gh.marad.chi.language.runtime.Unit;
 import gh.marad.chi.language.runtime.namespaces.Module;
-import gh.marad.chi.language.runtime.namespaces.Package;
 
 import java.io.DataOutputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class SaveModuleBuiltin extends Builtin {
     @Override
@@ -46,55 +44,19 @@ public class SaveModuleBuiltin extends Builtin {
         var moduleName = ChiArgs.getTruffleString(frame, 0).toString();
         var fileName = ChiArgs.getTruffleString(frame, 1).toString();
         var module = context.modules.getOrCreateModule(moduleName);
-        save(module, fileName);
+        save(context, module, fileName);
         return Unit.instance;
     }
 
     @CompilerDirectives.TruffleBoundary
-    public void save(Module module, String fileName) {
-        var chiContext = ChiContext.get(this);
-        var std = new StdStreams(chiContext);
-        try {
-            var output = new DataOutputStream(new FileOutputStream(fileName));
-            writeModule(module, output, std);
-            output.close();
-        } catch (Throwable e) {
-            std.err.println(e.getMessage());
-            std.err.flush();
-        }
-    }
-
-    public void writeModule(Module module, DataOutputStream stream, StdStreams std) throws Exception {
-        std.out.println("Module " + module.getName());
-        std.out.flush();
-        var packageNames = module.listPackages();
-        stream.writeUTF(module.getName());  // module name
-        stream.writeShort(packageNames.size()); // package count
-        for (String packageName : module.listPackages()) {
-            writePackage(module, packageName, stream, std); // package array
-        }
-    }
-
-    public void writePackage(Module module, String packageName, DataOutputStream stream, StdStreams std) throws Exception {
-        std.out.println("|- Package " + packageName);
-        std.out.flush();
-        var functions = module.listFunctions(packageName);
-        stream.writeUTF(packageName);     // package name
-        stream.writeShort(functions.size());  // function count
-
-        var imageWritingVisitor = new ImageWritingVisitor(stream);
-        for (Package.FunctionLookupResult function : functions) {
-            var rootNode = function.function().getCallTarget().getRootNode();
-            if (rootNode instanceof FnRootNode node) {
-                std.out.println("|  |- Function " + node.getName());
-                std.out.flush();
-                stream.writeUTF(node.getName());
-                TypeWriter.writeType(function.type(), stream);
-                stream.writeBoolean(function.isPublic());
-                node.accept(imageWritingVisitor);
-            } else {
-                throw new TODO("Non FnRootNode as function body!");
-            }
+    private void save(ChiContext context, Module module, String fileName) {
+        try(var output = new DataOutputStream(new FileOutputStream(fileName))) {
+            var writer = new ModuleWriter(context);
+            writer.save(module, output);
+        } catch (FileNotFoundException e) {
+            throw new TODO("File %s not found".formatted(fileName));
+        } catch (IOException e) {
+            throw new TODO(e);
         }
     }
 }

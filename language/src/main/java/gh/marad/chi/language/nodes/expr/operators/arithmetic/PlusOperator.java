@@ -6,6 +6,7 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.strings.TruffleString;
+import gh.marad.chi.language.nodes.ChiNodeVisitor;
 import gh.marad.chi.language.nodes.expr.operators.BinaryOperatorWithFallback;
 
 public abstract class PlusOperator extends BinaryOperatorWithFallback {
@@ -33,5 +34,12 @@ public abstract class PlusOperator extends BinaryOperatorWithFallback {
     ) {
         var rightString = TruffleString.fromJavaStringUncached(String.valueOf(interop.toDisplayString(right)), TruffleString.Encoding.UTF_8);
         return concatNode.execute(left, rightString, TruffleString.Encoding.UTF_8, false);
+    }
+
+    @Override
+    public void accept(ChiNodeVisitor visitor) throws Exception {
+        visitor.visitPlusOperator(this);
+        getLeft().accept(visitor);
+        getRight().accept(visitor);
     }
 }

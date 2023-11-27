@@ -4,9 +4,11 @@ import gh.marad.chi.language.nodes.ChiNodeVisitor;
 import gh.marad.chi.language.nodes.expr.BlockExpr;
 import gh.marad.chi.language.nodes.expr.cast.CastToFloat;
 import gh.marad.chi.language.nodes.expr.cast.CastToLongExpr;
+import gh.marad.chi.language.nodes.expr.operators.arithmetic.PlusOperator;
 import gh.marad.chi.language.nodes.expr.variables.ReadLocalArgument;
 import gh.marad.chi.language.nodes.function.GetDefinedFunction;
 import gh.marad.chi.language.nodes.function.InvokeFunction;
+import gh.marad.chi.language.nodes.value.LongValue;
 import gh.marad.chi.language.nodes.value.StringValue;
 
 import java.io.DataOutputStream;
@@ -60,5 +62,16 @@ public class ImageWritingVisitor implements ChiNodeVisitor {
         stream.writeUTF(getDefinedFunction.packageName);
         stream.writeUTF(getDefinedFunction.functionName);
         TypeWriter.writeTypes(getDefinedFunction.paramTypes, stream);
+    }
+
+    @Override
+    public void visitPlusOperator(PlusOperator plusOperator) throws Exception {
+        stream.writeShort(NodeId.PlusOperator.id());
+    }
+
+    @Override
+    public void visitLongValue(LongValue longValue) throws Exception {
+        stream.writeShort(NodeId.LongValue.id());
+        stream.writeLong(longValue.value);
     }
 }

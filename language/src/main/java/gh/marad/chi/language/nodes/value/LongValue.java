@@ -1,9 +1,10 @@
 package gh.marad.chi.language.nodes.value;
 
 import com.oracle.truffle.api.frame.VirtualFrame;
+import gh.marad.chi.language.nodes.ChiNodeVisitor;
 
 public class LongValue extends ValueNode {
-    private final long value;
+    public final long value;
 
     public LongValue(long value) {
         this.value = value;
@@ -17,5 +18,10 @@ public class LongValue extends ValueNode {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         return value;
+    }
+
+    @Override
+    public void accept(ChiNodeVisitor visitor) throws Exception {
+        visitor.visitLongValue(this);
     }
 }
