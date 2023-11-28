@@ -1,9 +1,10 @@
 package gh.marad.chi.language.nodes.value;
 
 import com.oracle.truffle.api.frame.VirtualFrame;
+import gh.marad.chi.language.nodes.ChiNodeVisitor;
 
 public class BooleanValue extends ValueNode {
-    private final boolean value;
+    public final boolean value;
 
     public BooleanValue(boolean value) {
         this.value = value;
@@ -17,5 +18,10 @@ public class BooleanValue extends ValueNode {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         return value;
+    }
+
+    @Override
+    public void accept(ChiNodeVisitor visitor) throws Exception {
+        visitor.visitBooleanValue(this);
     }
 }
