@@ -4,12 +4,13 @@ import gh.marad.chi.language.nodes.ChiNodeVisitor;
 import gh.marad.chi.language.nodes.expr.BlockExpr;
 import gh.marad.chi.language.nodes.expr.cast.CastToFloat;
 import gh.marad.chi.language.nodes.expr.cast.CastToLongExpr;
-import gh.marad.chi.language.nodes.expr.operators.arithmetic.PlusOperator;
-import gh.marad.chi.language.nodes.expr.variables.ReadLocalArgument;
-import gh.marad.chi.language.nodes.expr.variables.ReadModuleVariable;
-import gh.marad.chi.language.nodes.expr.variables.WriteLocalVariable;
+import gh.marad.chi.language.nodes.expr.operators.arithmetic.*;
+import gh.marad.chi.language.nodes.expr.variables.*;
 import gh.marad.chi.language.nodes.function.GetDefinedFunction;
 import gh.marad.chi.language.nodes.function.InvokeFunction;
+import gh.marad.chi.language.nodes.objects.ReadMember;
+import gh.marad.chi.language.nodes.objects.ReadMemberNodeGen;
+import gh.marad.chi.language.nodes.objects.WriteMember;
 import gh.marad.chi.language.nodes.value.*;
 
 import java.io.DataOutputStream;
@@ -68,6 +69,77 @@ public class ImageWritingVisitor implements ChiNodeVisitor {
     }
 
     @Override
+    public void visitReadLocalVariable(ReadLocalVariable readLocalVariable) throws IOException {
+        writeNodeId(NodeId.ReadLocalVariable);
+        stream.writeByte(readLocalVariable.slot);
+        stream.writeUTF(readLocalVariable.name);
+    }
+
+    @Override
+    public void visitReadOuterScopeVariable(ReadOuterScopeVariable readOuterScopeVariable) throws IOException {
+        writeNodeId(NodeId.ReadOuterScopeVariable);
+        stream.writeUTF(readOuterScopeVariable.name);
+    }
+
+    @Override
+    public void visitReadLocalArgument(ReadLocalArgument readLocalArgument) throws IOException {
+        writeNodeId(NodeId.ReadLocalArgument);
+        stream.writeByte(readLocalArgument.slot);
+    }
+
+    @Override
+    public void visitReadOuterScopeArgument(ReadOuterScopeArgument readOuterScopeArgument) throws IOException {
+        writeNodeId(NodeId.ReadOuterScopeArgument);
+        stream.writeByte(readOuterScopeArgument.scopesUp);
+        stream.writeByte(readOuterScopeArgument.argIndex);
+    }
+
+    @Override
+    public void visitReadMember(ReadMember readMember) throws IOException {
+        writeNodeId(NodeId.ReadMember);
+        stream.writeUTF(readMember.getMember());
+    }
+
+    @Override
+    public void visitWriteMember(WriteMember writeMember) throws IOException {
+        writeNodeId(NodeId.WriteMember);
+        stream.writeUTF(writeMember.getMember());
+    }
+
+    @Override
+    public void visitBlockExpr(BlockExpr blockExpr) throws IOException {
+        writeNodeId(NodeId.Block);
+        stream.writeShort(blockExpr.getElements().length);
+    }
+
+    @Override
+    public void visitPlusOperator(PlusOperator plusOperator) throws IOException {
+        writeNodeId(NodeId.PlusOperator);
+    }
+
+    @Override
+    public void visitMinusOperator(MinusOperator minusOperator) throws IOException {
+        writeNodeId(NodeId.MinusOperator);
+    }
+
+    @Override
+    public void visitMultiplyOperator(MultiplyOperator multiplyOperator) throws IOException {
+        writeNodeId(NodeId.MultiplyOperator);
+    }
+
+    @Override
+    public void visitDivideOperator(DivideOperator divideOperator) throws IOException {
+        writeNodeId(NodeId.DivideOperator);
+    }
+
+    @Override
+    public void visitModuloOperator(ModuloOperator moduloOperator) throws IOException {
+        writeNodeId(NodeId.ModuloOperator);
+    }
+
+    // --
+
+    @Override
     public void visitCastToLongExpr(CastToLongExpr castToLongExpr) {
 
         // TODO add serialization/deserialization tests for each node
@@ -79,18 +151,6 @@ public class ImageWritingVisitor implements ChiNodeVisitor {
     @Override
     public void visitCastToFloat(CastToFloat castToFloat) {
 
-    }
-
-    @Override
-    public void visitBlockExpr(BlockExpr blockExpr) throws IOException {
-        writeNodeId(NodeId.Block);
-        stream.writeShort(blockExpr.getElements().length);
-    }
-
-    @Override
-    public void visitReadLocalArgument(ReadLocalArgument readLocalArgument) throws IOException {
-        writeNodeId(NodeId.ReadLocalArgument);
-        stream.writeByte(readLocalArgument.slot);
     }
 
     @Override
@@ -106,11 +166,6 @@ public class ImageWritingVisitor implements ChiNodeVisitor {
         stream.writeUTF(getDefinedFunction.packageName);
         stream.writeUTF(getDefinedFunction.functionName);
         TypeWriter.writeTypes(getDefinedFunction.paramTypes, stream);
-    }
-
-    @Override
-    public void visitPlusOperator(PlusOperator plusOperator) throws IOException {
-        writeNodeId(NodeId.PlusOperator);
     }
 
     private void writeNodeId(NodeId nodeId) throws IOException {

@@ -8,11 +8,20 @@ public enum NodeId {
     BuildInterpolatedString,
     WriteLocalVariable,
     ReadModuleVariable,
-    Block,
+    ReadLocalVariable,
+    ReadOuterScopeVariable,
     ReadLocalArgument,
+    ReadOuterScopeArgument,
+    ReadMember,
+    WriteMember,
+    Block,
+    PlusOperator,
+    MinusOperator,
+    MultiplyOperator,
+    DivideOperator,
+    ModuloOperator,
     InvokeFunction,
     GetDefinedFunction,
-    PlusOperator
     ;
 
 

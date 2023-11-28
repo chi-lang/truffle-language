@@ -4,12 +4,12 @@ import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import gh.marad.chi.language.nodes.ChiNode;
 import gh.marad.chi.language.nodes.expr.BlockExpr;
-import gh.marad.chi.language.nodes.expr.operators.arithmetic.PlusOperatorNodeGen;
-import gh.marad.chi.language.nodes.expr.variables.ReadLocalArgument;
-import gh.marad.chi.language.nodes.expr.variables.ReadModuleVariable;
-import gh.marad.chi.language.nodes.expr.variables.WriteLocalVariableNodeGen;
+import gh.marad.chi.language.nodes.expr.operators.arithmetic.*;
+import gh.marad.chi.language.nodes.expr.variables.*;
 import gh.marad.chi.language.nodes.function.GetDefinedFunction;
 import gh.marad.chi.language.nodes.function.InvokeFunction;
+import gh.marad.chi.language.nodes.objects.ReadMemberNodeGen;
+import gh.marad.chi.language.nodes.objects.WriteMemberNodeGen;
 import gh.marad.chi.language.nodes.value.*;
 
 import java.io.DataInputStream;
@@ -43,11 +43,20 @@ public class NodeReader {
             case BuildInterpolatedString -> readBuildInterpolatedString();
             case WriteLocalVariable -> readWriteLocalVariable();
             case ReadModuleVariable -> readReadModuleVariable();
+            case ReadLocalVariable -> readReadLocalVariable();
+            case ReadOuterScopeVariable -> readReadOuterScopeVariable();
+            case ReadOuterScopeArgument -> readReadOuterScopeArgument();
+            case ReadMember -> readReadMember();
+            case WriteMember -> readWriteMember();
             case Block -> readBlock();
             case ReadLocalArgument -> readLocalArgument();
+            case PlusOperator -> readPlusOperator();
+            case MinusOperator -> readMinusOperator();
+            case MultiplyOperator -> readMultiplyOperator();
+            case DivideOperator -> readDivideOperator();
+            case ModuloOperator -> readModuloOperator();
             case InvokeFunction -> readInvokeFunction();
             case GetDefinedFunction -> readGetDefinedFunction();
-            case PlusOperator -> readPlusOperator();
         };
     }
 
@@ -92,7 +101,41 @@ public class NodeReader {
         return new ReadModuleVariable(moduleName, packageName, variableNAme);
     }
 
-    // ---
+    public ChiNode readReadLocalVariable() throws IOException {
+        var slot = stream.readByte();
+        var name = stream.readUTF();
+        return new ReadLocalVariable(name, slot);
+    }
+
+    public ChiNode readReadOuterScopeVariable() throws IOException {
+        var name = stream.readUTF();
+        return new ReadOuterScopeVariable(name);
+    }
+
+    public ChiNode readLocalArgument() throws IOException {
+        var slot = stream.readByte();
+        return new ReadLocalArgument(slot);
+    }
+
+    public ChiNode readReadOuterScopeArgument() throws IOException {
+        var scopesUp = stream.readByte();
+        var argIndex = stream.readByte();
+        return new ReadOuterScopeArgument(scopesUp, argIndex);
+    }
+
+    public ChiNode readReadMember() throws IOException {
+        var member = stream.readUTF();
+        var receiver = readNode();
+        return ReadMemberNodeGen.create(receiver, member);
+    }
+
+    public ChiNode readWriteMember() throws IOException {
+        var member = stream.readUTF();
+        var receiver = readNode();
+        var value = readNode();
+        return WriteMemberNodeGen.create(receiver, value, member);
+    }
+
 
     public ChiNode readBlock() throws IOException {
         var bodySize = stream.readShort();
@@ -103,10 +146,38 @@ public class NodeReader {
         return new BlockExpr(elements);
     }
 
-    public ChiNode readLocalArgument() throws IOException {
-        var slot = stream.readByte();
-        return new ReadLocalArgument(slot);
+    public ChiNode readPlusOperator() throws IOException {
+        var left = readNode();
+        var right = readNode();
+        return PlusOperatorNodeGen.create(left, right);
     }
+
+    public ChiNode readMinusOperator() throws IOException {
+        var left = readNode();
+        var right = readNode();
+        return MinusOperatorNodeGen.create(left, right);
+    }
+
+    public ChiNode readMultiplyOperator() throws IOException {
+        var left = readNode();
+        var right = readNode();
+        return MultiplyOperatorNodeGen.create(left, right);
+    }
+
+    public ChiNode readDivideOperator() throws IOException {
+        var left = readNode();
+        var right = readNode();
+        return DivideOperatorNodeGen.create(left, right);
+    }
+
+    public ChiNode readModuloOperator() throws IOException {
+        var left = readNode();
+        var right = readNode();
+        return ModuloOperatorNodeGen.create(left, right);
+    }
+
+    // ---
+
 
     public ChiNode readInvokeFunction() throws IOException {
         var argCount = stream.readByte();
@@ -126,9 +197,4 @@ public class NodeReader {
         return new GetDefinedFunction(moduleName, packageName, functionName, paramTypes);
     }
 
-    public ChiNode readPlusOperator() throws IOException {
-        var left = readNode();
-        var right = readNode();
-        return PlusOperatorNodeGen.create(left, right);
-    }
 }

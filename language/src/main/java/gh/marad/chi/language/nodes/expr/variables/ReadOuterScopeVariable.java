@@ -2,10 +2,11 @@ package gh.marad.chi.language.nodes.expr.variables;
 
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.frame.VirtualFrame;
+import gh.marad.chi.language.nodes.ChiNodeVisitor;
 import gh.marad.chi.language.nodes.expr.ExpressionNode;
 
 public class ReadOuterScopeVariable extends ExpressionNode {
-    private final String name;
+    public final String name;
 
     public ReadOuterScopeVariable(String name) {
         this.name = name;
@@ -30,4 +31,8 @@ public class ReadOuterScopeVariable extends ExpressionNode {
 
     }
 
+    @Override
+    public void accept(ChiNodeVisitor visitor) throws Exception {
+        visitor.visitReadOuterScopeVariable(this);
+    }
 }

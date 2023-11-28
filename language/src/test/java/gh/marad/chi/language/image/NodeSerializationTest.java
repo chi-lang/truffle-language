@@ -1,15 +1,27 @@
 package gh.marad.chi.language.image;
 
 import com.oracle.truffle.api.frame.FrameDescriptor;
+import com.oracle.truffle.api.frame.FrameSlotKind;
 import gh.marad.chi.language.nodes.ChiNode;
-import gh.marad.chi.language.nodes.expr.variables.ReadLocalArgument;
-import gh.marad.chi.language.nodes.expr.variables.ReadModuleVariable;
-import gh.marad.chi.language.nodes.expr.variables.WriteLocalVariable;
-import gh.marad.chi.language.nodes.expr.variables.WriteLocalVariableNodeGen;
+import gh.marad.chi.language.nodes.expr.BlockExpr;
+import gh.marad.chi.language.nodes.expr.operators.BinaryOperatorWithFallback;
+import gh.marad.chi.language.nodes.expr.operators.arithmetic.*;
+import gh.marad.chi.language.nodes.expr.operators.bit.*;
+import gh.marad.chi.language.nodes.expr.operators.bool.*;
+import gh.marad.chi.language.nodes.expr.variables.*;
+import gh.marad.chi.language.nodes.objects.ReadMember;
+import gh.marad.chi.language.nodes.objects.ReadMemberNodeGen;
+import gh.marad.chi.language.nodes.objects.WriteMember;
+import gh.marad.chi.language.nodes.objects.WriteMemberNodeGen;
 import gh.marad.chi.language.nodes.value.*;
+import gh.marad.chi.language.runtime.namespaces.Module;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.*;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -120,6 +132,36 @@ public class NodeSerializationTest {
         } else fail("Invalid node read!");
     }
 
+    @Test
+    void testReadLocalVariable() throws Exception {
+        // given
+        var slot = 0;
+        var name = "name";
+        var expected = new ReadLocalVariable(name, slot);
+        var fdBuilder = FrameDescriptor.newBuilder();
+        fdBuilder.addSlot(FrameSlotKind.Illegal, name, null);
+        // when
+        var result = serializeAndDeserialize(expected, fdBuilder);
+        var fd = fdBuilder.build();
+        // then
+        if (result instanceof ReadLocalVariable actual) {
+            assertEquals(expected.slot, actual.slot);
+            assertEquals(expected.name, actual.name);
+        } else fail("Invalid node read!");
+    }
+
+    @Test
+    void testReadOuterScopeVariable() throws Exception {
+        // given
+        var name = "name";
+        var expected = new ReadOuterScopeVariable(name);
+        // when
+        var result = serializeAndDeserialize(expected);
+        // then
+        if (result instanceof ReadOuterScopeVariable actual) {
+            assertEquals(expected.name, actual.name);
+        } else fail("Invalid node read!");
+    }
 
     @Test
     void testReadLocalArgumentSerialization() throws Exception {
@@ -130,6 +172,120 @@ public class NodeSerializationTest {
         // then
         if (result instanceof ReadLocalArgument actual) {
             assertEquals(expected.slot, actual.slot);
+        } else fail("Invalid node read!");
+    }
+
+    @Test
+    void testReadOuterScopeArgument() throws Exception {
+        // given
+        var scopesUp = 2;
+        var slot = 0;
+        var expected = new ReadOuterScopeArgument(scopesUp, slot);
+        // when
+        var result = serializeAndDeserialize(expected);
+        // then
+        if (result instanceof ReadOuterScopeArgument actual) {
+            assertEquals(expected.scopesUp, actual.scopesUp);
+            assertEquals(expected.argIndex, actual.argIndex);
+        } else fail("Invalid node read!");
+    }
+
+    @Test
+    void testReadMember() throws Exception {
+        // given
+        var readVariable = new ReadLocalVariable("obj", 0);
+        var expected = ReadMemberNodeGen.create(readVariable, "field");
+        // when
+        var result = serializeAndDeserialize(expected);
+        // then
+        if (result instanceof ReadMember actual) {
+            assertEquals(expected.getMember(), actual.getMember());
+            assertInstanceOf(ReadLocalVariable.class, actual.getReceiver());
+        } else fail("Invalid node read!");
+    }
+
+    @Test
+    void testWriteMember() throws Exception {
+        // given
+        var readVariable = new ReadLocalVariable("obj", 0);
+        var value = new LongValue(1);
+        var expected = WriteMemberNodeGen.create(readVariable, value, "field");
+        // when
+        var result = serializeAndDeserialize(expected);
+        // then
+        if (result instanceof WriteMember actual) {
+            assertEquals(expected.getMember(), actual.getMember());
+            assertInstanceOf(LongValue.class, actual.getValue());
+            assertInstanceOf(ReadLocalVariable.class, actual.getReceiver());
+        } else fail("Invalid node read!");
+    }
+
+    @Test
+    void testBlock() throws Exception {
+        // given
+        var body = new ChiNode[] {
+                new LongValue(1),
+                new StringValue("hello")
+        };
+        var expected = new BlockExpr(body);
+        // when
+        var result = serializeAndDeserialize(expected);
+        // then
+        if (result instanceof BlockExpr actual) {
+            var actualBody = actual.getElements();
+            assertInstanceOf(LongValue.class, actualBody[0]);
+            assertInstanceOf(StringValue.class, actualBody[1]);
+        } else fail("Invalid node read!");
+    }
+
+    @Test
+    void testPlusOperator() throws Exception {
+        // given
+        var left = new LongValue(1);
+        var right = new StringValue("hello");
+        var expected = PlusOperatorNodeGen.create(left, right);
+        // when
+        var result = serializeAndDeserialize(expected);
+        // then
+        if (result instanceof PlusOperator actual) {
+            assertInstanceOf(LongValue.class, actual.getLeft());
+            assertInstanceOf(StringValue.class, actual.getRight());
+        } else fail("Invalid node read!");
+    }
+
+
+    private static Stream<Arguments> provideOperatorTests() {
+        var left = new LongValue(1);
+        var right = new StringValue("hello");
+        return Stream.of(
+                Arguments.of(PlusOperatorNodeGen.create(left, right), PlusOperator.class),
+                Arguments.of(MinusOperatorNodeGen.create(left, right), MinusOperator.class),
+                Arguments.of(MultiplyOperatorNodeGen.create(left, right), MultiplyOperator.class),
+                Arguments.of(DivideOperatorNodeGen.create(left, right), DivideOperator.class),
+                Arguments.of(ModuloOperatorNodeGen.create(left, right), ModuloOperator.class),
+                Arguments.of(EqualOperatorNodeGen.create(left, right), EqualOperator.class),
+                Arguments.of(NotEqualOperatorNodeGen.create(left, right), NotEqualOperator.class),
+                Arguments.of(LessThanOperatorNodeGen.create(false, left, right), LessThanOperator.class),
+                Arguments.of(GreaterThanOperatorNodeGen.create(false, left, right), GreaterThanOperator.class),
+                Arguments.of(new LogicAndOperator(left, right), LogicAndOperator.class),
+                Arguments.of(new LogicOrOperator(left, right), LogicOrOperator.class),
+                Arguments.of(BitAndOperatorNodeGen.create(left, right), BitAndOperator.class),
+                Arguments.of(BitOrOperatorNodeGen.create(left, right), BitOrOperator.class),
+                Arguments.of(ShlOperatorNodeGen.create(left, right), ShlOperator.class),
+                Arguments.of(ShrOperatorNodeGen.create(left, right), ShrOperator.class)
+        );
+    }
+
+    @ParameterizedTest(name = "{1}")
+    @MethodSource("provideOperatorTests")
+    <T> void testOperators(ChiNode expected, Class<T> operatorClass) throws Exception {
+        // when
+        var result = serializeAndDeserialize(expected);
+        // then
+        assertInstanceOf(operatorClass, result);
+        if (result instanceof BinaryOperatorWithFallback actual) {
+            assertInstanceOf(LongValue.class, actual.getLeft());
+            assertInstanceOf(StringValue.class, actual.getRight());
         } else fail("Invalid node read!");
     }
 
