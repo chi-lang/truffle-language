@@ -30,6 +30,10 @@ public enum NodeId {
     BitOrOperator,
     ShlOperator,
     ShrOperator,
+    LogicNotOperator,
+    CastToLong,
+    CastToFloat,
+    CastToString,
     InvokeFunction,
     GetDefinedFunction,
     ;

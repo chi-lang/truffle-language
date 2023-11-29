@@ -3,6 +3,7 @@ package gh.marad.chi.language.nodes;
 import gh.marad.chi.language.nodes.expr.BlockExpr;
 import gh.marad.chi.language.nodes.expr.cast.CastToFloat;
 import gh.marad.chi.language.nodes.expr.cast.CastToLongExpr;
+import gh.marad.chi.language.nodes.expr.cast.CastToString;
 import gh.marad.chi.language.nodes.expr.operators.arithmetic.*;
 import gh.marad.chi.language.nodes.expr.operators.bit.BitAndOperator;
 import gh.marad.chi.language.nodes.expr.operators.bit.BitOrOperator;
@@ -47,10 +48,11 @@ public interface ChiNodeVisitor {
     void visitBitOrOperator(BitOrOperator bitOrOperator) throws Exception;
     void visitShlOperator(ShlOperator shlOperator) throws Exception;
     void visitShrOperator(ShrOperator shrOperator) throws Exception;
-
+    void visitLogicNotOperator(LogicNotOperator logicNotOperator) throws Exception;
+    void visitCastToLongExpr(CastToLongExpr castToLongExpr) throws Exception;
+    void visitCastToFloat(CastToFloat castToFloat) throws Exception;
+    void visitCastToString(CastToString castToString) throws Exception;
     // ---
-    void visitCastToLongExpr(CastToLongExpr castToLongExpr);
-    void visitCastToFloat(CastToFloat castToFloat);
     void visitInvokeFunction(InvokeFunction invokeFunction) throws Exception;
 
     void visitGetDefinedFunction(GetDefinedFunction getDefinedFunction) throws Exception;

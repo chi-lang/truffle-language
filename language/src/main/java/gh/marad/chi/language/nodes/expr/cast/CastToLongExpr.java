@@ -28,7 +28,8 @@ public abstract class CastToLongExpr extends CastExpression {
     }
 
     @Override
-    public void accept(ChiNodeVisitor visitor) {
+    public void accept(ChiNodeVisitor visitor) throws Exception {
         visitor.visitCastToLongExpr(this);
+        getValue().accept(visitor);
     }
 }

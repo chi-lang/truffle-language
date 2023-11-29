@@ -4,6 +4,7 @@ import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import gh.marad.chi.language.nodes.ChiNode;
 import gh.marad.chi.language.nodes.expr.BlockExpr;
+import gh.marad.chi.language.nodes.expr.cast.*;
 import gh.marad.chi.language.nodes.expr.operators.BinaryOperator;
 import gh.marad.chi.language.nodes.expr.operators.BinaryOperatorWithFallback;
 import gh.marad.chi.language.nodes.expr.operators.arithmetic.*;
@@ -272,6 +273,40 @@ public class NodeSerializationTest {
             assertInstanceOf(LongValue.class, actual.getLeft());
             assertInstanceOf(StringValue.class, actual.getRight());
         } else fail("Invalid node read!");
+    }
+
+    @Test
+    void testNotOperator() throws Exception {
+        // given
+        var value = new BooleanValue(true);
+        var expected = LogicNotOperatorNodeGen.create(value);
+        // when
+        var result = serializeAndDeserialize(expected);
+        // then
+        if (result instanceof LogicNotOperatorNodeGen actual) {
+            assertInstanceOf(BooleanValue.class, actual.getValue());
+        } else fail("Invalid node read!");
+    }
+
+    private static Stream<Arguments> provideCastTests() {
+        var value = new StringValue("hello");
+        return Stream.of(
+                Arguments.of(CastToLongExprNodeGen.create(value), CastToLongExpr.class),
+                Arguments.of(CastToFloatNodeGen.create(value), CastToFloat.class),
+                Arguments.of(CastToStringNodeGen.create(value), CastToString.class)
+        );
+    }
+
+    @ParameterizedTest(name = "{1}")
+    @MethodSource("provideCastTests")
+    <T> void testCastSerialization(ChiNode castNode, Class<T> expectedClass) throws Exception {
+        // when
+        var result = serializeAndDeserialize(castNode);
+        //then
+        assertInstanceOf(expectedClass, result);
+        if (result instanceof CastExpression cast) {
+            assertInstanceOf(StringValue.class, cast.getValue());
+        }
     }
 
     public ChiNode serializeAndDeserialize(ChiNode node) throws Exception {

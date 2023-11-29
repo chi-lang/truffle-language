@@ -4,6 +4,7 @@ import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import gh.marad.chi.language.nodes.ChiNode;
 import gh.marad.chi.language.nodes.expr.BlockExpr;
+import gh.marad.chi.language.nodes.expr.cast.*;
 import gh.marad.chi.language.nodes.expr.operators.arithmetic.*;
 import gh.marad.chi.language.nodes.expr.operators.bit.*;
 import gh.marad.chi.language.nodes.expr.operators.bool.*;
@@ -67,6 +68,10 @@ public class NodeReader {
             case BitOrOperator -> readBitOrOperator();
             case ShlOperator -> readShlOperator();
             case ShrOperator -> readShrOperator();
+            case LogicNotOperator -> readLogicNotOperator();
+            case CastToLong -> readCastToLong();
+            case CastToFloat -> readCastToFloat();
+            case CastToString -> readCastToString();
             case InvokeFunction -> readInvokeFunction();
             case GetDefinedFunction -> readGetDefinedFunction();
         };
@@ -248,6 +253,26 @@ public class NodeReader {
         var left = readNode();
         var right = readNode();
         return ShrOperatorNodeGen.create(left, right);
+    }
+
+    public ChiNode readLogicNotOperator() throws IOException {
+        var value = readNode();
+        return LogicNotOperatorNodeGen.create(value);
+    }
+
+    public ChiNode readCastToLong() throws IOException {
+        var value = readNode();
+        return CastToLongExprNodeGen.create(value);
+    }
+
+    public ChiNode readCastToFloat() throws IOException {
+        var value = readNode();
+        return CastToFloatNodeGen.create(value);
+    }
+
+    public ChiNode readCastToString() throws IOException {
+        var value = readNode();
+        return CastToStringNodeGen.create(value);
     }
 
 

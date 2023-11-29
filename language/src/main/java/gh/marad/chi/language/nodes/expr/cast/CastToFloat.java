@@ -22,7 +22,8 @@ public abstract class CastToFloat extends CastExpression {
     }
 
     @Override
-    public void accept(ChiNodeVisitor visitor) {
+    public void accept(ChiNodeVisitor visitor) throws Exception {
         visitor.visitCastToFloat(this);
+        getValue().accept(visitor);
     }
 }

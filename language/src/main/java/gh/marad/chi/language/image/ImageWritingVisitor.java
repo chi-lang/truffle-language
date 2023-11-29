@@ -4,6 +4,7 @@ import gh.marad.chi.language.nodes.ChiNodeVisitor;
 import gh.marad.chi.language.nodes.expr.BlockExpr;
 import gh.marad.chi.language.nodes.expr.cast.CastToFloat;
 import gh.marad.chi.language.nodes.expr.cast.CastToLongExpr;
+import gh.marad.chi.language.nodes.expr.cast.CastToString;
 import gh.marad.chi.language.nodes.expr.operators.arithmetic.*;
 import gh.marad.chi.language.nodes.expr.operators.bit.BitAndOperator;
 import gh.marad.chi.language.nodes.expr.operators.bit.BitOrOperator;
@@ -194,21 +195,30 @@ public class ImageWritingVisitor implements ChiNodeVisitor {
         writeNodeId(NodeId.ShrOperator);
     }
 
+    @Override
+    public void visitLogicNotOperator(LogicNotOperator logicNotOperator) throws IOException {
+        writeNodeId(NodeId.LogicNotOperator);
+    }
+
+    @Override
+    public void visitCastToLongExpr(CastToLongExpr castToLongExpr) throws IOException {
+        writeNodeId(NodeId.CastToLong);
+    }
+
+    @Override
+    public void visitCastToFloat(CastToFloat castToFloat) throws IOException {
+        writeNodeId(NodeId.CastToFloat);
+    }
+
+    @Override
+    public void visitCastToString(CastToString castToString) throws IOException {
+        writeNodeId(NodeId.CastToString);
+    }
+
     // --
-
-    @Override
-    public void visitCastToLongExpr(CastToLongExpr castToLongExpr) {
-
-        // TODO add serialization/deserialization tests for each node
-        // TODO implement visitor for every node
-        // TODO remove default `accept` implementation from ChiNode
-
-    }
-
-    @Override
-    public void visitCastToFloat(CastToFloat castToFloat) {
-
-    }
+    // TODO add serialization/deserialization tests for each node
+    // TODO implement visitor for every node
+    // TODO remove default `accept` implementation from ChiNode
 
     @Override
     public void visitInvokeFunction(InvokeFunction invokeFunction) throws IOException {

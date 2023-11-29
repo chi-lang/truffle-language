@@ -6,6 +6,7 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.strings.TruffleString;
+import gh.marad.chi.language.nodes.ChiNodeVisitor;
 
 import java.text.DecimalFormat;
 
@@ -45,5 +46,11 @@ public abstract class CastToString extends CastExpression {
     TruffleString fromInteropValue(Object value,
                                    @CachedLibrary(limit = "3") InteropLibrary interop) {
         return fromJavaStringNode.execute((String) interop.toDisplayString(value), TruffleString.Encoding.UTF_8);
+    }
+
+    @Override
+    public void accept(ChiNodeVisitor visitor) throws Exception {
+        visitor.visitCastToString(this);
+        getValue().accept(visitor);
     }
 }
