@@ -5,6 +5,7 @@ import gh.marad.chi.language.nodes.expr.BlockExpr;
 import gh.marad.chi.language.nodes.expr.cast.CastToFloat;
 import gh.marad.chi.language.nodes.expr.cast.CastToLongExpr;
 import gh.marad.chi.language.nodes.expr.cast.CastToString;
+import gh.marad.chi.language.nodes.expr.flow.IfExpr;
 import gh.marad.chi.language.nodes.expr.operators.arithmetic.*;
 import gh.marad.chi.language.nodes.expr.operators.bit.BitAndOperator;
 import gh.marad.chi.language.nodes.expr.operators.bit.BitOrOperator;
@@ -27,6 +28,11 @@ public class ImageWritingVisitor implements ChiNodeVisitor {
 
     public ImageWritingVisitor(DataOutputStream stream) {
         this.stream = stream;
+    }
+
+    @Override
+    public void visitUnitValue(UnitValue unitValue) throws Exception {
+        writeNodeId(NodeId.UnitValue);
     }
 
     @Override
@@ -213,6 +219,11 @@ public class ImageWritingVisitor implements ChiNodeVisitor {
     @Override
     public void visitCastToString(CastToString castToString) throws IOException {
         writeNodeId(NodeId.CastToString);
+    }
+
+    @Override
+    public void visitIfExpr(IfExpr ifExpr) throws Exception {
+        writeNodeId(NodeId.IfExpr);
     }
 
     // --

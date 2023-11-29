@@ -1,9 +1,11 @@
 package gh.marad.chi.language.nodes;
 
 import gh.marad.chi.language.nodes.expr.BlockExpr;
+import gh.marad.chi.language.nodes.expr.ExpressionNode;
 import gh.marad.chi.language.nodes.expr.cast.CastToFloat;
 import gh.marad.chi.language.nodes.expr.cast.CastToLongExpr;
 import gh.marad.chi.language.nodes.expr.cast.CastToString;
+import gh.marad.chi.language.nodes.expr.flow.IfExpr;
 import gh.marad.chi.language.nodes.expr.operators.arithmetic.*;
 import gh.marad.chi.language.nodes.expr.operators.bit.BitAndOperator;
 import gh.marad.chi.language.nodes.expr.operators.bit.BitOrOperator;
@@ -18,6 +20,7 @@ import gh.marad.chi.language.nodes.objects.WriteMember;
 import gh.marad.chi.language.nodes.value.*;
 
 public interface ChiNodeVisitor {
+    void visitUnitValue(UnitValue unitValue) throws Exception;
     void visitLongValue(LongValue longValue) throws Exception;
     void visitFloatValue(FloatValue floatValue) throws Exception;
     void visitStringValue(StringValue stringValue) throws Exception;
@@ -52,6 +55,7 @@ public interface ChiNodeVisitor {
     void visitCastToLongExpr(CastToLongExpr castToLongExpr) throws Exception;
     void visitCastToFloat(CastToFloat castToFloat) throws Exception;
     void visitCastToString(CastToString castToString) throws Exception;
+    void visitIfExpr(IfExpr ifExpr) throws Exception;
     // ---
     void visitInvokeFunction(InvokeFunction invokeFunction) throws Exception;
 

@@ -385,7 +385,7 @@ public class Converter {
         if (ifElse.getElseBranch() != null) {
             elseBranch = convertExpression(ifElse.getElseBranch());
         } else {
-            elseBranch = null;
+            elseBranch = new UnitValue();
         }
         return IfExpr.create(condition, thenBranch, elseBranch);
     }

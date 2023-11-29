@@ -5,8 +5,8 @@ import com.oracle.truffle.api.frame.FrameSlotKind;
 import gh.marad.chi.language.nodes.ChiNode;
 import gh.marad.chi.language.nodes.expr.BlockExpr;
 import gh.marad.chi.language.nodes.expr.cast.*;
+import gh.marad.chi.language.nodes.expr.flow.IfExpr;
 import gh.marad.chi.language.nodes.expr.operators.BinaryOperator;
-import gh.marad.chi.language.nodes.expr.operators.BinaryOperatorWithFallback;
 import gh.marad.chi.language.nodes.expr.operators.arithmetic.*;
 import gh.marad.chi.language.nodes.expr.operators.bit.*;
 import gh.marad.chi.language.nodes.expr.operators.bool.*;
@@ -16,7 +16,6 @@ import gh.marad.chi.language.nodes.objects.ReadMemberNodeGen;
 import gh.marad.chi.language.nodes.objects.WriteMember;
 import gh.marad.chi.language.nodes.objects.WriteMemberNodeGen;
 import gh.marad.chi.language.nodes.value.*;
-import gh.marad.chi.language.runtime.namespaces.Module;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -28,6 +27,17 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class NodeSerializationTest {
+
+    @Test
+    void testUnitValueSerialization() throws Exception {
+        // given
+        var expected = new UnitValue();
+        // when
+        var result = serializeAndDeserialize(expected);
+        // then
+        assertInstanceOf(UnitValue.class, result);
+    }
+
 
     @Test
     void testLongValueSerialization() throws Exception {
@@ -307,6 +317,23 @@ public class NodeSerializationTest {
         if (result instanceof CastExpression cast) {
             assertInstanceOf(StringValue.class, cast.getValue());
         }
+    }
+
+    @Test
+    void testIfElse() throws Exception {
+        // given
+        var expr = new BooleanValue(true);
+        var thenBranch = new LongValue(1);
+        var elseBranch = new UnitValue();
+        var expected = IfExpr.create(expr,thenBranch,elseBranch);
+        // when
+        var result = serializeAndDeserialize(expected);
+        // then
+        if (result instanceof IfExpr actual) {
+            assertInstanceOf(BooleanValue.class, actual.getCondition());
+            assertInstanceOf(LongValue.class, actual.getThenBranch());
+            assertInstanceOf(UnitValue.class, actual.getElseBranch());
+        } else fail("Invalid node read!");
     }
 
     public ChiNode serializeAndDeserialize(ChiNode node) throws Exception {

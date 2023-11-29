@@ -5,6 +5,7 @@ import com.oracle.truffle.api.frame.FrameSlotKind;
 import gh.marad.chi.language.nodes.ChiNode;
 import gh.marad.chi.language.nodes.expr.BlockExpr;
 import gh.marad.chi.language.nodes.expr.cast.*;
+import gh.marad.chi.language.nodes.expr.flow.IfExpr;
 import gh.marad.chi.language.nodes.expr.operators.arithmetic.*;
 import gh.marad.chi.language.nodes.expr.operators.bit.*;
 import gh.marad.chi.language.nodes.expr.operators.bool.*;
@@ -39,6 +40,7 @@ public class NodeReader {
         var nodeId = NodeId.fromId(stream.readShort());
 
         return switch (nodeId) {
+            case UnitValue -> readUnitValue();
             case LongValue -> readLongValue();
             case FloatValue -> readFloatValue();
             case StringValue -> readStringValue();
@@ -72,9 +74,14 @@ public class NodeReader {
             case CastToLong -> readCastToLong();
             case CastToFloat -> readCastToFloat();
             case CastToString -> readCastToString();
+            case IfExpr -> readIfExpr();
             case InvokeFunction -> readInvokeFunction();
             case GetDefinedFunction -> readGetDefinedFunction();
         };
+    }
+
+    private ChiNode readUnitValue() {
+        return new UnitValue();
     }
 
     public ChiNode readLongValue() throws IOException {
@@ -273,6 +280,13 @@ public class NodeReader {
     public ChiNode readCastToString() throws IOException {
         var value = readNode();
         return CastToStringNodeGen.create(value);
+    }
+
+    public ChiNode readIfExpr() throws IOException {
+        var condition = readNode();
+        var thenBranch = readNode();
+        var elseBranch = readNode();
+        return IfExpr.create(condition, thenBranch, elseBranch);
     }
 
 

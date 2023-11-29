@@ -1,6 +1,7 @@
 package gh.marad.chi.language.image;
 
 public enum NodeId {
+    UnitValue,
     LongValue,
     FloatValue,
     StringValue,
@@ -34,6 +35,7 @@ public enum NodeId {
     CastToLong,
     CastToFloat,
     CastToString,
+    IfExpr,
     InvokeFunction,
     GetDefinedFunction,
     ;
