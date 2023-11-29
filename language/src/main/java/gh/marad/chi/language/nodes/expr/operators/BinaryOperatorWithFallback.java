@@ -10,7 +10,4 @@ public abstract class BinaryOperatorWithFallback extends BinaryOperator {
         CompilerDirectives.transferToInterpreter();
         throw new RuntimeException("Unexpected %s and %s for operator".formatted(left, right));
     }
-
-    public abstract ChiNode getLeft();
-    public abstract ChiNode getRight();
 }

@@ -19,6 +19,16 @@ public abstract class ShortCircuitBaseLogicOperator extends BinaryOperator {
         this.right = right;
     }
 
+    @Override
+    public ChiNode getLeft() {
+        return left;
+    }
+
+    @Override
+    public ChiNode getRight() {
+        return right;
+    }
+
     private final CountingConditionProfile evaluateRightProfile = CountingConditionProfile.create();
 
     @Override

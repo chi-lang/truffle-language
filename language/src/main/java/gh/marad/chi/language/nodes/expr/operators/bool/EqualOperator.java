@@ -5,6 +5,7 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.strings.TruffleString;
+import gh.marad.chi.language.nodes.ChiNodeVisitor;
 import gh.marad.chi.language.nodes.expr.operators.BinaryOperator;
 
 public abstract class EqualOperator extends BinaryOperator {
@@ -36,5 +37,12 @@ public abstract class EqualOperator extends BinaryOperator {
                              @CachedLibrary(value = "right") InteropLibrary rightInterop
     ) {
         return leftInterop.isIdentical(left, right, rightInterop);
+    }
+
+    @Override
+    public void accept(ChiNodeVisitor visitor) throws Exception {
+        visitor.visitEqualOperator(this);
+        getLeft().accept(visitor);
+        getRight().accept(visitor);
     }
 }

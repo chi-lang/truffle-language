@@ -5,6 +5,11 @@ import gh.marad.chi.language.nodes.expr.BlockExpr;
 import gh.marad.chi.language.nodes.expr.cast.CastToFloat;
 import gh.marad.chi.language.nodes.expr.cast.CastToLongExpr;
 import gh.marad.chi.language.nodes.expr.operators.arithmetic.*;
+import gh.marad.chi.language.nodes.expr.operators.bit.BitAndOperator;
+import gh.marad.chi.language.nodes.expr.operators.bit.BitOrOperator;
+import gh.marad.chi.language.nodes.expr.operators.bit.ShlOperator;
+import gh.marad.chi.language.nodes.expr.operators.bit.ShrOperator;
+import gh.marad.chi.language.nodes.expr.operators.bool.*;
 import gh.marad.chi.language.nodes.expr.variables.*;
 import gh.marad.chi.language.nodes.function.GetDefinedFunction;
 import gh.marad.chi.language.nodes.function.InvokeFunction;
@@ -135,6 +140,58 @@ public class ImageWritingVisitor implements ChiNodeVisitor {
     @Override
     public void visitModuloOperator(ModuloOperator moduloOperator) throws IOException {
         writeNodeId(NodeId.ModuloOperator);
+    }
+
+    @Override
+    public void visitEqualOperator(EqualOperator equalOperator) throws IOException {
+        writeNodeId(NodeId.EqualOperator);
+    }
+
+    @Override
+    public void visitNotEqual(NotEqualOperator notEqualOperator) throws IOException {
+        writeNodeId(NodeId.NotEqualOperator);
+    }
+
+    @Override
+    public void visitLessThanOperator(LessThanOperator lessThanOperator) throws IOException {
+        writeNodeId(NodeId.LessThanOperator);
+        stream.writeBoolean(lessThanOperator.inclusive);
+    }
+
+    @Override
+    public void visitGreaterThanOperator(GreaterThanOperator greaterThanOperator) throws IOException {
+        writeNodeId(NodeId.GreaterThanOperator);
+        stream.writeBoolean(greaterThanOperator.inclusive);
+    }
+
+    @Override
+    public void visitLogicAndOperator(LogicAndOperator logicAndOperator) throws IOException {
+        writeNodeId(NodeId.LogicAndOperator);
+    }
+
+    @Override
+    public void visitLogicOrOperator(LogicOrOperator logicOrOperator) throws IOException {
+        writeNodeId(NodeId.LogicOrOperator);
+    }
+
+    @Override
+    public void visitBitAndOperator(BitAndOperator bitAndOperator) throws IOException {
+        writeNodeId(NodeId.BitAndOperator);
+    }
+
+    @Override
+    public void visitBitOrOperator(BitOrOperator bitOrOperator) throws IOException {
+        writeNodeId(NodeId.BitOrOperator);
+    }
+
+    @Override
+    public void visitShlOperator(ShlOperator shlOperator) throws IOException {
+        writeNodeId(NodeId.ShlOperator);
+    }
+
+    @Override
+    public void visitShrOperator(ShrOperator shrOperator) throws IOException {
+        writeNodeId(NodeId.ShrOperator);
     }
 
     // --

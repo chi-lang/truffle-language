@@ -5,6 +5,8 @@ import com.oracle.truffle.api.frame.FrameSlotKind;
 import gh.marad.chi.language.nodes.ChiNode;
 import gh.marad.chi.language.nodes.expr.BlockExpr;
 import gh.marad.chi.language.nodes.expr.operators.arithmetic.*;
+import gh.marad.chi.language.nodes.expr.operators.bit.*;
+import gh.marad.chi.language.nodes.expr.operators.bool.*;
 import gh.marad.chi.language.nodes.expr.variables.*;
 import gh.marad.chi.language.nodes.function.GetDefinedFunction;
 import gh.marad.chi.language.nodes.function.InvokeFunction;
@@ -55,6 +57,16 @@ public class NodeReader {
             case MultiplyOperator -> readMultiplyOperator();
             case DivideOperator -> readDivideOperator();
             case ModuloOperator -> readModuloOperator();
+            case EqualOperator -> readEqualOperator();
+            case NotEqualOperator -> readNotEqualOperator();
+            case LessThanOperator -> readLessThanOperator();
+            case GreaterThanOperator -> readGreaterThanOperator();
+            case LogicAndOperator -> readLogicAndOperator();
+            case LogicOrOperator -> readLogicOrOperator();
+            case BitAndOperator -> readBitAndOperator();
+            case BitOrOperator -> readBitOrOperator();
+            case ShlOperator -> readShlOperator();
+            case ShrOperator -> readShrOperator();
             case InvokeFunction -> readInvokeFunction();
             case GetDefinedFunction -> readGetDefinedFunction();
         };
@@ -175,6 +187,69 @@ public class NodeReader {
         var right = readNode();
         return ModuloOperatorNodeGen.create(left, right);
     }
+
+    public ChiNode readEqualOperator() throws IOException {
+        var left = readNode();
+        var right = readNode();
+        return EqualOperatorNodeGen.create(left, right);
+    }
+
+    public ChiNode readNotEqualOperator() throws IOException {
+        var left = readNode();
+        var right = readNode();
+        return NotEqualOperatorNodeGen.create(left, right);
+    }
+
+    public ChiNode readLessThanOperator() throws IOException {
+        var inclusive = stream.readBoolean();
+        var left = readNode();
+        var right = readNode();
+        return LessThanOperatorNodeGen.create(inclusive, left, right);
+    }
+
+    public ChiNode readGreaterThanOperator() throws IOException {
+        var inclusive = stream.readBoolean();
+        var left = readNode();
+        var right = readNode();
+        return GreaterThanOperatorNodeGen.create(inclusive, left, right);
+    }
+
+    public ChiNode readLogicAndOperator() throws IOException {
+        var left = readNode();
+        var right = readNode();
+        return new LogicAndOperator(left, right);
+    }
+
+    public ChiNode readLogicOrOperator() throws IOException {
+        var left = readNode();
+        var right = readNode();
+        return new LogicOrOperator(left, right);
+    }
+
+    public ChiNode readBitAndOperator() throws IOException {
+        var left = readNode();
+        var right = readNode();
+        return BitAndOperatorNodeGen.create(left, right);
+    }
+
+    public ChiNode readBitOrOperator() throws IOException {
+        var left = readNode();
+        var right = readNode();
+        return BitOrOperatorNodeGen.create(left, right);
+    }
+
+    public ChiNode readShlOperator() throws IOException {
+        var left = readNode();
+        var right = readNode();
+        return ShlOperatorNodeGen.create(left, right);
+    }
+
+    public ChiNode readShrOperator() throws IOException {
+        var left = readNode();
+        var right = readNode();
+        return ShrOperatorNodeGen.create(left, right);
+    }
+
 
     // ---
 

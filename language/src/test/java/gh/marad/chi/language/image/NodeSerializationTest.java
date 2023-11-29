@@ -4,6 +4,7 @@ import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import gh.marad.chi.language.nodes.ChiNode;
 import gh.marad.chi.language.nodes.expr.BlockExpr;
+import gh.marad.chi.language.nodes.expr.operators.BinaryOperator;
 import gh.marad.chi.language.nodes.expr.operators.BinaryOperatorWithFallback;
 import gh.marad.chi.language.nodes.expr.operators.arithmetic.*;
 import gh.marad.chi.language.nodes.expr.operators.bit.*;
@@ -238,22 +239,6 @@ public class NodeSerializationTest {
         } else fail("Invalid node read!");
     }
 
-    @Test
-    void testPlusOperator() throws Exception {
-        // given
-        var left = new LongValue(1);
-        var right = new StringValue("hello");
-        var expected = PlusOperatorNodeGen.create(left, right);
-        // when
-        var result = serializeAndDeserialize(expected);
-        // then
-        if (result instanceof PlusOperator actual) {
-            assertInstanceOf(LongValue.class, actual.getLeft());
-            assertInstanceOf(StringValue.class, actual.getRight());
-        } else fail("Invalid node read!");
-    }
-
-
     private static Stream<Arguments> provideOperatorTests() {
         var left = new LongValue(1);
         var right = new StringValue("hello");
@@ -283,7 +268,7 @@ public class NodeSerializationTest {
         var result = serializeAndDeserialize(expected);
         // then
         assertInstanceOf(operatorClass, result);
-        if (result instanceof BinaryOperatorWithFallback actual) {
+        if (result instanceof BinaryOperator actual) {
             assertInstanceOf(LongValue.class, actual.getLeft());
             assertInstanceOf(StringValue.class, actual.getRight());
         } else fail("Invalid node read!");
