@@ -5,6 +5,7 @@ import gh.marad.chi.language.nodes.expr.cast.CastToFloat;
 import gh.marad.chi.language.nodes.expr.cast.CastToLongExpr;
 import gh.marad.chi.language.nodes.expr.cast.CastToString;
 import gh.marad.chi.language.nodes.expr.flow.IfExpr;
+import gh.marad.chi.language.nodes.expr.flow.IsNode;
 import gh.marad.chi.language.nodes.expr.flow.loop.WhileBreakNode;
 import gh.marad.chi.language.nodes.expr.flow.loop.WhileContinueNode;
 import gh.marad.chi.language.nodes.expr.flow.loop.WhileExprNode;
@@ -66,4 +67,6 @@ public interface ChiNodeVisitor {
     void visitWhileExprNode(WhileExprNode whileExprNode) throws Exception;
     void visitWhileBreakNode(WhileBreakNode whileBreakNode) throws Exception;
     void visitWhileContinueNode(WhileContinueNode whileContinueNode) throws Exception;
+    void visitIndexedAssignmentNode(IndexedAssignmentNode indexedAssignmentNode) throws Exception;
+    void visitIs(IsNode isNode) throws Exception;
 }

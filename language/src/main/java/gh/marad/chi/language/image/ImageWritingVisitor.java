@@ -2,11 +2,13 @@ package gh.marad.chi.language.image;
 
 import gh.marad.chi.language.nodes.ChiNodeVisitor;
 import gh.marad.chi.language.nodes.FnRootNode;
+import gh.marad.chi.language.nodes.IndexedAssignmentNode;
 import gh.marad.chi.language.nodes.expr.BlockExpr;
 import gh.marad.chi.language.nodes.expr.cast.CastToFloat;
 import gh.marad.chi.language.nodes.expr.cast.CastToLongExpr;
 import gh.marad.chi.language.nodes.expr.cast.CastToString;
 import gh.marad.chi.language.nodes.expr.flow.IfExpr;
+import gh.marad.chi.language.nodes.expr.flow.IsNode;
 import gh.marad.chi.language.nodes.expr.flow.loop.WhileBreakNode;
 import gh.marad.chi.language.nodes.expr.flow.loop.WhileContinueNode;
 import gh.marad.chi.language.nodes.expr.flow.loop.WhileExprNode;
@@ -291,6 +293,17 @@ public class ImageWritingVisitor implements ChiNodeVisitor {
     @Override
     public void visitWhileContinueNode(WhileContinueNode whileContinueNode) throws IOException {
         writeNodeId(NodeId.WhileContinue);
+    }
+
+    @Override
+    public void visitIndexedAssignmentNode(IndexedAssignmentNode indexedAssignmentNode) throws Exception {
+        writeNodeId(NodeId.IndexedAssignment);
+    }
+
+    @Override
+    public void visitIs(IsNode isNode) throws Exception {
+        writeNodeId(NodeId.IsExpr);
+        stream.writeUTF(isNode.getTypeName());
     }
 
     private void writeNodeId(NodeId nodeId) throws IOException {

@@ -45,6 +45,8 @@ public enum NodeId {
     WhileExpr,
     WhileBreak,
     WhileContinue,
+    IndexedAssignment,
+    IsExpr,
     ;
 
 

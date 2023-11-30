@@ -7,9 +7,11 @@ import com.oracle.truffle.api.nodes.NodeVisitor;
 import gh.marad.chi.language.ChiLanguage;
 import gh.marad.chi.language.nodes.ChiNode;
 import gh.marad.chi.language.nodes.FnRootNode;
+import gh.marad.chi.language.nodes.IndexedAssignmentNodeGen;
 import gh.marad.chi.language.nodes.expr.BlockExpr;
 import gh.marad.chi.language.nodes.expr.cast.*;
 import gh.marad.chi.language.nodes.expr.flow.IfExpr;
+import gh.marad.chi.language.nodes.expr.flow.IsNodeGen;
 import gh.marad.chi.language.nodes.expr.flow.loop.WhileBreakNode;
 import gh.marad.chi.language.nodes.expr.flow.loop.WhileContinueNode;
 import gh.marad.chi.language.nodes.expr.flow.loop.WhileExprNode;
@@ -91,6 +93,8 @@ public class NodeReader {
             case WhileExpr -> readWhileExprNode();
             case WhileBreak -> new WhileBreakNode();
             case WhileContinue -> new WhileContinueNode();
+            case IndexedAssignment -> readIndexedAssignment();
+            case IsExpr -> readIsExpr();
         };
     }
 
@@ -373,5 +377,18 @@ public class NodeReader {
         var condition = readNode();
         var loopNode = readNode();
         return new WhileExprNode(condition, loopNode);
+    }
+
+    public ChiNode readIndexedAssignment() throws IOException {
+        var variable = readNode();
+        var index = readNode();
+        var value = readNode();
+        return IndexedAssignmentNodeGen.create(variable, index, value);
+    }
+
+    public ChiNode readIsExpr() throws IOException {
+        var typeName = stream.readUTF();
+        var value = readNode();
+        return IsNodeGen.create(value, typeName);
     }
 }

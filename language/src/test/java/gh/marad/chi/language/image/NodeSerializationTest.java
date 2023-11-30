@@ -3,9 +3,13 @@ package gh.marad.chi.language.image;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import gh.marad.chi.language.nodes.ChiNode;
+import gh.marad.chi.language.nodes.IndexedAssignmentNode;
+import gh.marad.chi.language.nodes.IndexedAssignmentNodeGen;
 import gh.marad.chi.language.nodes.expr.BlockExpr;
 import gh.marad.chi.language.nodes.expr.cast.*;
 import gh.marad.chi.language.nodes.expr.flow.IfExpr;
+import gh.marad.chi.language.nodes.expr.flow.IsNode;
+import gh.marad.chi.language.nodes.expr.flow.IsNodeGen;
 import gh.marad.chi.language.nodes.expr.flow.loop.WhileBreakNode;
 import gh.marad.chi.language.nodes.expr.flow.loop.WhileContinueNode;
 import gh.marad.chi.language.nodes.expr.flow.loop.WhileExprNode;
@@ -19,6 +23,8 @@ import gh.marad.chi.language.nodes.objects.ReadMemberNodeGen;
 import gh.marad.chi.language.nodes.objects.WriteMember;
 import gh.marad.chi.language.nodes.objects.WriteMemberNodeGen;
 import gh.marad.chi.language.nodes.value.*;
+import gh.marad.chi.language.runtime.ChiArray;
+import gh.marad.chi.language.runtime.ChiArrayGen;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -423,11 +429,48 @@ public class NodeSerializationTest {
         assertInstanceOf(WhileContinueNode.class, result);
     }
 
+
+    @Test
+    void testIndexedAssignmentSerialization() throws Exception {
+        // given
+        // those values doesn't make sense but in this test
+        // only serialization and deserialization is crucial
+        // the three child nodes need to be different types to make assertions
+        // easily check for node type
+        var variable = new StringValue("hello");
+        var index = new LongValue(5);
+        var value = new FloatValue(0.5f);
+        var expected = IndexedAssignmentNodeGen.create(variable, index, value);
+        // when
+        var result = serializeAndDeserialize(expected);
+        // then
+        if (result instanceof IndexedAssignmentNode actual) {
+            assertInstanceOf(StringValue.class, actual.getVariable());
+            assertInstanceOf(LongValue.class, actual.getIndex());
+            assertInstanceOf(FloatValue.class, actual.getValue());
+        } else fail("Invalid node read!");
+    }
+
+    // Is
+
+    @Test
+    void testIsSerialization() throws Exception {
+        // given
+        var value = new LongValue(5);
+        var typeName = "name";
+        var expected = IsNodeGen.create(value, typeName);
+        // when
+        var result = serializeAndDeserialize(expected);
+        // then
+        if (result instanceof IsNode actual) {
+            assertInstanceOf(LongValue.class, actual.getValue());
+            assertEquals(expected.getTypeName(), actual.getTypeName());
+        } else fail("Invalid node read!");
+    }
+
+
     // ConstructChiObject
     // DefinePackageFunction
-
-    // IndexedAssignment
-    // Is
 
     // InvokeEffect
     // HandleEffect
