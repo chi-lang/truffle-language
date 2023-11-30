@@ -10,6 +10,7 @@ module gh.marad.chi.language {
   requires org.jgrapht.core;
 
   exports gh.marad.chi.language;
+  exports gh.marad.chi.language.image;
   exports gh.marad.chi.language.builtin;
   exports gh.marad.chi.language.runtime;
   exports gh.marad.chi.language.runtime.namespaces;
