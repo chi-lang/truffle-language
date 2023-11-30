@@ -6,9 +6,20 @@ import gh.marad.chi.core.FnType;
 import gh.marad.chi.core.VariantType;
 import gh.marad.chi.language.ChiLanguage;
 import gh.marad.chi.language.EffectHandlers;
-import gh.marad.chi.language.nodes.ChiNode;
-import gh.marad.chi.language.nodes.FnRootNode;
-import gh.marad.chi.language.nodes.IndexedAssignmentNodeGen;
+import gh.marad.chi.language.builtin.collections.ArrayBuiltin;
+import gh.marad.chi.language.builtin.collections.SizeBuiltin;
+import gh.marad.chi.language.builtin.io.*;
+import gh.marad.chi.language.builtin.lang.EvalBuiltin;
+import gh.marad.chi.language.builtin.lang.LoadModuleBuiltin;
+import gh.marad.chi.language.builtin.lang.SaveModuleBuiltin;
+import gh.marad.chi.language.builtin.lang.interop.LookupHostSymbolBuiltin;
+import gh.marad.chi.language.builtin.lang.interop.array.HasArrayElementsBuiltin;
+import gh.marad.chi.language.builtin.lang.interop.members.*;
+import gh.marad.chi.language.builtin.lang.interop.values.IsNullBuiltin;
+import gh.marad.chi.language.builtin.lang.usafe.UnsafeArrayBuiltin;
+import gh.marad.chi.language.builtin.string.*;
+import gh.marad.chi.language.builtin.time.MillisBuiltin;
+import gh.marad.chi.language.nodes.*;
 import gh.marad.chi.language.nodes.expr.BlockExpr;
 import gh.marad.chi.language.nodes.expr.cast.*;
 import gh.marad.chi.language.nodes.expr.flow.IfExpr;
@@ -35,14 +46,16 @@ import gh.marad.chi.language.runtime.TODO;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
-import java.util.function.Supplier;
 
 public class NodeReader {
     private final DataInputStream stream;
+    private final OutputStream stdOutputStream;
 
-    public NodeReader(DataInputStream stream) {
+    public NodeReader(DataInputStream stream, OutputStream stdOutputStream) {
         this.stream = stream;
+        this.stdOutputStream = stdOutputStream;
     }
 
     public ChiNode readNode() throws IOException {
@@ -93,6 +106,7 @@ public class NodeReader {
             case WhileExpr -> readWhileExprNode();
             case WhileBreak -> new WhileBreakNode();
             case WhileContinue -> new WhileContinueNode();
+            case IndexOperator -> readIndexOperator();
             case IndexedAssignment -> readIndexedAssignment();
             case IsExpr -> readIsExpr();
             case ConstructObject -> readConstructObject();
@@ -100,6 +114,52 @@ public class NodeReader {
             case InvokeEffect -> readInvokeEffect();
             case HandleEffect -> readHandleEffect();
             case ResumeEffect -> new ResumeNode();
+            // builtins
+            case ArraySizeBuiltin -> new SizeBuiltin();
+            case ArrayBuiltin -> new ArrayBuiltin();
+            case ArgsBuiltin -> new ArgsBuiltin();
+            case PrintBuiltin -> new PrintBuiltin(stdOutputStream);
+            case PrintlnBuiltin -> new PrintlnBuiltin(stdOutputStream);
+            case ReadStringBuiltin -> new ReadStringBuiltin();
+            case ReadLinesBuiltin -> new ReadLinesBuiltin();
+            case LoadModuleBuiltin -> new LoadModuleBuiltin();
+            case SaveModuleBuiltin -> new SaveModuleBuiltin();
+            case EvalBuiltin -> new EvalBuiltin();
+            case UnsafeArrayBuiltin -> new UnsafeArrayBuiltin();
+            case LookupHostSymbolBuiltin -> new LookupHostSymbolBuiltin();
+            case HasArrayElementsBuiltin -> new HasArrayElementsBuiltin();
+            case IsMemberInvocableBuiltin -> new IsMemberInvocableBuiltin();
+            case IsMemberModifiableBuiltin -> new IsMemberModifiable();
+            case IsMemberReadableBuiltin -> new IsMemberReadableBuiltin();
+            case IsMemberInternalBuiltin -> new IsMemberInternalBuiltin();
+            case WriteMemberBuiltin -> new WriteMemberBuiltin();
+            case ReadMemberBuiltin -> new ReadMemberBuiltin();
+            case IsMemberRemovableBuiltin -> new IsMemberRemovableBuiltin();
+            case IsMemberWritableBuiltin -> new IsMemberWritableBuiltin();
+            case IsMemberExistingBuiltin -> new IsMemberExistingBuiltin();
+            case GetMembersBuitlin -> new GetMembersBuiltin();
+            case HasMemberReadSideEffectsBuiltin -> new HasMemberReadSideEffectsBuiltin();
+            case RemoveMemberBuiltin -> new RemoveMemberBuiltin();
+            case HasMembersBuiltin -> new HasMembersBuiltin();
+            case InvokeMemberBuiltin -> new InvokeMemberBuiltin();
+            case IsMemberInsertable -> new IsMemberInsertable();
+            case HasMemberWriteSideEffectsBuiltin -> new HasMemberWriteSideEffectsBuiltin();
+            case IsNullBuiltin -> new IsNullBuiltin();
+            case StringFromCodePointsBuiltin -> new StringFromCodePointsBuiltin();
+            case ToUpperBuiltin -> new ToUpperBuiltin();
+            case StringHashBuiltin -> new StringHashBuiltin();
+            case StringCodePointsBuiltin -> new StringCodePointsBuiltin();
+            case ToLowerBuiltin -> new ToLowerBuiltin();
+            case StringLengthBuiltin -> new StringLengthBuiltin();
+            case IndexOfCodePointBuiltin -> new IndexOfCodePointBuiltin();
+            case SubstringBuiltin -> new SubstringBuiltin();
+            case StringReplaceAllBuiltin -> new StringReplaceAllBuiltin();
+            case SplitStringBuiltin -> new SplitStringBuiltin();
+            case StringCodePointAtBuiltin -> new StringCodePointAtBuiltin();
+            case IndexOfStringBuiltin -> new IndexOfStringBuiltin();
+            case StringReplaceBuiltin -> new StringReplaceBuiltin();
+            case MillisBuiltin -> new MillisBuiltin();
+            // end builtins
         };
     }
 
@@ -352,6 +412,12 @@ public class NodeReader {
         var condition = readNode();
         var loopNode = readNode();
         return new WhileExprNode(condition, loopNode);
+    }
+
+    public ChiNode readIndexOperator() throws  IOException {
+        var variable = readNode();
+        var index = readNode();
+        return IndexOperatorNodeGen.create(variable, index);
     }
 
     public ChiNode readIndexedAssignment() throws IOException {

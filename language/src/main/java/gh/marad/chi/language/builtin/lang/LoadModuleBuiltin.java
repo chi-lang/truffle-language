@@ -9,6 +9,7 @@ import gh.marad.chi.language.ChiContext;
 import gh.marad.chi.language.ChiLanguage;
 import gh.marad.chi.language.builtin.Builtin;
 import gh.marad.chi.language.image.ModuleReader;
+import gh.marad.chi.language.image.NodeId;
 import gh.marad.chi.language.runtime.StdStreams;
 import gh.marad.chi.language.runtime.Unit;
 
@@ -59,5 +60,10 @@ public class LoadModuleBuiltin extends Builtin {
         }
     }
 
+
+    @Override
+    public NodeId getNodeId() {
+        return NodeId.LoadModuleBuiltin;
+    }
 
 }

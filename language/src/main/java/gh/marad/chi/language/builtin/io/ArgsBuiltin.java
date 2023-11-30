@@ -6,6 +6,7 @@ import gh.marad.chi.core.FnType;
 import gh.marad.chi.core.Type;
 import gh.marad.chi.language.ChiContext;
 import gh.marad.chi.language.builtin.Builtin;
+import gh.marad.chi.language.image.NodeId;
 import gh.marad.chi.language.runtime.ChiArray;
 
 public class ArgsBuiltin extends Builtin {
@@ -38,5 +39,10 @@ public class ArgsBuiltin extends Builtin {
     @Override
     public String name() {
         return "programArguments";
+    }
+
+    @Override
+    public NodeId getNodeId() {
+        return NodeId.ArgsBuiltin;
     }
 }

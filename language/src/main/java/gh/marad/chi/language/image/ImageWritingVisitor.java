@@ -1,8 +1,10 @@
 package gh.marad.chi.language.image;
 
 import gh.marad.chi.language.EffectHandlers;
+import gh.marad.chi.language.builtin.Builtin;
 import gh.marad.chi.language.nodes.ChiNodeVisitor;
 import gh.marad.chi.language.nodes.FnRootNode;
+import gh.marad.chi.language.nodes.IndexOperatorNode;
 import gh.marad.chi.language.nodes.IndexedAssignmentNode;
 import gh.marad.chi.language.nodes.expr.BlockExpr;
 import gh.marad.chi.language.nodes.expr.cast.CastToFloat;
@@ -301,6 +303,11 @@ public class ImageWritingVisitor implements ChiNodeVisitor {
     }
 
     @Override
+    public void visitIndexOperator(IndexOperatorNode indexOperatorNode) throws IOException {
+        writeNodeId(NodeId.IndexOperator);
+    }
+
+    @Override
     public void visitIndexedAssignmentNode(IndexedAssignmentNode indexedAssignmentNode) throws IOException {
         writeNodeId(NodeId.IndexedAssignment);
     }
@@ -358,6 +365,11 @@ public class ImageWritingVisitor implements ChiNodeVisitor {
     @Override
     public void visitResumeNode(ResumeNode resumeNode) throws Exception {
         writeNodeId(NodeId.ResumeEffect);
+    }
+
+    @Override
+    public void visitBuiltin(Builtin builtin) throws Exception {
+        writeNodeId(builtin.getNodeId());
     }
 
     private void writeNodeId(NodeId nodeId) throws IOException {

@@ -45,6 +45,7 @@ public enum NodeId {
     WhileExpr,
     WhileBreak,
     WhileContinue,
+    IndexOperator,
     IndexedAssignment,
     IsExpr,
     ConstructObject,
@@ -52,6 +53,62 @@ public enum NodeId {
     InvokeEffect,
     HandleEffect,
     ResumeEffect,
+
+    // builtins
+    // std/collections.array
+    ArraySizeBuiltin,
+    ArrayBuiltin,
+    // std/io
+    ArgsBuiltin,
+    PrintBuiltin,
+    PrintlnBuiltin,
+    ReadStringBuiltin,
+    ReadLinesBuiltin,
+    // std/lang
+    LoadModuleBuiltin,
+    SaveModuleBuiltin,
+    EvalBuiltin,
+    // std/lang.unsafe
+    UnsafeArrayBuiltin,
+    // std/lang.interop
+    LookupHostSymbolBuiltin,
+    // std/lang.interop.array
+    HasArrayElementsBuiltin,
+    // std/lang.interop.members
+    IsMemberInvocableBuiltin,
+    IsMemberModifiableBuiltin,
+    IsMemberReadableBuiltin,
+    IsMemberInternalBuiltin,
+    WriteMemberBuiltin,
+    ReadMemberBuiltin,
+    IsMemberRemovableBuiltin,
+    IsMemberWritableBuiltin,
+    IsMemberExistingBuiltin,
+    GetMembersBuitlin,
+    HasMemberReadSideEffectsBuiltin,
+    RemoveMemberBuiltin,
+    HasMembersBuiltin,
+    InvokeMemberBuiltin,
+    IsMemberInsertable,
+    HasMemberWriteSideEffectsBuiltin,
+    // std/lang.interop.values
+    IsNullBuiltin,
+    // std/string
+    StringFromCodePointsBuiltin,
+    ToUpperBuiltin,
+    StringHashBuiltin,
+    StringCodePointsBuiltin,
+    ToLowerBuiltin,
+    StringLengthBuiltin,
+    IndexOfCodePointBuiltin,
+    SubstringBuiltin,
+    StringReplaceAllBuiltin,
+    SplitStringBuiltin,
+    StringCodePointAtBuiltin,
+    IndexOfStringBuiltin,
+    StringReplaceBuiltin,
+    // std/time
+    MillisBuiltin,
     ;
 
 

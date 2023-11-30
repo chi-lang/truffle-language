@@ -42,7 +42,7 @@ public class ModuleReader {
         std.out.println("|- Package " + packageName);
         std.out.flush();
 
-        var nodeReader = new NodeReader(stream);
+        var nodeReader = new NodeReader(stream, context.getEnv().out());
         for (int i = 0; i < functionCount; i++) {
             var functionName = stream.readUTF();
             var type = (FnType) TypeWriter.readType(stream);

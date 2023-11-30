@@ -6,6 +6,7 @@ import gh.marad.chi.core.FnType;
 import gh.marad.chi.core.Type;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.builtin.Builtin;
+import gh.marad.chi.language.image.NodeId;
 import gh.marad.chi.language.runtime.ChiArray;
 
 public class StringCodePointsBuiltin extends Builtin {
@@ -45,5 +46,10 @@ public class StringCodePointsBuiltin extends Builtin {
             data[index++] = (long) iterator.nextUncached();
         }
         return new ChiArray(data);
+    }
+
+    @Override
+    public NodeId getNodeId() {
+        return NodeId.StringCodePointsBuiltin;
     }
 }

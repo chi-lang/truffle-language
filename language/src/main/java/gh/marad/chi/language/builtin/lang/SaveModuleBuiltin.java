@@ -8,6 +8,7 @@ import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.ChiContext;
 import gh.marad.chi.language.builtin.Builtin;
 import gh.marad.chi.language.image.ModuleWriter;
+import gh.marad.chi.language.image.NodeId;
 import gh.marad.chi.language.runtime.TODO;
 import gh.marad.chi.language.runtime.Unit;
 import gh.marad.chi.language.runtime.namespaces.Module;
@@ -58,5 +59,10 @@ public class SaveModuleBuiltin extends Builtin {
         } catch (IOException e) {
             throw new TODO(e);
         }
+    }
+
+    @Override
+    public NodeId getNodeId() {
+        return NodeId.SaveModuleBuiltin;
     }
 }

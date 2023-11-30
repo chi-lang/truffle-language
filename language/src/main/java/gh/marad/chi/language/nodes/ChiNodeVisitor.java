@@ -1,5 +1,6 @@
 package gh.marad.chi.language.nodes;
 
+import gh.marad.chi.language.builtin.Builtin;
 import gh.marad.chi.language.nodes.expr.BlockExpr;
 import gh.marad.chi.language.nodes.expr.cast.CastToFloat;
 import gh.marad.chi.language.nodes.expr.cast.CastToLongExpr;
@@ -72,6 +73,7 @@ public interface ChiNodeVisitor {
     void visitWhileExprNode(WhileExprNode whileExprNode) throws Exception;
     void visitWhileBreakNode(WhileBreakNode whileBreakNode) throws Exception;
     void visitWhileContinueNode(WhileContinueNode whileContinueNode) throws Exception;
+    void visitIndexOperator(IndexOperatorNode indexOperatorNode) throws Exception;
     void visitIndexedAssignmentNode(IndexedAssignmentNode indexedAssignmentNode) throws Exception;
     void visitIs(IsNode isNode) throws Exception;
     void visitConstructChiObject(ConstructChiObject constructChiObject) throws Exception;
@@ -79,4 +81,5 @@ public interface ChiNodeVisitor {
     void visitInvokeEffect(InvokeEffect invokeEffect) throws Exception;
     void visitHandleEffect(HandleEffectNode visitor) throws Exception;
     void visitResumeNode(ResumeNode resumeNode) throws Exception;
+    void visitBuiltin(Builtin builtin) throws Exception;
 }

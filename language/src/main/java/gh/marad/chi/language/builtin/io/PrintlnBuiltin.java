@@ -5,8 +5,10 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import gh.marad.chi.core.FnType;
 import gh.marad.chi.core.Type;
 import gh.marad.chi.language.ChiArgs;
+import gh.marad.chi.language.ChiContext;
 import gh.marad.chi.language.ChiTypesGen;
 import gh.marad.chi.language.builtin.Builtin;
+import gh.marad.chi.language.image.NodeId;
 import gh.marad.chi.language.runtime.Unit;
 
 import java.io.OutputStream;
@@ -52,5 +54,10 @@ public class PrintlnBuiltin extends Builtin {
     @Override
     public String name() {
         return "println";
+    }
+
+    @Override
+    public NodeId getNodeId() {
+        return NodeId.PrintlnBuiltin;
     }
 }

@@ -26,6 +26,7 @@ import gh.marad.chi.language.runtime.ChiFunction;
 import gh.marad.chi.language.runtime.LexicalScope;
 import gh.marad.chi.language.runtime.namespaces.Modules;
 
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,63 +54,9 @@ public class ChiContext {
         this.compilationNamespace = new GlobalCompilationNamespace(Prelude.imports);
         this.currentEffectHandlers = new EffectHandlers(null, new HashMap<>());
 
-        List<Builtin> builtins = List.of(
-                // lang
-                new EvalBuiltin(chiLanguage),
-                // lang.image
-                new SaveModuleBuiltin(),
-                new LoadModuleBuiltin(),
-                // lang.unsafe
-                new UnsafeArrayBuiltin(),
-                // lang.interop
-                new LookupHostSymbolBuiltin(env),
-                new HasMembersBuiltin(),
-                new GetMembersBuiltin(),
-                new IsMemberReadableBuiltin(),
-                new IsMemberModifiable(),
-                new IsMemberInsertable(),
-                new IsMemberRemovableBuiltin(),
-                new IsMemberInvocableBuiltin(),
-                new IsMemberInternalBuiltin(),
-                new IsMemberWritableBuiltin(),
-                new IsMemberExistingBuiltin(),
-                new HasMemberReadSideEffectsBuiltin(),
-                new HasMemberWriteSideEffectsBuiltin(),
-                new ReadMemberBuiltin(),
-                new WriteMemberBuiltin(),
-                new RemoveMemberBuiltin(),
-                new InvokeMemberBuiltin(),
-                new IsNullBuiltin(),
-                // io
-                new PrintBuiltin(env.out()),
-                new PrintlnBuiltin(env.out()),
-                new ReadLinesBuiltin(),
-                new ReadStringBuiltin(),
-                new ArgsBuiltin(),
-                // time
-                new MillisBuiltin(),
-                // collections
-                new ArrayBuiltin(),
-                new SizeBuiltin(),
-                new HasArrayElementsBuiltin(),
-                // string
-                new StringLengthBuiltin(),
-                new StringCodePointAtBuiltin(),
-                new SubstringBuiltin(),
-                new StringHashBuiltin(),
-                new StringCodePointsBuiltin(),
-                new StringFromCodePointsBuiltin(),
-                new IndexOfCodePointBuiltin(),
-                new IndexOfStringBuiltin(),
-                new ToUpperBuiltin(),
-                new ToLowerBuiltin(),
-                new SplitStringBuiltin(),
-                new StringReplaceBuiltin(),
-                new StringReplaceAllBuiltin()
-        );
         var frameDescriptor = FrameDescriptor.newBuilder().build();
         this.globalScope = new LexicalScope(Truffle.getRuntime().createMaterializedFrame(new Object[0], frameDescriptor));
-        installBuiltins(builtins);
+        installBuiltins(builtins(env.out()));
     }
 
     private void installBuiltins(List<Builtin> builtins) {
@@ -143,5 +90,62 @@ public class ChiContext {
 
     public ChiFunction findEffectHandlerOrNull(EffectHandlers.Qualifier qualifier) {
         return currentEffectHandlers.findEffectHandlerOrNull(qualifier);
+    }
+
+    public static List<Builtin> builtins(OutputStream outputStream) {
+         return List.of(
+                // lang
+                new EvalBuiltin(),
+                // lang.image
+                new SaveModuleBuiltin(),
+                new LoadModuleBuiltin(),
+                // lang.unsafe
+                new UnsafeArrayBuiltin(),
+                // lang.interop
+                new LookupHostSymbolBuiltin(),
+                new HasMembersBuiltin(),
+                new GetMembersBuiltin(),
+                new IsMemberReadableBuiltin(),
+                new IsMemberModifiable(),
+                new IsMemberInsertable(),
+                new IsMemberRemovableBuiltin(),
+                new IsMemberInvocableBuiltin(),
+                new IsMemberInternalBuiltin(),
+                new IsMemberWritableBuiltin(),
+                new IsMemberExistingBuiltin(),
+                new HasMemberReadSideEffectsBuiltin(),
+                new HasMemberWriteSideEffectsBuiltin(),
+                new ReadMemberBuiltin(),
+                new WriteMemberBuiltin(),
+                new RemoveMemberBuiltin(),
+                new InvokeMemberBuiltin(),
+                new IsNullBuiltin(),
+                // io
+                new PrintBuiltin(outputStream),
+                new PrintlnBuiltin(outputStream),
+                new ReadLinesBuiltin(),
+                new ReadStringBuiltin(),
+                new ArgsBuiltin(),
+                // time
+                new MillisBuiltin(),
+                // collections
+                new ArrayBuiltin(),
+                new SizeBuiltin(),
+                new HasArrayElementsBuiltin(),
+                // string
+                new StringLengthBuiltin(),
+                new StringCodePointAtBuiltin(),
+                new SubstringBuiltin(),
+                new StringHashBuiltin(),
+                new StringCodePointsBuiltin(),
+                new StringFromCodePointsBuiltin(),
+                new IndexOfCodePointBuiltin(),
+                new IndexOfStringBuiltin(),
+                new ToUpperBuiltin(),
+                new ToLowerBuiltin(),
+                new SplitStringBuiltin(),
+                new StringReplaceBuiltin(),
+                new StringReplaceAllBuiltin()
+        );
     }
 }

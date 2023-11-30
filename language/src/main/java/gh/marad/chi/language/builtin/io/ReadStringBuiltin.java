@@ -7,6 +7,7 @@ import gh.marad.chi.core.FnType;
 import gh.marad.chi.core.Type;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.builtin.Builtin;
+import gh.marad.chi.language.image.NodeId;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -56,5 +57,10 @@ public class ReadStringBuiltin extends Builtin {
     @Override
     public String name() {
         return "readString";
+    }
+
+    @Override
+    public NodeId getNodeId() {
+        return NodeId.ReadStringBuiltin;
     }
 }

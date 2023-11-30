@@ -6,6 +6,7 @@ import gh.marad.chi.core.FnType;
 import gh.marad.chi.core.Type;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.builtin.Builtin;
+import gh.marad.chi.language.image.NodeId;
 
 public class StringCodePointAtBuiltin extends Builtin {
     @Child
@@ -41,5 +42,10 @@ public class StringCodePointAtBuiltin extends Builtin {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         return executeLong(frame);
+    }
+
+    @Override
+    public NodeId getNodeId() {
+        return NodeId.StringCodePointAtBuiltin;
     }
 }

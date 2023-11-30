@@ -7,6 +7,7 @@ import gh.marad.chi.core.FnType;
 import gh.marad.chi.core.Type;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.builtin.lang.interop.LangInteropBuiltin;
+import gh.marad.chi.language.image.NodeId;
 
 public class HasMemberReadSideEffectsBuiltin extends LangInteropBuiltin {
     @Child
@@ -34,5 +35,10 @@ public class HasMemberReadSideEffectsBuiltin extends LangInteropBuiltin {
         var receiver = ChiArgs.getObject(frame, 0);
         var member = ChiArgs.getTruffleString(frame, 1);
         return library.hasMemberReadSideEffects(receiver, toJavaString.execute(member));
+    }
+
+    @Override
+    public NodeId getNodeId() {
+        return NodeId.HasMemberReadSideEffectsBuiltin;
     }
 }

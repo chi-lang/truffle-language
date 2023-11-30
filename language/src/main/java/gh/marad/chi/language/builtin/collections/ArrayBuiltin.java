@@ -3,6 +3,7 @@ package gh.marad.chi.language.builtin.collections;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import gh.marad.chi.core.FnType;
 import gh.marad.chi.language.ChiArgs;
+import gh.marad.chi.language.image.NodeId;
 import gh.marad.chi.language.runtime.ChiArray;
 
 import java.util.List;
@@ -29,5 +30,10 @@ public class ArrayBuiltin extends CollectionsArrayBuiltin {
     @Override
     public String name() {
         return "array";
+    }
+
+    @Override
+    public NodeId getNodeId() {
+        return NodeId.ArrayBuiltin;
     }
 }

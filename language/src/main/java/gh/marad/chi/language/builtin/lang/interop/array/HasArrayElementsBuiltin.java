@@ -7,6 +7,7 @@ import gh.marad.chi.core.FnType;
 import gh.marad.chi.core.Type;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.builtin.lang.interop.LangInteropBuiltin;
+import gh.marad.chi.language.image.NodeId;
 import gh.marad.chi.language.runtime.TODO;
 
 public class HasArrayElementsBuiltin extends LangInteropBuiltin {
@@ -36,5 +37,10 @@ public class HasArrayElementsBuiltin extends LangInteropBuiltin {
         } catch (UnsupportedMessageException e) {
             throw new TODO(e);
         }
+    }
+
+    @Override
+    public NodeId getNodeId() {
+        return NodeId.HasArrayElementsBuiltin;
     }
 }

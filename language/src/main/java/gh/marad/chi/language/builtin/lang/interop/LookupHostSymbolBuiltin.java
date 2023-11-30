@@ -6,14 +6,14 @@ import com.oracle.truffle.api.strings.TruffleString;
 import gh.marad.chi.core.FnType;
 import gh.marad.chi.core.Type;
 import gh.marad.chi.language.ChiArgs;
+import gh.marad.chi.language.ChiContext;
+import gh.marad.chi.language.image.NodeId;
 
 public class LookupHostSymbolBuiltin extends LangInteropBuiltin {
-    private final TruffleLanguage.Env env;
     @Child
     private TruffleString.ToJavaStringNode toJavaString;
 
-    public LookupHostSymbolBuiltin(TruffleLanguage.Env env) {
-        this.env = env;
+    public LookupHostSymbolBuiltin() {
         this.toJavaString = TruffleString.ToJavaStringNode.create();
     }
 
@@ -30,6 +30,12 @@ public class LookupHostSymbolBuiltin extends LangInteropBuiltin {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         var hostSymbolName = ChiArgs.getTruffleString(frame, 0);
+        var env = ChiContext.get(this).getEnv();
         return env.lookupHostSymbol(toJavaString.execute(hostSymbolName));
+    }
+
+    @Override
+    public NodeId getNodeId() {
+        return NodeId.LookupHostSymbolBuiltin;
     }
 }

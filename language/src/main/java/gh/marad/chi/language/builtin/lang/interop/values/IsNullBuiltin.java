@@ -6,6 +6,7 @@ import gh.marad.chi.core.FnType;
 import gh.marad.chi.core.Type;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.builtin.lang.interop.LangInteropBuiltin;
+import gh.marad.chi.language.image.NodeId;
 
 public class IsNullBuiltin extends LangInteropBuiltin {
     @Child
@@ -29,5 +30,10 @@ public class IsNullBuiltin extends LangInteropBuiltin {
     public Object executeGeneric(VirtualFrame frame) {
         var arg = ChiArgs.getObject(frame, 0);
         return library.isNull(arg);
+    }
+
+    @Override
+    public NodeId getNodeId() {
+        return NodeId.IsNullBuiltin;
     }
 }

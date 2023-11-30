@@ -2,9 +2,7 @@ package gh.marad.chi.language.image;
 
 import gh.marad.chi.core.Type;
 import gh.marad.chi.core.VariantType;
-import gh.marad.chi.language.nodes.ChiNode;
-import gh.marad.chi.language.nodes.IndexedAssignmentNode;
-import gh.marad.chi.language.nodes.IndexedAssignmentNodeGen;
+import gh.marad.chi.language.nodes.*;
 import gh.marad.chi.language.nodes.expr.BlockExpr;
 import gh.marad.chi.language.nodes.expr.cast.*;
 import gh.marad.chi.language.nodes.expr.flow.IfExpr;
@@ -421,6 +419,21 @@ public class NodeSerializationTest {
         assertInstanceOf(WhileContinueNode.class, result);
     }
 
+    @Test
+    void testIndexOperatorSerialization() throws Exception {
+        // given
+        var variable = new StringValue("hello world");
+        var index = new LongValue(5);
+        var expected = IndexOperatorNodeGen.create(variable, index);
+        // when
+        var result = serializeAndDeserialize(expected);
+        // then
+        if (result instanceof IndexOperatorNode actual) {
+            assertInstanceOf(StringValue.class, actual.getVariable());
+            assertInstanceOf(LongValue.class, actual.getIndex());
+        } else fail("Invalid node read!");
+    }
+
 
     @Test
     void testIndexedAssignmentSerialization() throws Exception {
@@ -522,7 +535,7 @@ public class NodeSerializationTest {
         node.accept(nodeWriter);
 
         var inputStream = new DataInputStream(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
-        var nodeReader = new NodeReader(inputStream);
+        var nodeReader = new NodeReader(inputStream, System.out);
 
         return nodeReader.readNode();
     }
