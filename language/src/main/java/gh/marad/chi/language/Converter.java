@@ -162,7 +162,6 @@ public class Converter {
                     .map(constructor -> {
                         var constructorFunction = createFunctionFromNode(
                                 new ConstructChiObject(
-                                        language,
                                         expr.getBaseVariantType().withVariant(constructor.toVariant())),
                                 constructor.getName());
                         if (constructor.getFields().isEmpty()) {

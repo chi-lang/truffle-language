@@ -21,11 +21,11 @@ import gh.marad.chi.language.nodes.expr.operators.bool.*;
 import gh.marad.chi.language.nodes.expr.variables.*;
 import gh.marad.chi.language.nodes.function.GetDefinedFunction;
 import gh.marad.chi.language.nodes.function.InvokeFunction;
+import gh.marad.chi.language.nodes.objects.ConstructChiObject;
 import gh.marad.chi.language.nodes.objects.ReadMember;
 import gh.marad.chi.language.nodes.objects.WriteMember;
 import gh.marad.chi.language.nodes.value.*;
 import gh.marad.chi.language.runtime.TODO;
-import kotlin.jvm.internal.Lambda;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -301,9 +301,15 @@ public class ImageWritingVisitor implements ChiNodeVisitor {
     }
 
     @Override
-    public void visitIs(IsNode isNode) throws Exception {
+    public void visitIs(IsNode isNode) throws IOException {
         writeNodeId(NodeId.IsExpr);
         stream.writeUTF(isNode.getTypeName());
+    }
+
+    @Override
+    public void visitConstructChiObject(ConstructChiObject constructChiObject) throws IOException {
+        writeNodeId(NodeId.ConstructObject);
+        TypeWriter.writeType(constructChiObject.type, stream);
     }
 
     private void writeNodeId(NodeId nodeId) throws IOException {

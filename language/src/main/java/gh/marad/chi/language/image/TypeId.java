@@ -11,8 +11,8 @@ public enum TypeId {
     Array,
     Fn,
     GenericFn,
-    GenericTypeParameter
-
+    GenericTypeParameter,
+    Variant,
     ;
 
     public static TypeId fromId(int typeId) {

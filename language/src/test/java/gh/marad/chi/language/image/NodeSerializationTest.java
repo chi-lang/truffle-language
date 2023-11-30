@@ -2,6 +2,8 @@ package gh.marad.chi.language.image;
 
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import gh.marad.chi.core.Type;
+import gh.marad.chi.core.VariantType;
 import gh.marad.chi.language.nodes.ChiNode;
 import gh.marad.chi.language.nodes.IndexedAssignmentNode;
 import gh.marad.chi.language.nodes.IndexedAssignmentNodeGen;
@@ -18,19 +20,16 @@ import gh.marad.chi.language.nodes.expr.operators.arithmetic.*;
 import gh.marad.chi.language.nodes.expr.operators.bit.*;
 import gh.marad.chi.language.nodes.expr.operators.bool.*;
 import gh.marad.chi.language.nodes.expr.variables.*;
-import gh.marad.chi.language.nodes.objects.ReadMember;
-import gh.marad.chi.language.nodes.objects.ReadMemberNodeGen;
-import gh.marad.chi.language.nodes.objects.WriteMember;
-import gh.marad.chi.language.nodes.objects.WriteMemberNodeGen;
+import gh.marad.chi.language.nodes.objects.*;
 import gh.marad.chi.language.nodes.value.*;
-import gh.marad.chi.language.runtime.ChiArray;
-import gh.marad.chi.language.runtime.ChiArrayGen;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.*;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -451,13 +450,11 @@ public class NodeSerializationTest {
         } else fail("Invalid node read!");
     }
 
-    // Is
-
     @Test
     void testIsSerialization() throws Exception {
         // given
         var value = new LongValue(5);
-        var typeName = "name";
+        var typeName = "int";
         var expected = IsNodeGen.create(value, typeName);
         // when
         var result = serializeAndDeserialize(expected);
@@ -468,8 +465,37 @@ public class NodeSerializationTest {
         } else fail("Invalid node read!");
     }
 
+    @Test
+    void testConstructChiObject() throws Exception {
+        // given
+        var type = new VariantType(
+                "moduleName",
+                "packageName",
+                "typeName",
+                List.of(), // generic type parameters
+                Map.of(), // concrete parameter types
+                new VariantType.Variant(
+                        true, // public
+                        "variantName",
+                        List.of(
+                                new VariantType.VariantField(
+                                        true, // public
+                                        "fieldName",
+                                        Type.getIntType()
+                                )
+                        )
+                )
+        );
+        var expected = new ConstructChiObject(type);
+        // when
+        var result = serializeAndDeserialize(expected);
+        // then
+        if (result instanceof ConstructChiObject actual) {
+            assertEquals(expected.type, actual.type);
+        } else fail("Invalid node read!");
+    }
 
-    // ConstructChiObject
+
     // DefinePackageFunction
 
     // InvokeEffect

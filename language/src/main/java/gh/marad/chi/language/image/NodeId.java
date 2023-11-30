@@ -47,6 +47,7 @@ public enum NodeId {
     WhileContinue,
     IndexedAssignment,
     IsExpr,
+    ConstructObject,
     ;
 
 

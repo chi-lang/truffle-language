@@ -6,7 +6,9 @@ import gh.marad.chi.language.runtime.TODO;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class TypeWriter {
@@ -56,10 +58,50 @@ public class TypeWriter {
         } else if (type instanceof GenericTypeParameter typeParameter) {
             stream.writeByte(TypeId.GenericTypeParameter.id());
             stream.writeUTF(typeParameter.getName());
+        } else if (type instanceof VariantType variantType) {
+            stream.writeByte(TypeId.Variant.id());
+            writeVariantType(stream, variantType);
         } else {
             throw new TODO("Unsupported type " + type);
         }
     }
+
+    private static void writeVariantType(DataOutputStream stream, VariantType type) throws IOException {
+        stream.writeUTF(type.getModuleName());
+        stream.writeUTF(type.getPackageName());
+        stream.writeUTF(type.getSimpleName());
+        writeTypes(type.getGenericTypeParameters().toArray(new Type[0]), stream);
+
+        // write concrete type map
+        var concreteTypes = type.getConcreteTypeParameters();
+        var concreteTypeCount = type.getConcreteTypeParameters().size();
+        stream.writeByte(concreteTypeCount);
+        for (GenericTypeParameter parameter : concreteTypes.keySet()) {
+            var value = concreteTypes.get(parameter);
+            writeType(parameter, stream);
+            writeType(value, stream);
+        }
+
+        // write variant
+        var variant = type.getVariant();
+        if (variant != null) {
+            stream.writeBoolean(true);
+            stream.writeBoolean(variant.getPublic());
+            stream.writeUTF(variant.getVariantName());
+
+            // write variant fields
+            var fields = variant.getFields();
+            stream.writeByte(fields.size());
+            for (VariantType.VariantField field : fields) {
+                stream.writeBoolean(field.getPublic());
+                stream.writeUTF(field.getName());
+                writeType(field.getType(), stream);
+            }
+        } else {
+            stream.writeBoolean(false);
+        }
+    }
+
 
     public static Type[] readTypes(DataInputStream stream) throws IOException {
         var count = stream.readByte();
@@ -88,6 +130,7 @@ public class TypeWriter {
             );
             case GenericFn -> readGenericFn(stream);
             case GenericTypeParameter -> Type.typeParameter(stream.readUTF());
+            case Variant -> readVariantType(stream);
         };
     }
 
@@ -100,5 +143,55 @@ public class TypeWriter {
                 returnType,
                 paramTypes
         );
+    }
+
+    private static Type readVariantType(DataInputStream stream) throws IOException {
+        var moduleName = stream.readUTF();
+        var packageName = stream.readUTF();
+        var simpleName = stream.readUTF();
+        var genericTypeParams = new ArrayList<GenericTypeParameter>();
+        for (Type type : readTypes(stream)) {
+            genericTypeParams.add((GenericTypeParameter) type);
+        }
+
+        // read concrete type map
+        var count = stream.readByte();
+        var concreteTypeMap = new HashMap<GenericTypeParameter, Type>();
+        for (int i = 0; i < count; i++) {
+            var parameter = readType(stream);
+            var type = readType(stream);
+            concreteTypeMap.put((GenericTypeParameter) parameter, type);
+        }
+
+        // read variant
+        VariantType.Variant variant = null;
+        var hasVariant = stream.readBoolean();
+        if (hasVariant) {
+            var isPublic = stream.readBoolean();
+            var variantName = stream.readUTF();
+
+            // read variant fields
+            var fieldCount = stream.readByte();
+            var fields = new ArrayList<VariantType.VariantField>();
+            for (byte i = 0; i < fieldCount; i++) {
+                var isFieldPublic = stream.readBoolean();
+                var fieldName = stream.readUTF();
+                var fieldType = readType(stream);
+                fields.add(new VariantType.VariantField(isFieldPublic, fieldName, fieldType));
+            }
+            variant = new VariantType.Variant(
+                    isPublic,
+                    variantName,
+                    fields
+            );
+        }
+
+        return new VariantType(
+                moduleName,
+                packageName,
+                simpleName,
+                genericTypeParams,
+                concreteTypeMap,
+                variant);
     }
 }

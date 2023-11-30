@@ -4,6 +4,7 @@ import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeVisitor;
+import gh.marad.chi.core.VariantType;
 import gh.marad.chi.language.ChiLanguage;
 import gh.marad.chi.language.nodes.ChiNode;
 import gh.marad.chi.language.nodes.FnRootNode;
@@ -21,9 +22,11 @@ import gh.marad.chi.language.nodes.expr.operators.bool.*;
 import gh.marad.chi.language.nodes.expr.variables.*;
 import gh.marad.chi.language.nodes.function.GetDefinedFunction;
 import gh.marad.chi.language.nodes.function.InvokeFunction;
+import gh.marad.chi.language.nodes.objects.ConstructChiObject;
 import gh.marad.chi.language.nodes.objects.ReadMemberNodeGen;
 import gh.marad.chi.language.nodes.objects.WriteMemberNodeGen;
 import gh.marad.chi.language.nodes.value.*;
+import gh.marad.chi.language.runtime.TODO;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -95,6 +98,7 @@ public class NodeReader {
             case WhileContinue -> new WhileContinueNode();
             case IndexedAssignment -> readIndexedAssignment();
             case IsExpr -> readIsExpr();
+            case ConstructObject -> readConstructObject();
         };
     }
 
@@ -390,5 +394,14 @@ public class NodeReader {
         var typeName = stream.readUTF();
         var value = readNode();
         return IsNodeGen.create(value, typeName);
+    }
+
+    public ChiNode readConstructObject() throws IOException {
+        var type = TypeWriter.readType(stream);
+        if (type instanceof VariantType variantType) {
+            return new ConstructChiObject(variantType);
+        } else {
+            throw new TODO("Expected variant type!");
+        }
     }
 }

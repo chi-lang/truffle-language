@@ -18,6 +18,7 @@ import gh.marad.chi.language.nodes.expr.operators.bool.*;
 import gh.marad.chi.language.nodes.expr.variables.*;
 import gh.marad.chi.language.nodes.function.GetDefinedFunction;
 import gh.marad.chi.language.nodes.function.InvokeFunction;
+import gh.marad.chi.language.nodes.objects.ConstructChiObject;
 import gh.marad.chi.language.nodes.objects.ReadMember;
 import gh.marad.chi.language.nodes.objects.WriteMember;
 import gh.marad.chi.language.nodes.value.*;
@@ -69,4 +70,5 @@ public interface ChiNodeVisitor {
     void visitWhileContinueNode(WhileContinueNode whileContinueNode) throws Exception;
     void visitIndexedAssignmentNode(IndexedAssignmentNode indexedAssignmentNode) throws Exception;
     void visitIs(IsNode isNode) throws Exception;
+    void visitConstructChiObject(ConstructChiObject constructChiObject) throws Exception;
 }

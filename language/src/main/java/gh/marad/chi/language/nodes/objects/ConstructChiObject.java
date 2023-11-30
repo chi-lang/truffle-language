@@ -10,18 +10,21 @@ import gh.marad.chi.core.VariantType;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.ChiContext;
 import gh.marad.chi.language.ChiLanguage;
+import gh.marad.chi.language.nodes.ChiNodeVisitor;
 import gh.marad.chi.language.nodes.expr.ExpressionNode;
 
 import java.util.Objects;
 
 public class ConstructChiObject extends ExpressionNode {
-    private final ChiLanguage language;
     private final String[] fieldNames;
     private final InteropLibrary interopLibrary;
-    private final VariantType type;
+    public final VariantType type;
 
-    public ConstructChiObject(ChiLanguage language, VariantType type) {
-        this.language = language;
+    // TODO this should only have variant type identifier, and types should be defined in central place
+    // TODO runtime should also have some different representation of the type that references the Chi type
+    //      because serialization of VariantType that has fields of other VariantTypes is VERY HEAVY
+
+    public ConstructChiObject(VariantType type) {
         this.fieldNames = Objects.requireNonNull(type.getVariant()).getFields().stream()
                                  .map(VariantType.VariantField::getName).toList().toArray(new String[0]);
         this.type = type;
@@ -31,6 +34,7 @@ public class ConstructChiObject extends ExpressionNode {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         var env = ChiContext.get(this).getEnv();
+        var language = ChiLanguage.get(this);
         var object = language.createObject(fieldNames, type, env);
         for (int i = 0; i < fieldNames.length; i++) {
             try {
@@ -41,5 +45,10 @@ public class ConstructChiObject extends ExpressionNode {
             }
         }
         return object;
+    }
+
+    @Override
+    public void accept(ChiNodeVisitor visitor) throws Exception {
+        visitor.visitConstructChiObject(this);
     }
 }
