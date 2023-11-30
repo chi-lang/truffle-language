@@ -20,6 +20,8 @@ import gh.marad.chi.language.nodes.expr.operators.arithmetic.*;
 import gh.marad.chi.language.nodes.expr.operators.bit.*;
 import gh.marad.chi.language.nodes.expr.operators.bool.*;
 import gh.marad.chi.language.nodes.expr.variables.*;
+import gh.marad.chi.language.nodes.function.DefinePackageFunctionFromNode;
+import gh.marad.chi.language.nodes.function.DefinePackageFunctionFromNodeGen;
 import gh.marad.chi.language.nodes.objects.*;
 import gh.marad.chi.language.nodes.value.*;
 import org.junit.jupiter.api.Test;
@@ -495,6 +497,31 @@ public class NodeSerializationTest {
         } else fail("Invalid node read!");
     }
 
+
+    @Test
+    void testDefinePackageFunctionSerialization() throws Exception {
+        // given
+        var function = new LongValue(5);
+        var expected = DefinePackageFunctionFromNodeGen.create(
+                function,
+                "moduleName",
+                "packageName",
+                "functionName",
+                Type.fn(Type.getIntType(), Type.getFloatType()),
+                true // public
+        );
+        // when
+        var result = serializeAndDeserialize(expected);
+        // then
+        if (result instanceof DefinePackageFunctionFromNode actual) {
+            assertInstanceOf(LongValue.class, actual.getFunction());
+            assertEquals(expected.getModuleName(), actual.getModuleName());
+            assertEquals(expected.getPackageName(), actual.getPackageName());
+            assertEquals(expected.getFunctionName(), actual.getFunctionName());
+            assertEquals(expected.getType(), actual.getType());
+            assertEquals(expected.getIsPublic(), actual.getIsPublic());
+        } else fail("Invalid node read!");
+    }
 
     // DefinePackageFunction
 

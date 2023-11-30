@@ -48,6 +48,7 @@ public enum NodeId {
     IndexedAssignment,
     IsExpr,
     ConstructObject,
+    DefinePackageFunction,
     ;
 
 

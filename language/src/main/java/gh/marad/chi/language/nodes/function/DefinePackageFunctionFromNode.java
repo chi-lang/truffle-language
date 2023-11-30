@@ -6,6 +6,7 @@ import com.oracle.truffle.api.dsl.Specialization;
 import gh.marad.chi.core.FnType;
 import gh.marad.chi.language.ChiContext;
 import gh.marad.chi.language.nodes.ChiNode;
+import gh.marad.chi.language.nodes.ChiNodeVisitor;
 import gh.marad.chi.language.nodes.expr.ExpressionNode;
 import gh.marad.chi.language.runtime.ChiFunction;
 
@@ -17,15 +18,17 @@ import gh.marad.chi.language.runtime.ChiFunction;
 @NodeField(name = "isPublic", type = Boolean.class)
 public abstract class DefinePackageFunctionFromNode extends ExpressionNode {
 
-    protected abstract String getModuleName();
+    public abstract ChiNode getFunction();
 
-    protected abstract String getPackageName();
+    public abstract String getModuleName();
 
-    protected abstract String getFunctionName();
+    public abstract String getPackageName();
 
-    protected abstract FnType getType();
+    public abstract String getFunctionName();
 
-    protected abstract boolean getIsPublic();
+    public abstract FnType getType();
+
+    public abstract boolean getIsPublic();
 
     @Specialization
     public ChiFunction defineModuleFunction(ChiFunction function) {
@@ -33,6 +36,11 @@ public abstract class DefinePackageFunctionFromNode extends ExpressionNode {
         var module = context.modules.getOrCreateModule(getModuleName());
         module.defineNamedFunction(getPackageName(), getFunctionName(), function, getType(), getIsPublic());
         return function;
+    }
 
+    @Override
+    public void accept(ChiNodeVisitor visitor) throws Exception {
+        visitor.visitDefinePackageFunction(this);
+        getFunction().accept(visitor);
     }
 }

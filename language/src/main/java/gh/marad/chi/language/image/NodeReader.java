@@ -4,6 +4,9 @@ import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeVisitor;
+import gh.marad.chi.core.Fn;
+import gh.marad.chi.core.FnType;
+import gh.marad.chi.core.Type;
 import gh.marad.chi.core.VariantType;
 import gh.marad.chi.language.ChiLanguage;
 import gh.marad.chi.language.nodes.ChiNode;
@@ -20,6 +23,8 @@ import gh.marad.chi.language.nodes.expr.operators.arithmetic.*;
 import gh.marad.chi.language.nodes.expr.operators.bit.*;
 import gh.marad.chi.language.nodes.expr.operators.bool.*;
 import gh.marad.chi.language.nodes.expr.variables.*;
+import gh.marad.chi.language.nodes.function.DefinePackageFunctionFromNode;
+import gh.marad.chi.language.nodes.function.DefinePackageFunctionFromNodeGen;
 import gh.marad.chi.language.nodes.function.GetDefinedFunction;
 import gh.marad.chi.language.nodes.function.InvokeFunction;
 import gh.marad.chi.language.nodes.objects.ConstructChiObject;
@@ -99,6 +104,7 @@ public class NodeReader {
             case IndexedAssignment -> readIndexedAssignment();
             case IsExpr -> readIsExpr();
             case ConstructObject -> readConstructObject();
+            case DefinePackageFunction -> readDefinePackageFunction();
         };
     }
 
@@ -404,4 +410,17 @@ public class NodeReader {
             throw new TODO("Expected variant type!");
         }
     }
+
+    private ChiNode readDefinePackageFunction() throws IOException {
+        var moduleName = stream.readUTF();
+        var packageName = stream.readUTF();
+        var functionName = stream.readUTF();
+        var type = TypeWriter.readType(stream);
+        var isPublic = stream.readBoolean();
+        var function = readNode();
+        return DefinePackageFunctionFromNodeGen.create(
+                function, moduleName, packageName, functionName, (FnType) type, isPublic
+        );
+    }
+
 }

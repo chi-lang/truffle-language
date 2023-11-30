@@ -19,6 +19,7 @@ import gh.marad.chi.language.nodes.expr.operators.bit.ShlOperator;
 import gh.marad.chi.language.nodes.expr.operators.bit.ShrOperator;
 import gh.marad.chi.language.nodes.expr.operators.bool.*;
 import gh.marad.chi.language.nodes.expr.variables.*;
+import gh.marad.chi.language.nodes.function.DefinePackageFunctionFromNode;
 import gh.marad.chi.language.nodes.function.GetDefinedFunction;
 import gh.marad.chi.language.nodes.function.InvokeFunction;
 import gh.marad.chi.language.nodes.objects.ConstructChiObject;
@@ -296,7 +297,7 @@ public class ImageWritingVisitor implements ChiNodeVisitor {
     }
 
     @Override
-    public void visitIndexedAssignmentNode(IndexedAssignmentNode indexedAssignmentNode) throws Exception {
+    public void visitIndexedAssignmentNode(IndexedAssignmentNode indexedAssignmentNode) throws IOException {
         writeNodeId(NodeId.IndexedAssignment);
     }
 
@@ -310,6 +311,16 @@ public class ImageWritingVisitor implements ChiNodeVisitor {
     public void visitConstructChiObject(ConstructChiObject constructChiObject) throws IOException {
         writeNodeId(NodeId.ConstructObject);
         TypeWriter.writeType(constructChiObject.type, stream);
+    }
+
+    @Override
+    public void visitDefinePackageFunction(DefinePackageFunctionFromNode node) throws IOException {
+        writeNodeId(NodeId.DefinePackageFunction);
+        stream.writeUTF(node.getModuleName());
+        stream.writeUTF(node.getPackageName());
+        stream.writeUTF(node.getFunctionName());
+        TypeWriter.writeType(node.getType(), stream);
+        stream.writeBoolean(node.getIsPublic());
     }
 
     private void writeNodeId(NodeId nodeId) throws IOException {

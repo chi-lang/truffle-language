@@ -16,6 +16,7 @@ import gh.marad.chi.language.nodes.expr.operators.bit.ShlOperator;
 import gh.marad.chi.language.nodes.expr.operators.bit.ShrOperator;
 import gh.marad.chi.language.nodes.expr.operators.bool.*;
 import gh.marad.chi.language.nodes.expr.variables.*;
+import gh.marad.chi.language.nodes.function.DefinePackageFunctionFromNode;
 import gh.marad.chi.language.nodes.function.GetDefinedFunction;
 import gh.marad.chi.language.nodes.function.InvokeFunction;
 import gh.marad.chi.language.nodes.objects.ConstructChiObject;
@@ -71,4 +72,5 @@ public interface ChiNodeVisitor {
     void visitIndexedAssignmentNode(IndexedAssignmentNode indexedAssignmentNode) throws Exception;
     void visitIs(IsNode isNode) throws Exception;
     void visitConstructChiObject(ConstructChiObject constructChiObject) throws Exception;
+    void visitDefinePackageFunction(DefinePackageFunctionFromNode definePackageFunctionFromNode) throws Exception;
 }
