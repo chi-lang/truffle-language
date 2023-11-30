@@ -2,13 +2,10 @@ package gh.marad.chi.language.image;
 
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlotKind;
-import com.oracle.truffle.api.nodes.Node;
-import com.oracle.truffle.api.nodes.NodeVisitor;
-import gh.marad.chi.core.Fn;
 import gh.marad.chi.core.FnType;
-import gh.marad.chi.core.Type;
 import gh.marad.chi.core.VariantType;
 import gh.marad.chi.language.ChiLanguage;
+import gh.marad.chi.language.EffectHandlers;
 import gh.marad.chi.language.nodes.ChiNode;
 import gh.marad.chi.language.nodes.FnRootNode;
 import gh.marad.chi.language.nodes.IndexedAssignmentNodeGen;
@@ -16,6 +13,9 @@ import gh.marad.chi.language.nodes.expr.BlockExpr;
 import gh.marad.chi.language.nodes.expr.cast.*;
 import gh.marad.chi.language.nodes.expr.flow.IfExpr;
 import gh.marad.chi.language.nodes.expr.flow.IsNodeGen;
+import gh.marad.chi.language.nodes.expr.flow.effect.HandleEffectNode;
+import gh.marad.chi.language.nodes.expr.flow.effect.InvokeEffect;
+import gh.marad.chi.language.nodes.expr.flow.effect.ResumeNode;
 import gh.marad.chi.language.nodes.expr.flow.loop.WhileBreakNode;
 import gh.marad.chi.language.nodes.expr.flow.loop.WhileContinueNode;
 import gh.marad.chi.language.nodes.expr.flow.loop.WhileExprNode;
@@ -23,7 +23,6 @@ import gh.marad.chi.language.nodes.expr.operators.arithmetic.*;
 import gh.marad.chi.language.nodes.expr.operators.bit.*;
 import gh.marad.chi.language.nodes.expr.operators.bool.*;
 import gh.marad.chi.language.nodes.expr.variables.*;
-import gh.marad.chi.language.nodes.function.DefinePackageFunctionFromNode;
 import gh.marad.chi.language.nodes.function.DefinePackageFunctionFromNodeGen;
 import gh.marad.chi.language.nodes.function.GetDefinedFunction;
 import gh.marad.chi.language.nodes.function.InvokeFunction;
@@ -31,26 +30,19 @@ import gh.marad.chi.language.nodes.objects.ConstructChiObject;
 import gh.marad.chi.language.nodes.objects.ReadMemberNodeGen;
 import gh.marad.chi.language.nodes.objects.WriteMemberNodeGen;
 import gh.marad.chi.language.nodes.value.*;
+import gh.marad.chi.language.runtime.ChiFunction;
 import gh.marad.chi.language.runtime.TODO;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.function.Supplier;
 
 public class NodeReader {
     private final DataInputStream stream;
-    private FrameDescriptor.Builder currentFdBuilder;
 
     public NodeReader(DataInputStream stream) {
         this.stream = stream;
-    }
-
-    public <T> T withFrameDescriptor(FrameDescriptor.Builder fd, Supplier<T> f) {
-        var previousFdBuilder = currentFdBuilder;
-        currentFdBuilder = fd;
-        var result = f.get();
-        currentFdBuilder = previousFdBuilder;
-        return result;
     }
 
     public ChiNode readNode() throws IOException {
@@ -105,6 +97,9 @@ public class NodeReader {
             case IsExpr -> readIsExpr();
             case ConstructObject -> readConstructObject();
             case DefinePackageFunction -> readDefinePackageFunction();
+            case InvokeEffect -> readInvokeEffect();
+            case HandleEffect -> readHandleEffect();
+            case ResumeEffect -> new ResumeNode();
         };
     }
 
@@ -141,8 +136,6 @@ public class NodeReader {
         var slot = stream.readByte();
         var variableName = stream.readUTF();
         var valueNode = readNode();
-        var addedSlot = currentFdBuilder.addSlot(FrameSlotKind.Illegal, variableName, null);
-        assert addedSlot == slot : "Saved slot does not match added slot!";
         return WriteLocalVariableNodeGen.create(valueNode, slot, variableName);
     }
 
@@ -317,34 +310,6 @@ public class NodeReader {
         return IfExpr.create(condition, thenBranch, elseBranch);
     }
 
-
-    private class LocalVarsCounter implements NodeVisitor {
-        private int count = 0;
-
-        @Override
-        public boolean visit(Node node) {
-            if (node instanceof ReadLocalVariable) {
-                count += 1;
-            }
-            return true;
-        }
-
-        public int getCount() {
-            return count;
-        }
-    }
-    public ChiNode readLambdaValue() throws IOException {
-        var name = stream.readUTF();
-        var body = readNode();
-        var slotCounter = new LocalVarsCounter();
-        body.accept(slotCounter);
-        var fdBuilder = FrameDescriptor.newBuilder();
-        fdBuilder.addSlots(slotCounter.getCount(), FrameSlotKind.Illegal);
-        var language = ChiLanguage.get(body);
-        var rootNode = new FnRootNode(language, fdBuilder.build(), body, name);
-        return new LambdaValue(rootNode.getCallTarget());
-    }
-
     public ChiNode readWriteModuleVariable() throws IOException {
         var moduleName = stream.readUTF();
         var packageName = stream.readUTF();
@@ -421,6 +386,49 @@ public class NodeReader {
         return DefinePackageFunctionFromNodeGen.create(
                 function, moduleName, packageName, functionName, (FnType) type, isPublic
         );
+    }
+
+    public ChiNode readLambdaValue() throws IOException {
+        var name = stream.readUTF();
+        var body = readNode();
+        var slotCounter = new LocalVarsCountingVisitor();
+        body.accept(slotCounter);
+        var fdBuilder = FrameDescriptor.newBuilder();
+        fdBuilder.addSlots(slotCounter.getCount(), FrameSlotKind.Illegal);
+        var language = ChiLanguage.get(body);
+        var rootNode = new FnRootNode(language, fdBuilder.build(), body, name);
+        return new LambdaValue(rootNode.getCallTarget());
+    }
+
+    public ChiNode readInvokeEffect() throws IOException {
+        var moduleName = stream.readUTF();
+        var packageName = stream.readUTF();
+        var effectName = stream.readUTF();
+        return new InvokeEffect(moduleName, packageName, effectName);
+    }
+
+    public ChiNode readHandleEffect() throws IOException {
+        var handlersCount = stream.readShort();
+        var handlers = new HashMap<EffectHandlers.Qualifier, ChiFunction>();
+        for (int i = 0; i < handlersCount; i++) {
+            var moduleName = stream.readUTF();
+            var packageName = stream.readUTF();
+            var name = stream.readUTF();
+            var qualifier = new EffectHandlers.Qualifier(moduleName, packageName, name);
+
+            var handlerName = stream.readUTF();
+            var slotCounter = new LocalVarsCountingVisitor();
+            var handlerBody = readNode();
+            handlerBody.accept(slotCounter);
+            var fdBuilder = FrameDescriptor.newBuilder();
+            fdBuilder.addSlots(slotCounter.getCount(), FrameSlotKind.Illegal);
+            var language = ChiLanguage.get(handlerBody);
+            var rootNode = new FnRootNode(language, fdBuilder.build(), handlerBody, handlerName);
+            var handlerFunction = new ChiFunction(rootNode.getCallTarget());
+            handlers.put(qualifier, handlerFunction);
+        }
+        var blockNode = (BlockExpr) readNode();
+        return new HandleEffectNode(blockNode, handlers);
     }
 
 }

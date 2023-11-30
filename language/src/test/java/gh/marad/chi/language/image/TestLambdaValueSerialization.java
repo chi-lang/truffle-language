@@ -1,6 +1,5 @@
 package gh.marad.chi.language.image;
 
-import org.graalvm.polyglot.Context;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -9,7 +8,7 @@ public class TestLambdaValueSerialization {
     @Test
     void testLambdaValueSerialization() {
         // given
-        try (var context = createContext()) {
+        try (var context = TestContext.create()) {
             context.eval("chi", """
                     package test/modimage
                     pub fn hello(): (int)->int {
@@ -19,7 +18,7 @@ public class TestLambdaValueSerialization {
                     """.stripIndent());
         }
 
-        try (var context = createContext()) {
+        try (var context = TestContext.create()) {
             context.eval("chi", """
                     loadModule("lambda.chim")
                     """.stripIndent());
@@ -34,14 +33,4 @@ public class TestLambdaValueSerialization {
 
     }
 
-    private Context createContext() {
-        return Context.newBuilder("chi")
-                      .in(System.in)
-                      .out(System.out)
-                      .err(System.err)
-                      .allowExperimentalOptions(true)
-                      .allowAllAccess(true)
-                       .option("log.file", "truffle.log")
-                      .build();
-    }
 }

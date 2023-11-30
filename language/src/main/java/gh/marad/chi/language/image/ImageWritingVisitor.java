@@ -1,5 +1,6 @@
 package gh.marad.chi.language.image;
 
+import gh.marad.chi.language.EffectHandlers;
 import gh.marad.chi.language.nodes.ChiNodeVisitor;
 import gh.marad.chi.language.nodes.FnRootNode;
 import gh.marad.chi.language.nodes.IndexedAssignmentNode;
@@ -9,6 +10,9 @@ import gh.marad.chi.language.nodes.expr.cast.CastToLongExpr;
 import gh.marad.chi.language.nodes.expr.cast.CastToString;
 import gh.marad.chi.language.nodes.expr.flow.IfExpr;
 import gh.marad.chi.language.nodes.expr.flow.IsNode;
+import gh.marad.chi.language.nodes.expr.flow.effect.HandleEffectNode;
+import gh.marad.chi.language.nodes.expr.flow.effect.InvokeEffect;
+import gh.marad.chi.language.nodes.expr.flow.effect.ResumeNode;
 import gh.marad.chi.language.nodes.expr.flow.loop.WhileBreakNode;
 import gh.marad.chi.language.nodes.expr.flow.loop.WhileContinueNode;
 import gh.marad.chi.language.nodes.expr.flow.loop.WhileExprNode;
@@ -321,6 +325,39 @@ public class ImageWritingVisitor implements ChiNodeVisitor {
         stream.writeUTF(node.getFunctionName());
         TypeWriter.writeType(node.getType(), stream);
         stream.writeBoolean(node.getIsPublic());
+    }
+
+    @Override
+    public void visitInvokeEffect(InvokeEffect invokeEffect) throws IOException {
+        writeNodeId(NodeId.InvokeEffect);
+        stream.writeUTF(invokeEffect.moduleName);
+        stream.writeUTF(invokeEffect.packageName);
+        stream.writeUTF(invokeEffect.effectName);
+    }
+
+    @Override
+    public void visitHandleEffect(HandleEffectNode handle) throws Exception {
+        writeNodeId(NodeId.HandleEffect);
+        stream.writeShort(handle.handlers.size());
+        for (EffectHandlers.Qualifier qualifier : handle.handlers.keySet()) {
+            stream.writeUTF(qualifier.module());
+            stream.writeUTF(qualifier.pkg());
+            stream.writeUTF(qualifier.name());
+
+            var function = handle.handlers.get(qualifier);
+            var rootNode = function.getCallTarget().getRootNode();
+            if (rootNode instanceof FnRootNode fnRootNode) {
+                stream.writeUTF(fnRootNode.getName());
+                fnRootNode.accept(this);
+            } else {
+                throw new TODO("Cannot serialize foreign language functions");
+            }
+        }
+    }
+
+    @Override
+    public void visitResumeNode(ResumeNode resumeNode) throws Exception {
+        writeNodeId(NodeId.ResumeEffect);
     }
 
     private void writeNodeId(NodeId nodeId) throws IOException {

@@ -512,7 +512,7 @@ public class Converter {
                                      var resumeSlot = currentFdBuilder.addSlot(FrameSlotKind.Illegal, "resume", null);
                                      it.getScope().updateSlot("resume", resumeSlot);
 
-                                     var resumeFunc = ResumeNode.createResumeFunction(language);
+                                     var resumeFunc = ResumeNode.createResumeFunction();
                                      var bodyNode2 = new BlockExpr(new ChiNode[]{
                                              WriteLocalVariableNodeGen.create(
                                                      new LambdaValue(resumeFunc.getCallTarget()),

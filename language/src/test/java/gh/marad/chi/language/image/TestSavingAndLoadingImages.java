@@ -1,8 +1,8 @@
 package gh.marad.chi.language.image;
 
-import org.graalvm.polyglot.Context;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestSavingAndLoadingImages {
     @Test
@@ -10,7 +10,7 @@ public class TestSavingAndLoadingImages {
         org.graalvm.polyglot.Value result;
 
         // create and save module
-        try (var context = createContext()) {
+        try (var context = TestContext.create()) {
             context.eval("chi", """
                     package test/modimage
                     
@@ -20,7 +20,7 @@ public class TestSavingAndLoadingImages {
                     """.stripIndent());
         }
 
-        try (var context = createContext()) {
+        try (var context = TestContext.create()) {
             // load module
             context.eval("chi", """
                     loadModule("test.chim")
@@ -36,7 +36,7 @@ public class TestSavingAndLoadingImages {
 
 
             // change module code (using different context to not mess with the test one)
-            try(var innerContext = createContext()) {
+            try(var innerContext = TestContext.create()) {
                 innerContext.eval("chi", """
                         package test/modimage
 
@@ -57,13 +57,4 @@ public class TestSavingAndLoadingImages {
         }
     }
 
-    private Context createContext() {
-        return Context.newBuilder("chi")
-               .in(System.in)
-               .out(System.out)
-               .err(System.err)
-               .allowExperimentalOptions(true)
-               .allowAllAccess(true)
-               .build();
-    }
 }

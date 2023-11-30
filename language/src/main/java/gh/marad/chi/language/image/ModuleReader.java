@@ -2,6 +2,7 @@ package gh.marad.chi.language.image;
 
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.frame.FrameDescriptor;
+import com.oracle.truffle.api.frame.FrameSlotKind;
 import gh.marad.chi.core.FnType;
 import gh.marad.chi.core.namespace.SymbolType;
 import gh.marad.chi.language.ChiContext;
@@ -51,10 +52,13 @@ public class ModuleReader {
             std.out.println("|  |- Function " + functionName);
             std.out.flush();
 
-            var frameDescriptor = FrameDescriptor.newBuilder().build();
+            var frameDescriptorBuilder = FrameDescriptor.newBuilder();
+            var localCounter = new LocalVarsCountingVisitor();
+            frameDescriptorBuilder.addSlots(localCounter.getCount(), FrameSlotKind.Illegal);
+            functionBody.accept(localCounter);
             var rootNode = new FnRootNode(
                     language,
-                    frameDescriptor,
+                    frameDescriptorBuilder.build(),
                     functionBody,
                     functionName
             );

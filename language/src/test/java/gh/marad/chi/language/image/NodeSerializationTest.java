@@ -1,7 +1,5 @@
 package gh.marad.chi.language.image;
 
-import com.oracle.truffle.api.frame.FrameDescriptor;
-import com.oracle.truffle.api.frame.FrameSlotKind;
 import gh.marad.chi.core.Type;
 import gh.marad.chi.core.VariantType;
 import gh.marad.chi.language.nodes.ChiNode;
@@ -120,18 +118,14 @@ public class NodeSerializationTest {
         var slot = 0;
         var name = "varname";
         var expected = WriteLocalVariableNodeGen.create(value, slot, name);
-        var fdBuilder = FrameDescriptor.newBuilder();
         // when
-        var result = serializeAndDeserialize(expected, fdBuilder);
-        var fd = fdBuilder.build();
+        var result = serializeAndDeserialize(expected);
 
         // then
         if (result instanceof WriteLocalVariable actual) {
             assertInstanceOf(LongValue.class, actual.getValueNode());
             assertEquals(slot, actual.getSlot());
             assertEquals(name, actual.getName());
-            assertEquals(1, fd.getNumberOfSlots());
-            assertEquals(name, fd.getSlotName(slot));
         } else fail("Invalid node read!");
     }
 
@@ -160,11 +154,8 @@ public class NodeSerializationTest {
         var slot = 0;
         var name = "name";
         var expected = new ReadLocalVariable(name, slot);
-        var fdBuilder = FrameDescriptor.newBuilder();
-        fdBuilder.addSlot(FrameSlotKind.Illegal, name, null);
         // when
-        var result = serializeAndDeserialize(expected, fdBuilder);
-        var fd = fdBuilder.build();
+        var result = serializeAndDeserialize(expected);
         // then
         if (result instanceof ReadLocalVariable actual) {
             assertEquals(expected.slot, actual.slot);
@@ -523,17 +514,7 @@ public class NodeSerializationTest {
         } else fail("Invalid node read!");
     }
 
-    // DefinePackageFunction
-
-    // InvokeEffect
-    // HandleEffect
-
-
     public ChiNode serializeAndDeserialize(ChiNode node) throws Exception {
-        return serializeAndDeserialize(node, FrameDescriptor.newBuilder());
-    }
-
-    public ChiNode serializeAndDeserialize(ChiNode node, FrameDescriptor.Builder fd) throws Exception {
         var byteArrayOutputStream = new ByteArrayOutputStream();
         var outputStream = new DataOutputStream(byteArrayOutputStream);
         var nodeWriter = new ImageWritingVisitor(outputStream);
@@ -543,12 +524,6 @@ public class NodeSerializationTest {
         var inputStream = new DataInputStream(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
         var nodeReader = new NodeReader(inputStream);
 
-        return nodeReader.withFrameDescriptor(fd, () -> {
-            try {
-                return nodeReader.readNode();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        return nodeReader.readNode();
     }
 }

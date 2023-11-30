@@ -49,6 +49,9 @@ public enum NodeId {
     IsExpr,
     ConstructObject,
     DefinePackageFunction,
+    InvokeEffect,
+    HandleEffect,
+    ResumeEffect,
     ;
 
 
