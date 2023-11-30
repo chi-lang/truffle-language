@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class LocalVarsCountingVisitor implements NodeVisitor {
-    private Set<String> localVarsSet = new HashSet<>();
+    private final Set<String> localVarsSet = new HashSet<>();
 
     @Override
     public boolean visit(Node node) {

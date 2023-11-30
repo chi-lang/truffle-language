@@ -8,7 +8,6 @@ import gh.marad.chi.core.Type;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.builtin.lang.interop.LangInteropBuiltin;
 import gh.marad.chi.language.image.NodeId;
-import gh.marad.chi.language.nodes.ChiNodeVisitor;
 
 public class IsMemberInvocableBuiltin extends LangInteropBuiltin {
     @Child

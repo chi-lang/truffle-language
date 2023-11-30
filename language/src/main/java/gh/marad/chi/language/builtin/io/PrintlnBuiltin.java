@@ -5,7 +5,6 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import gh.marad.chi.core.FnType;
 import gh.marad.chi.core.Type;
 import gh.marad.chi.language.ChiArgs;
-import gh.marad.chi.language.ChiContext;
 import gh.marad.chi.language.ChiTypesGen;
 import gh.marad.chi.language.builtin.Builtin;
 import gh.marad.chi.language.image.NodeId;
@@ -15,7 +14,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 
 public class PrintlnBuiltin extends Builtin {
-    private PrintWriter writer;
+    private final PrintWriter writer;
 
 
     @CompilerDirectives.TruffleBoundary

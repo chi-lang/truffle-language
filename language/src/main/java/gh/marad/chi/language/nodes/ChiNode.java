@@ -13,7 +13,6 @@ import gh.marad.chi.language.ChiLanguage;
 import gh.marad.chi.language.ChiTypes;
 import gh.marad.chi.language.ChiTypesGen;
 import gh.marad.chi.language.runtime.ChiFunction;
-import gh.marad.chi.language.runtime.TODO;
 
 @Introspectable
 @TypeSystemReference(ChiTypes.class)
@@ -25,6 +24,7 @@ public abstract class ChiNode extends Node {
         hasRootTag = true;
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean hasTag(Class<? extends Tag> tag) {
         return hasRootTag && (tag == StandardTags.RootTag.class || tag == StandardTags.RootBodyTag.class);
     }
