@@ -3,6 +3,7 @@ package gh.marad.chi.language.nodes.function;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import gh.marad.chi.core.FnType;
 import gh.marad.chi.language.ChiContext;
+import gh.marad.chi.language.nodes.ChiNodeVisitor;
 import gh.marad.chi.language.nodes.expr.ExpressionNode;
 import gh.marad.chi.language.runtime.ChiFunction;
 
@@ -33,5 +34,10 @@ public class DefinePackageFunction extends ExpressionNode {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         return executeFunction(frame);
+    }
+
+    @Override
+    public void accept(ChiNodeVisitor visitor) throws Exception {
+        visitor.visitDefinePackageFunction(this);
     }
 }

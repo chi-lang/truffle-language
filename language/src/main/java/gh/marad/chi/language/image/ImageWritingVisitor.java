@@ -25,6 +25,7 @@ import gh.marad.chi.language.nodes.expr.operators.bit.ShlOperator;
 import gh.marad.chi.language.nodes.expr.operators.bit.ShrOperator;
 import gh.marad.chi.language.nodes.expr.operators.bool.*;
 import gh.marad.chi.language.nodes.expr.variables.*;
+import gh.marad.chi.language.nodes.function.DefinePackageFunction;
 import gh.marad.chi.language.nodes.function.DefinePackageFunctionFromNode;
 import gh.marad.chi.language.nodes.function.GetDefinedFunction;
 import gh.marad.chi.language.nodes.function.InvokeFunction;
@@ -332,6 +333,11 @@ public class ImageWritingVisitor implements ChiNodeVisitor {
         stream.writeUTF(node.getFunctionName());
         TypeWriter.writeType(node.getType(), stream);
         stream.writeBoolean(node.getIsPublic());
+    }
+
+    @Override
+    public void visitDefinePackageFunction(DefinePackageFunction definePackageFunction) {
+        throw new TODO("Package functions should be serialized by ModuleWriter!");
     }
 
     @Override

@@ -61,8 +61,5 @@ public abstract class ChiNode extends Node {
 
     public abstract Object executeGeneric(VirtualFrame frame);
 
-    public void accept(ChiNodeVisitor visitor) throws Exception {
-        var className = this.getClass().getName();
-        throw new TODO(String.format("Visiting node %s is not implemented", className));
-    }
+    public abstract void accept(ChiNodeVisitor visitor) throws Exception;
 }

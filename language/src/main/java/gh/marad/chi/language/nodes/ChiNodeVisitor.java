@@ -20,6 +20,7 @@ import gh.marad.chi.language.nodes.expr.operators.bit.ShlOperator;
 import gh.marad.chi.language.nodes.expr.operators.bit.ShrOperator;
 import gh.marad.chi.language.nodes.expr.operators.bool.*;
 import gh.marad.chi.language.nodes.expr.variables.*;
+import gh.marad.chi.language.nodes.function.DefinePackageFunction;
 import gh.marad.chi.language.nodes.function.DefinePackageFunctionFromNode;
 import gh.marad.chi.language.nodes.function.GetDefinedFunction;
 import gh.marad.chi.language.nodes.function.InvokeFunction;
@@ -78,8 +79,10 @@ public interface ChiNodeVisitor {
     void visitIs(IsNode isNode) throws Exception;
     void visitConstructChiObject(ConstructChiObject constructChiObject) throws Exception;
     void visitDefinePackageFunction(DefinePackageFunctionFromNode definePackageFunctionFromNode) throws Exception;
+    void visitDefinePackageFunction(DefinePackageFunction definePackageFunction) throws Exception;
     void visitInvokeEffect(InvokeEffect invokeEffect) throws Exception;
     void visitHandleEffect(HandleEffectNode visitor) throws Exception;
     void visitResumeNode(ResumeNode resumeNode) throws Exception;
     void visitBuiltin(Builtin builtin) throws Exception;
+
 }
