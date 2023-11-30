@@ -38,6 +38,8 @@ public enum NodeId {
     IfExpr,
     LambdaValue,
     WriteModuleVariable,
+    WriteOuterVariable,
+    WriteLocalArgument,
     InvokeFunction,
     GetDefinedFunction,
     ;

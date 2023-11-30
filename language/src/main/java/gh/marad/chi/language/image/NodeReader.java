@@ -81,6 +81,8 @@ public class NodeReader {
             case IfExpr -> readIfExpr();
             case LambdaValue -> readLambdaValue();
             case WriteModuleVariable -> readWriteModuleVariable();
+            case WriteOuterVariable -> readWriteOuterVariable();
+            case WriteLocalArgument -> readWriteLocalArgument();
             case InvokeFunction -> readInvokeFunction();
             case GetDefinedFunction -> readGetDefinedFunction();
         };
@@ -329,6 +331,18 @@ public class NodeReader {
         var variableName = stream.readUTF();
         var value = readNode();
         return WriteModuleVariableNodeGen.create(value, moduleName ,packageName, variableName);
+    }
+
+    public ChiNode readWriteOuterVariable() throws IOException {
+        var name = stream.readUTF();
+        var value = readNode();
+        return WriteOuterVariableNodeGen.create(value, name);
+    }
+
+    public ChiNode readWriteLocalArgument() throws IOException {
+        int slot = stream.readByte();
+        var value = readNode();
+        return WriteLocalArgumentNodeGen.create(value, slot);
     }
 
     // ---

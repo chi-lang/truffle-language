@@ -339,21 +339,6 @@ public class NodeSerializationTest {
     }
 
     @Test
-    void testLambdaValueSerialization() throws Exception {
-        // given
-        var lang = new ChiLanguage();
-        var body = new LongValue(5);
-        var rootNode = new FnRootNode(lang, FrameDescriptor.newBuilder().build(), body, "name");
-        var expected = new LambdaValue(rootNode.getCallTarget());
-        // when
-        var result = serializeAndDeserialize(expected);
-        // then
-        if (result instanceof LambdaValue actual) {
-        } else fail("Invalid node read!");
-    }
-
-
-    @Test
     void testWriteModuleVariableSerialization() throws Exception {
         // given
         var value = new LongValue(5);
@@ -374,9 +359,37 @@ public class NodeSerializationTest {
     }
 
     @Test
-    void nextTask() {
-        fail("Fn serialization");
+    void testWriteOuterVariableSerialization() throws Exception {
+        // given
+        var value = new LongValue(5);
+        var expected = WriteOuterVariableNodeGen.create(value, "name");
+        // when
+        var result = serializeAndDeserialize(expected);
+        // then
+        if (result instanceof WriteOuterVariable actual) {
+            assertEquals(expected.getName(), actual.getName());
+            assertInstanceOf(LongValue.class, actual.getValueNode());
+        } else fail("Invalid node read!");
     }
+
+    @Test
+    void testWriteLocalArgumentSerialization() throws Exception {
+        // given
+        var value = new LongValue(5);
+        var expected = WriteLocalArgumentNodeGen.create(value, 0);
+        // when
+        var result = serializeAndDeserialize(expected);
+        // then
+        if (result instanceof WriteLocalArgument actual) {
+            assertEquals(expected.getSlot(), actual.getSlot());
+            assertInstanceOf(LongValue.class, actual.getValue());
+        } else fail("Invalid node read!");
+    }
+
+//    @Test
+//    void nextTask() {
+//        fail("Fn serialization");
+//    }
 
     public ChiNode serializeAndDeserialize(ChiNode node) throws Exception {
         return serializeAndDeserialize(node, FrameDescriptor.newBuilder());

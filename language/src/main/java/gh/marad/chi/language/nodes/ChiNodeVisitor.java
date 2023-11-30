@@ -57,6 +57,8 @@ public interface ChiNodeVisitor {
     void visitIfExpr(IfExpr ifExpr) throws Exception;
     void visitLambdaValue(LambdaValue lambdaValue) throws Exception;
     void visitWriteModuleVariable(WriteModuleVariable writeModuleVariable) throws Exception;
+    void visitWriteOuterVariable(WriteOuterVariable writeOuterVariable) throws Exception;
+    void visitWriteLocalArgument(WriteLocalArgument writeLocalArgument) throws Exception;
     // ---
     void visitInvokeFunction(InvokeFunction invokeFunction) throws Exception;
 

@@ -248,6 +248,18 @@ public class ImageWritingVisitor implements ChiNodeVisitor {
         stream.writeUTF(writeModuleVariable.getVariableName());
     }
 
+    @Override
+    public void visitWriteOuterVariable(WriteOuterVariable writeOuterVariable) throws IOException {
+        writeNodeId(NodeId.WriteOuterVariable);
+        stream.writeUTF(writeOuterVariable.getName());
+    }
+
+    @Override
+    public void visitWriteLocalArgument(WriteLocalArgument writeLocalArgument) throws IOException {
+        writeNodeId(NodeId.WriteLocalArgument);
+        stream.writeByte(writeLocalArgument.getSlot());
+    }
+
     // --
     // TODO add serialization/deserialization tests for each node
     // TODO implement visitor for every node
