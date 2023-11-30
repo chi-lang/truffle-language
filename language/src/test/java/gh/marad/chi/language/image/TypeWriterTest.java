@@ -1,11 +1,14 @@
 package gh.marad.chi.language.image;
 
 import gh.marad.chi.core.FnType;
+import gh.marad.chi.core.GenericTypeParameter;
 import gh.marad.chi.core.Type;
+import gh.marad.chi.core.VariantType;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 class TypeWriterTest {
@@ -65,6 +68,33 @@ class TypeWriterTest {
         } else {
             fail("Result did not deserialize to function type.");
         }
+    }
+
+    @Test
+    public void testVariantTypeSerialization() throws IOException {
+        // given
+        var variantType = new VariantType(
+                "moduleName",
+                "packageName",
+                "SimpleName",
+                List.of(new GenericTypeParameter("T")),
+                Map.of(new GenericTypeParameter("T"), Type.getIntType()),
+                new VariantType.Variant(
+                        true, // public
+                        "VariantName",
+                        List.of(
+                                new VariantType.VariantField(
+                                        true, // public
+                                        "fieldName",
+                                        Type.getIntType()
+                                )
+                        )
+                )
+        );
+        // when
+        var result = serializeAndDeserializeType(variantType);
+        // then
+        assertEquals(variantType, result);
     }
 
     private Type serializeAndDeserializeType(Type type) throws IOException {
