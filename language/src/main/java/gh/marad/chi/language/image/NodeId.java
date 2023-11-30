@@ -36,6 +36,8 @@ public enum NodeId {
     CastToFloat,
     CastToString,
     IfExpr,
+    LambdaValue,
+    WriteModuleVariable,
     InvokeFunction,
     GetDefinedFunction,
     ;

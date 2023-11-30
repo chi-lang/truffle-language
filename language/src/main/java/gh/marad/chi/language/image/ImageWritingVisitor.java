@@ -1,6 +1,7 @@
 package gh.marad.chi.language.image;
 
 import gh.marad.chi.language.nodes.ChiNodeVisitor;
+import gh.marad.chi.language.nodes.FnRootNode;
 import gh.marad.chi.language.nodes.expr.BlockExpr;
 import gh.marad.chi.language.nodes.expr.cast.CastToFloat;
 import gh.marad.chi.language.nodes.expr.cast.CastToLongExpr;
@@ -16,9 +17,10 @@ import gh.marad.chi.language.nodes.expr.variables.*;
 import gh.marad.chi.language.nodes.function.GetDefinedFunction;
 import gh.marad.chi.language.nodes.function.InvokeFunction;
 import gh.marad.chi.language.nodes.objects.ReadMember;
-import gh.marad.chi.language.nodes.objects.ReadMemberNodeGen;
 import gh.marad.chi.language.nodes.objects.WriteMember;
 import gh.marad.chi.language.nodes.value.*;
+import gh.marad.chi.language.runtime.TODO;
+import kotlin.jvm.internal.Lambda;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -31,7 +33,7 @@ public class ImageWritingVisitor implements ChiNodeVisitor {
     }
 
     @Override
-    public void visitUnitValue(UnitValue unitValue) throws Exception {
+    public void visitUnitValue(UnitValue unitValue) throws IOException {
         writeNodeId(NodeId.UnitValue);
     }
 
@@ -224,6 +226,26 @@ public class ImageWritingVisitor implements ChiNodeVisitor {
     @Override
     public void visitIfExpr(IfExpr ifExpr) throws Exception {
         writeNodeId(NodeId.IfExpr);
+    }
+
+    @Override
+    public void visitLambdaValue(LambdaValue lambdaValue) throws Exception {
+        writeNodeId(NodeId.LambdaValue);
+        var rootNode = lambdaValue.callTarget.getRootNode();
+        if (rootNode instanceof FnRootNode fnRootNode) {
+            stream.writeUTF(fnRootNode.getName());
+            fnRootNode.accept(this);
+        } else {
+            throw new TODO("Cannot serialize foreign language functions");
+        }
+    }
+
+    @Override
+    public void visitWriteModuleVariable(WriteModuleVariable writeModuleVariable) throws IOException {
+        writeNodeId(NodeId.WriteModuleVariable);
+        stream.writeUTF(writeModuleVariable.getModuleName());
+        stream.writeUTF(writeModuleVariable.getPackageName());
+        stream.writeUTF(writeModuleVariable.getVariableName());
     }
 
     // --

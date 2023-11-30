@@ -5,6 +5,7 @@ import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
 import gh.marad.chi.language.ChiContext;
 import gh.marad.chi.language.nodes.ChiNode;
+import gh.marad.chi.language.nodes.ChiNodeVisitor;
 import gh.marad.chi.language.nodes.expr.ExpressionNode;
 
 @NodeField(name = "moduleName", type = String.class)
@@ -12,11 +13,13 @@ import gh.marad.chi.language.nodes.expr.ExpressionNode;
 @NodeField(name = "variableName", type = String.class)
 @NodeChild(value = "value", type = ChiNode.class)
 public abstract class WriteModuleVariable extends ExpressionNode {
-    protected abstract String getModuleName();
+    public abstract String getModuleName();
 
-    protected abstract String getPackageName();
+    public abstract String getPackageName();
 
-    protected abstract String getVariableName();
+    public abstract String getVariableName();
+
+    public abstract ChiNode getValue();
 
     @Specialization
     public Object saveObject(Object value) {
@@ -24,5 +27,11 @@ public abstract class WriteModuleVariable extends ExpressionNode {
         ctx.modules.getOrCreateModule(getModuleName())
                    .defineVariable(getPackageName(), getVariableName(), value);
         return value;
+    }
+
+    @Override
+    public void accept(ChiNodeVisitor visitor) throws Exception {
+        visitor.visitWriteModuleVariable(this);
+        getValue().accept(visitor);
     }
 }

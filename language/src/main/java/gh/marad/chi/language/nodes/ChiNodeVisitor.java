@@ -46,7 +46,6 @@ public interface ChiNodeVisitor {
     void visitGreaterThanOperator(GreaterThanOperator greaterThanOperator) throws Exception;
     void visitLogicAndOperator(LogicAndOperator logicAndOperator) throws Exception;
     void visitLogicOrOperator(LogicOrOperator logicOrOperator) throws Exception;
-
     void visitBitAndOperator(BitAndOperator bitAndOperator) throws Exception;
     void visitBitOrOperator(BitOrOperator bitOrOperator) throws Exception;
     void visitShlOperator(ShlOperator shlOperator) throws Exception;
@@ -56,6 +55,8 @@ public interface ChiNodeVisitor {
     void visitCastToFloat(CastToFloat castToFloat) throws Exception;
     void visitCastToString(CastToString castToString) throws Exception;
     void visitIfExpr(IfExpr ifExpr) throws Exception;
+    void visitLambdaValue(LambdaValue lambdaValue) throws Exception;
+    void visitWriteModuleVariable(WriteModuleVariable writeModuleVariable) throws Exception;
     // ---
     void visitInvokeFunction(InvokeFunction invokeFunction) throws Exception;
 

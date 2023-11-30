@@ -2,7 +2,9 @@ package gh.marad.chi.language.image;
 
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import gh.marad.chi.language.ChiLanguage;
 import gh.marad.chi.language.nodes.ChiNode;
+import gh.marad.chi.language.nodes.FnRootNode;
 import gh.marad.chi.language.nodes.expr.BlockExpr;
 import gh.marad.chi.language.nodes.expr.cast.*;
 import gh.marad.chi.language.nodes.expr.flow.IfExpr;
@@ -334,6 +336,46 @@ public class NodeSerializationTest {
             assertInstanceOf(LongValue.class, actual.getThenBranch());
             assertInstanceOf(UnitValue.class, actual.getElseBranch());
         } else fail("Invalid node read!");
+    }
+
+    @Test
+    void testLambdaValueSerialization() throws Exception {
+        // given
+        var lang = new ChiLanguage();
+        var body = new LongValue(5);
+        var rootNode = new FnRootNode(lang, FrameDescriptor.newBuilder().build(), body, "name");
+        var expected = new LambdaValue(rootNode.getCallTarget());
+        // when
+        var result = serializeAndDeserialize(expected);
+        // then
+        if (result instanceof LambdaValue actual) {
+        } else fail("Invalid node read!");
+    }
+
+
+    @Test
+    void testWriteModuleVariableSerialization() throws Exception {
+        // given
+        var value = new LongValue(5);
+        var moduleName = "moduleName";
+        var packageName = "packageName";
+        var variableName = "variableName";
+        var expected = WriteModuleVariableNodeGen.create(value, moduleName, packageName, variableName);
+        // when
+        var result = serializeAndDeserialize(expected);
+        // then
+        if (result instanceof WriteModuleVariable actual) {
+            assertEquals(expected.getModuleName(), actual.getModuleName());
+            assertEquals(expected.getPackageName(), actual.getPackageName());
+            assertEquals(expected.getVariableName(), actual.getVariableName());
+            assertInstanceOf(LongValue.class, actual.getValue());
+
+        } else fail("Invalid node read!");
+    }
+
+    @Test
+    void nextTask() {
+        fail("Fn serialization");
     }
 
     public ChiNode serializeAndDeserialize(ChiNode node) throws Exception {

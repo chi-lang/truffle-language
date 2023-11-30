@@ -2,7 +2,11 @@ package gh.marad.chi.language.image;
 
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import com.oracle.truffle.api.nodes.Node;
+import com.oracle.truffle.api.nodes.NodeVisitor;
+import gh.marad.chi.language.ChiLanguage;
 import gh.marad.chi.language.nodes.ChiNode;
+import gh.marad.chi.language.nodes.FnRootNode;
 import gh.marad.chi.language.nodes.expr.BlockExpr;
 import gh.marad.chi.language.nodes.expr.cast.*;
 import gh.marad.chi.language.nodes.expr.flow.IfExpr;
@@ -75,6 +79,8 @@ public class NodeReader {
             case CastToFloat -> readCastToFloat();
             case CastToString -> readCastToString();
             case IfExpr -> readIfExpr();
+            case LambdaValue -> readLambdaValue();
+            case WriteModuleVariable -> readWriteModuleVariable();
             case InvokeFunction -> readInvokeFunction();
             case GetDefinedFunction -> readGetDefinedFunction();
         };
@@ -289,6 +295,41 @@ public class NodeReader {
         return IfExpr.create(condition, thenBranch, elseBranch);
     }
 
+
+    private class LocalVarsCounter implements NodeVisitor {
+        private int count = 0;
+
+        @Override
+        public boolean visit(Node node) {
+            if (node instanceof ReadLocalVariable) {
+                count += 1;
+            }
+            return true;
+        }
+
+        public int getCount() {
+            return count;
+        }
+    }
+    public ChiNode readLambdaValue() throws IOException {
+        var name = stream.readUTF();
+        var body = readNode();
+        var slotCounter = new LocalVarsCounter();
+        body.accept(slotCounter);
+        var fdBuilder = FrameDescriptor.newBuilder();
+        fdBuilder.addSlots(slotCounter.getCount(), FrameSlotKind.Illegal);
+        var language = ChiLanguage.get(body);
+        var rootNode = new FnRootNode(language, fdBuilder.build(), body, name);
+        return new LambdaValue(rootNode.getCallTarget());
+    }
+
+    public ChiNode readWriteModuleVariable() throws IOException {
+        var moduleName = stream.readUTF();
+        var packageName = stream.readUTF();
+        var variableName = stream.readUTF();
+        var value = readNode();
+        return WriteModuleVariableNodeGen.create(value, moduleName ,packageName, variableName);
+    }
 
     // ---
 
