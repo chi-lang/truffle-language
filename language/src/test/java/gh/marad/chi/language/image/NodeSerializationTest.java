@@ -2,12 +2,13 @@ package gh.marad.chi.language.image;
 
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlotKind;
-import gh.marad.chi.language.ChiLanguage;
 import gh.marad.chi.language.nodes.ChiNode;
-import gh.marad.chi.language.nodes.FnRootNode;
 import gh.marad.chi.language.nodes.expr.BlockExpr;
 import gh.marad.chi.language.nodes.expr.cast.*;
 import gh.marad.chi.language.nodes.expr.flow.IfExpr;
+import gh.marad.chi.language.nodes.expr.flow.loop.WhileBreakNode;
+import gh.marad.chi.language.nodes.expr.flow.loop.WhileContinueNode;
+import gh.marad.chi.language.nodes.expr.flow.loop.WhileExprNode;
 import gh.marad.chi.language.nodes.expr.operators.BinaryOperator;
 import gh.marad.chi.language.nodes.expr.operators.arithmetic.*;
 import gh.marad.chi.language.nodes.expr.operators.bit.*;
@@ -386,10 +387,51 @@ public class NodeSerializationTest {
         } else fail("Invalid node read!");
     }
 
-//    @Test
-//    void nextTask() {
-//        fail("Fn serialization");
-//    }
+    @Test
+    void testWhileExprNode() throws Exception {
+        // given
+        var condition = new BooleanValue(true);
+        var loopBody = new LongValue(5);
+        var expected = new WhileExprNode(condition, loopBody);
+        // when
+        var result = serializeAndDeserialize(expected);
+        // then
+        if (result instanceof WhileExprNode actual) {
+            assertInstanceOf(BooleanValue.class, actual.getCondition());
+            assertInstanceOf(LongValue.class, actual.getLoopBody());
+        } else fail("Invalid node read!");
+    }
+
+
+    @Test
+    void testWhileBreakNode() throws Exception {
+        // given
+        var expected = new WhileBreakNode();
+        // when
+        var result = serializeAndDeserialize(expected);
+        // then
+        assertInstanceOf(WhileBreakNode.class, result);
+    }
+
+    @Test
+    void testWhileContinueNode() throws Exception {
+        // given
+        var expected = new WhileContinueNode();
+        // when
+        var result = serializeAndDeserialize(expected);
+        // then
+        assertInstanceOf(WhileContinueNode.class, result);
+    }
+
+    // ConstructChiObject
+    // DefinePackageFunction
+
+    // IndexedAssignment
+    // Is
+
+    // InvokeEffect
+    // HandleEffect
+
 
     public ChiNode serializeAndDeserialize(ChiNode node) throws Exception {
         return serializeAndDeserialize(node, FrameDescriptor.newBuilder());

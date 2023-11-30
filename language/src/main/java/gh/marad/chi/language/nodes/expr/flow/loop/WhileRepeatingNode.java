@@ -47,6 +47,14 @@ public class WhileRepeatingNode extends ExpressionNode implements RepeatingNode 
         throw new TODO("while is not a regular expression node");
     }
 
+    public ChiNode getConditionNode() {
+        return conditionNode;
+    }
+
+    public ChiNode getBodyNode() {
+        return bodyNode;
+    }
+
     //    @Override
 //    public Object executeRepeatingWithValue(VirtualFrame frame) {
 //        return RepeatingNode.super.executeRepeatingWithValue(frame);

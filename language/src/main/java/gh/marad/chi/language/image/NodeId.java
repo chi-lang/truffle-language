@@ -42,6 +42,9 @@ public enum NodeId {
     WriteLocalArgument,
     InvokeFunction,
     GetDefinedFunction,
+    WhileExpr,
+    WhileBreak,
+    WhileContinue,
     ;
 
 

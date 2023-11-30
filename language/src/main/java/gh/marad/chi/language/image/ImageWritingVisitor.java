@@ -7,6 +7,9 @@ import gh.marad.chi.language.nodes.expr.cast.CastToFloat;
 import gh.marad.chi.language.nodes.expr.cast.CastToLongExpr;
 import gh.marad.chi.language.nodes.expr.cast.CastToString;
 import gh.marad.chi.language.nodes.expr.flow.IfExpr;
+import gh.marad.chi.language.nodes.expr.flow.loop.WhileBreakNode;
+import gh.marad.chi.language.nodes.expr.flow.loop.WhileContinueNode;
+import gh.marad.chi.language.nodes.expr.flow.loop.WhileExprNode;
 import gh.marad.chi.language.nodes.expr.operators.arithmetic.*;
 import gh.marad.chi.language.nodes.expr.operators.bit.BitAndOperator;
 import gh.marad.chi.language.nodes.expr.operators.bit.BitOrOperator;
@@ -260,11 +263,6 @@ public class ImageWritingVisitor implements ChiNodeVisitor {
         stream.writeByte(writeLocalArgument.getSlot());
     }
 
-    // --
-    // TODO add serialization/deserialization tests for each node
-    // TODO implement visitor for every node
-    // TODO remove default `accept` implementation from ChiNode
-
     @Override
     public void visitInvokeFunction(InvokeFunction invokeFunction) throws IOException {
         writeNodeId(NodeId.InvokeFunction);
@@ -280,7 +278,28 @@ public class ImageWritingVisitor implements ChiNodeVisitor {
         TypeWriter.writeTypes(getDefinedFunction.paramTypes, stream);
     }
 
+    @Override
+    public void visitWhileExprNode(WhileExprNode whileExprNode) throws IOException {
+        writeNodeId(NodeId.WhileExpr);
+    }
+
+    @Override
+    public void visitWhileBreakNode(WhileBreakNode whileBreakNode) throws IOException {
+        writeNodeId(NodeId.WhileBreak);
+    }
+
+    @Override
+    public void visitWhileContinueNode(WhileContinueNode whileContinueNode) throws IOException {
+        writeNodeId(NodeId.WhileContinue);
+    }
+
     private void writeNodeId(NodeId nodeId) throws IOException {
         stream.writeShort(nodeId.id());
     }
+
+    // --
+    // TODO add serialization/deserialization tests for each node
+    // TODO implement visitor for every node
+    // TODO remove default `accept` implementation from ChiNode
+
 }

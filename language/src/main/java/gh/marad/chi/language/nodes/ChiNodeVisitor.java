@@ -1,11 +1,13 @@
 package gh.marad.chi.language.nodes;
 
 import gh.marad.chi.language.nodes.expr.BlockExpr;
-import gh.marad.chi.language.nodes.expr.ExpressionNode;
 import gh.marad.chi.language.nodes.expr.cast.CastToFloat;
 import gh.marad.chi.language.nodes.expr.cast.CastToLongExpr;
 import gh.marad.chi.language.nodes.expr.cast.CastToString;
 import gh.marad.chi.language.nodes.expr.flow.IfExpr;
+import gh.marad.chi.language.nodes.expr.flow.loop.WhileBreakNode;
+import gh.marad.chi.language.nodes.expr.flow.loop.WhileContinueNode;
+import gh.marad.chi.language.nodes.expr.flow.loop.WhileExprNode;
 import gh.marad.chi.language.nodes.expr.operators.arithmetic.*;
 import gh.marad.chi.language.nodes.expr.operators.bit.BitAndOperator;
 import gh.marad.chi.language.nodes.expr.operators.bit.BitOrOperator;
@@ -59,9 +61,9 @@ public interface ChiNodeVisitor {
     void visitWriteModuleVariable(WriteModuleVariable writeModuleVariable) throws Exception;
     void visitWriteOuterVariable(WriteOuterVariable writeOuterVariable) throws Exception;
     void visitWriteLocalArgument(WriteLocalArgument writeLocalArgument) throws Exception;
-    // ---
     void visitInvokeFunction(InvokeFunction invokeFunction) throws Exception;
-
     void visitGetDefinedFunction(GetDefinedFunction getDefinedFunction) throws Exception;
-
+    void visitWhileExprNode(WhileExprNode whileExprNode) throws Exception;
+    void visitWhileBreakNode(WhileBreakNode whileBreakNode) throws Exception;
+    void visitWhileContinueNode(WhileContinueNode whileContinueNode) throws Exception;
 }

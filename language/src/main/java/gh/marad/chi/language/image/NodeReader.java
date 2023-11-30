@@ -10,6 +10,9 @@ import gh.marad.chi.language.nodes.FnRootNode;
 import gh.marad.chi.language.nodes.expr.BlockExpr;
 import gh.marad.chi.language.nodes.expr.cast.*;
 import gh.marad.chi.language.nodes.expr.flow.IfExpr;
+import gh.marad.chi.language.nodes.expr.flow.loop.WhileBreakNode;
+import gh.marad.chi.language.nodes.expr.flow.loop.WhileContinueNode;
+import gh.marad.chi.language.nodes.expr.flow.loop.WhileExprNode;
 import gh.marad.chi.language.nodes.expr.operators.arithmetic.*;
 import gh.marad.chi.language.nodes.expr.operators.bit.*;
 import gh.marad.chi.language.nodes.expr.operators.bool.*;
@@ -85,6 +88,9 @@ public class NodeReader {
             case WriteLocalArgument -> readWriteLocalArgument();
             case InvokeFunction -> readInvokeFunction();
             case GetDefinedFunction -> readGetDefinedFunction();
+            case WhileExpr -> readWhileExprNode();
+            case WhileBreak -> new WhileBreakNode();
+            case WhileContinue -> new WhileContinueNode();
         };
     }
 
@@ -345,9 +351,6 @@ public class NodeReader {
         return WriteLocalArgumentNodeGen.create(value, slot);
     }
 
-    // ---
-
-
     public ChiNode readInvokeFunction() throws IOException {
         var argCount = stream.readByte();
         var arguments = new ChiNode[argCount];
@@ -366,4 +369,9 @@ public class NodeReader {
         return new GetDefinedFunction(moduleName, packageName, functionName, paramTypes);
     }
 
+    public ChiNode readWhileExprNode() throws IOException {
+        var condition = readNode();
+        var loopNode = readNode();
+        return new WhileExprNode(condition, loopNode);
+    }
 }
