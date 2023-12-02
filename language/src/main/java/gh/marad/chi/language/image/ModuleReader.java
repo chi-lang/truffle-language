@@ -28,8 +28,6 @@ public class ModuleReader {
     public void readModule(DataInputStream stream, StdStreams std) throws IOException {
         var moduleName = stream.readUTF();
         var packageCount = stream.readShort();
-        std.out.println("Module " + moduleName);
-        std.out.flush();
         var module = context.modules.getOrCreateModule(moduleName);
         for (int i = 0; i < packageCount; i++) {
             readPackage(module, stream, std);
@@ -39,8 +37,6 @@ public class ModuleReader {
     private void readPackage(Module module, DataInputStream stream, StdStreams std) throws IOException {
         var packageName = stream.readUTF();
         var functionCount = stream.readShort();
-        std.out.println("|- Package " + packageName);
-        std.out.flush();
 
         var nodeReader = new NodeReader(stream, context.getEnv().out());
         for (int i = 0; i < functionCount; i++) {
@@ -49,28 +45,31 @@ public class ModuleReader {
             var isPublic = stream.readBoolean();
             var functionBody = nodeReader.readNode();
 
-            std.out.println("|  |- Function " + functionName);
-            std.out.flush();
-
-            var frameDescriptorBuilder = FrameDescriptor.newBuilder();
-            var localCounter = new LocalVarsCountingVisitor();
-            frameDescriptorBuilder.addSlots(localCounter.getCount(), FrameSlotKind.Illegal);
-            functionBody.accept(localCounter);
-            var rootNode = new FnRootNode(
-                    language,
-                    frameDescriptorBuilder.build(),
-                    functionBody,
-                    functionName
-            );
-            var function = new ChiFunction(rootNode.getCallTarget());
-            module.defineFunction(packageName, function, type, isPublic);
-            context.compilationNamespace
-                    .getOrCreatePackage(module.getName(), packageName)
-                    .getScope().addSymbol(
-                           functionName,
-                           type, SymbolType.Local,
-                           isPublic, true
-                   );
+            try {
+                var frameDescriptorBuilder = FrameDescriptor.newBuilder();
+                var localCounter = new LocalVarsCountingVisitor();
+                frameDescriptorBuilder.addSlots(localCounter.getCount(), FrameSlotKind.Illegal);
+                functionBody.accept(localCounter);
+                var rootNode = new FnRootNode(
+                        language,
+                        frameDescriptorBuilder.build(),
+                        functionBody,
+                        functionName
+                );
+                var function = new ChiFunction(rootNode.getCallTarget());
+                module.defineFunction(packageName, function, type, isPublic);
+                context.compilationNamespace
+                        .getOrCreatePackage(module.getName(), packageName)
+                        .getScope().addSymbol(
+                               functionName,
+                               type, SymbolType.Local,
+                               isPublic, true
+                       );
+            } catch (Exception ex) {
+                std.err.printf("Error loading function %s in %s/%s%n", functionName, module.getName(), packageName);
+                ex.printStackTrace(std.err);
+                std.err.flush();
+            }
         }
     }
 

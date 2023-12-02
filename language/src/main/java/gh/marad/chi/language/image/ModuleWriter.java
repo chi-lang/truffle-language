@@ -13,6 +13,9 @@ import java.io.DataOutputStream;
 public class ModuleWriter {
     private final ChiContext context;
 
+    // TODO implement saving/loading package variables
+    // TODO implement saving/loading custom data types
+
     public ModuleWriter(ChiContext context) {
         this.context = context;
     }
@@ -29,8 +32,6 @@ public class ModuleWriter {
     }
 
     private void writeModule(Module module, DataOutputStream stream, StdStreams std) throws Exception {
-        std.out.println("Module " + module.getName());
-        std.out.flush();
         var packageNames = module.listPackages();
         stream.writeUTF(module.getName());  // module name
         stream.writeShort(packageNames.size()); // package count
@@ -40,24 +41,26 @@ public class ModuleWriter {
     }
 
     private void writePackage(Module module, String packageName, DataOutputStream stream, StdStreams std) throws Exception {
-        std.out.println("|- Package " + packageName);
-        std.out.flush();
         var functions = module.listFunctions(packageName);
         stream.writeUTF(packageName);     // package name
         stream.writeShort(functions.size());  // function count
 
         var imageWritingVisitor = new ImageWritingVisitor(stream);
         for (Package.FunctionLookupResult function : functions) {
-            var rootNode = function.function().getCallTarget().getRootNode();
-            if (rootNode instanceof FnRootNode node) {
-                std.out.println("|  |- Function " + node.getName());
-                std.out.flush();
-                stream.writeUTF(node.getName());
-                TypeWriter.writeType(function.type(), stream);
-                stream.writeBoolean(function.isPublic());
-                node.accept(imageWritingVisitor);
-            } else {
-                throw new TODO("Non FnRootNode as function body!");
+            try {
+                var rootNode = function.function().getCallTarget().getRootNode();
+                if (rootNode instanceof FnRootNode node) {
+                    stream.writeUTF(node.getName());
+                    TypeWriter.writeType(function.type(), stream);
+                    stream.writeBoolean(function.isPublic());
+                    node.accept(imageWritingVisitor);
+                } else {
+                    throw new TODO("Non FnRootNode as function body!");
+                }
+            } catch (Exception ex) {
+                std.err.printf("Error saving function %s in %s/%s%n", function.function().getExecutableName(), module.getName(), packageName);
+                ex.printStackTrace(std.err);
+                std.err.flush();
             }
         }
     }

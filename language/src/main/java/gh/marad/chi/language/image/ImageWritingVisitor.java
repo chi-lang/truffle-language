@@ -382,9 +382,4 @@ public class ImageWritingVisitor implements ChiNodeVisitor {
         stream.writeShort(nodeId.id());
     }
 
-    // --
-    // TODO add serialization/deserialization tests for each node
-    // TODO implement visitor for every node
-    // TODO remove default `accept` implementation from ChiNode
-
 }
