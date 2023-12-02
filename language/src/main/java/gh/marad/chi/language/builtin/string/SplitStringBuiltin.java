@@ -52,7 +52,7 @@ public class SplitStringBuiltin extends Builtin {
         for (int i = 0; i < result.length; i++) {
             data[i] = fromJava.execute(result[i], TruffleString.Encoding.UTF_8);
         }
-        return new ChiArray(data);
+        return new ChiArray(data, Type.getString());
     }
 
     @Override

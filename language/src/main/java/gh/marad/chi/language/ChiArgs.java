@@ -54,7 +54,7 @@ public class ChiArgs {
     }
 
     public static ChiArray getChiArray(Frame frame, int argumentIndex) {
-        return ChiTypesGen.asImplicitChiArray(getObject(frame, argumentIndex));
+        return ChiTypesGen.asChiArray(getObject(frame, argumentIndex));
     }
 
     public static void setArgument(Frame frame, int argumentIndex, Object value) {

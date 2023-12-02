@@ -12,20 +12,20 @@ import com.oracle.truffle.api.object.DynamicObject;
 import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.object.Shape;
 import com.oracle.truffle.api.utilities.TriState;
+import gh.marad.chi.core.Type;
 import gh.marad.chi.core.VariantType;
+import gh.marad.chi.language.ChiContext;
 
 import java.util.Objects;
 
 @ExportLibrary(InteropLibrary.class)
 public class ChiObject extends DynamicObject implements ChiValue {
-    private final String[] fieldNames;
     private final VariantType type;
 
     private final TruffleLanguage.Env env;
 
-    public ChiObject(String[] fieldNames, VariantType type, Shape shape, TruffleLanguage.Env env) {
+    public ChiObject(VariantType type, Shape shape, TruffleLanguage.Env env) {
         super(shape);
-        this.fieldNames = fieldNames;
         this.type = type;
         this.env = env;
     }
@@ -50,35 +50,35 @@ public class ChiObject extends DynamicObject implements ChiValue {
     }
 
     @ExportMessage
-    void writeMember(String name, Object value,
+    public void writeMember(String name, Object value,
                      @CachedLibrary("this") DynamicObjectLibrary objectLibrary) {
         objectLibrary.put(this, name, value);
     }
 
     @ExportMessage
-    boolean isMemberReadable(String member,
+    public boolean isMemberReadable(String member,
                              @CachedLibrary("this") DynamicObjectLibrary objectLibrary) {
         return objectLibrary.containsKey(this, member);
     }
 
     @ExportMessage
-    Object getMembers(boolean includeInternal,
+    public Object getMembers(boolean includeInternal,
                       @CachedLibrary("this") DynamicObjectLibrary objectLibrary) {
-        return new ChiArray(objectLibrary.getKeyArray(this));
+        return new ChiArray(objectLibrary.getKeyArray(this), Type.getString());
     }
 
     @ExportMessage
-    boolean isMemberModifiable(String member) {
+    public boolean isMemberModifiable(String member) {
         return getShape().hasProperty(member);
     }
 
     @ExportMessage
-    boolean isMemberInsertable(String member) {
+    public boolean isMemberInsertable(String member) {
         return !getShape().hasProperty(member);
     }
 
     @ExportMessage
-    boolean isMemberInvocable(String member,
+    public boolean isMemberInvocable(String member,
                               @CachedLibrary("this") @Cached.Exclusive DynamicObjectLibrary objectLibrary,
                               @CachedLibrary(limit = "3") @Cached.Exclusive InteropLibrary interop) {
         try {
@@ -111,6 +111,7 @@ public class ChiObject extends DynamicObject implements ChiValue {
         sb.append(Objects.requireNonNull(type.getVariant()).getVariantName());
         sb.append("(");
         var index = 0;
+        var fieldNames = objectLibrary.getKeyArray(this);
         for (var key : fieldNames) {
             var value = objectLibrary.getOrDefault(this, key, "");
             sb.append(key);
@@ -135,7 +136,7 @@ public class ChiObject extends DynamicObject implements ChiValue {
             var otherShape = objectLibrary.getShape(other);
             if (recvShape.equals(otherShape)) {
                 var equal = true;
-                for (var key : receiver.fieldNames) {
+                for (var key : objectLibrary.getKeyArray(receiver)) {
                     var thisField = objectLibrary.getOrDefault(receiver, key, null);
                     var otherField = objectLibrary.getOrDefault(other, key, null);
                     if (receiver.env.isHostObject(thisField) && receiver.env.isHostObject(otherField)) {
@@ -162,9 +163,10 @@ public class ChiObject extends DynamicObject implements ChiValue {
     @ExportMessage
     @CompilerDirectives.TruffleBoundary
     public int identityHashCode(@CachedLibrary("this") DynamicObjectLibrary objectLibrary) {
-        var values = new Object[fieldNames.length];
+        var members = objectLibrary.getKeyArray(this);
+        var values = new Object[members.length];
         var i = 0;
-        for (var key : fieldNames) {
+        for (var key : members) {
             values[i++] = objectLibrary.getOrDefault(this, key, null);
         }
         return Objects.hash(values);

@@ -34,8 +34,7 @@ public class ConstructChiObject extends ExpressionNode {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         var env = ChiContext.get(this).getEnv();
-        var language = ChiLanguage.get(this);
-        var object = language.createObject(fieldNames, type, env);
+        var object = ChiLanguage.createObject(type, env);
         for (int i = 0; i < fieldNames.length; i++) {
             try {
                 interopLibrary.writeMember(object, fieldNames[i], ChiArgs.getObject(frame, i));

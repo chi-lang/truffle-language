@@ -6,12 +6,33 @@ import com.oracle.truffle.api.dsl.TypeSystem;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.strings.TruffleString;
+import gh.marad.chi.core.Type;
 import gh.marad.chi.language.runtime.ChiArray;
 import gh.marad.chi.language.runtime.ChiFunction;
 import gh.marad.chi.language.runtime.ChiObject;
+import gh.marad.chi.language.runtime.TODO;
 
-@TypeSystem({long.class, float.class, boolean.class, TruffleString.class, ChiFunction.class, ChiObject.class})
+@TypeSystem({long.class, float.class, boolean.class, TruffleString.class, ChiFunction.class, ChiObject.class, ChiArray.class})
 public class ChiTypes {
+
+    public static Type getType(Object object) {
+        if(object instanceof Long) {
+            return Type.getIntType();
+        } else if (object instanceof Float) {
+            return Type.getFloatType();
+        } else if (object instanceof Boolean) {
+            return Type.getBool();
+        } else if (object instanceof TruffleString) {
+            return Type.getString();
+        } else if (object instanceof ChiFunction f) {
+            throw new TODO("Determining function type is unsupported! (yet?)");
+        } else if (object instanceof ChiObject o) {
+            return o.getType();
+        } else if (object instanceof ChiArray a) {
+            return a.getType();
+        }
+        throw new TODO("Cannot determine type of object %s".formatted(object));
+    }
 
     @ImplicitCast
     public static TruffleString toTruffleString(int i) {
@@ -78,8 +99,4 @@ public class ChiTypes {
         return (float) d.doubleValue();
     }
 
-    @ImplicitCast
-    public static ChiArray toChiArray(Object[] arr) {
-        return new ChiArray(arr);
-    }
 }

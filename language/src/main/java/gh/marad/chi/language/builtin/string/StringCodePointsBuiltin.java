@@ -45,7 +45,7 @@ public class StringCodePointsBuiltin extends Builtin {
         while (iterator.hasNext()) {
             data[index++] = (long) iterator.nextUncached();
         }
-        return new ChiArray(data);
+        return new ChiArray(data, Type.getIntType());
     }
 
     @Override

@@ -29,7 +29,7 @@ public class ReadLinesBuiltin extends Builtin {
             var data = lines.stream()
                             .map(it -> TruffleString.fromJavaStringUncached(it, TruffleString.Encoding.UTF_8))
                             .toList();
-            return new ChiArray(data.toArray(new TruffleString[0]));
+            return new ChiArray(data.toArray(new TruffleString[0]), Type.getString());
         } catch (IOException e) {
             CompilerDirectives.transferToInterpreter();
             throw new RuntimeException(e);

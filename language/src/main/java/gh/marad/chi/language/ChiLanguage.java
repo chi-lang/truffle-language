@@ -31,10 +31,10 @@ public class ChiLanguage extends TruffleLanguage<ChiContext> {
     public static final String mimeType = "application/x-chi";
     private static final LanguageReference<ChiLanguage> REFERENCE = LanguageReference.create(ChiLanguage.class);
 
-    private final Shape initialObjectShape = Shape.newBuilder().build();
+    private static final Shape initialObjectShape = Shape.newBuilder().build();
 
-    public Object createObject(String[] fieldNames, VariantType variant, Env env) {
-        return new ChiObject(fieldNames, variant, initialObjectShape, env);
+    public static ChiObject createObject(VariantType variant, Env env) {
+        return new ChiObject(variant, initialObjectShape, env);
     }
 
     public static ChiLanguage get(Node node) {

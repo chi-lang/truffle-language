@@ -18,7 +18,7 @@ public class ArgsBuiltin extends Builtin {
         for (var i = 0; i < args.length; i++) {
             truffleStrings[i] = TruffleString.fromJavaStringUncached(args[i], TruffleString.Encoding.UTF_8);
         }
-        return new ChiArray(truffleStrings);
+        return new ChiArray(truffleStrings, Type.getString());
     }
 
     @Override

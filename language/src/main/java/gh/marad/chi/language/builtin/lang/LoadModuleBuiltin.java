@@ -52,10 +52,10 @@ public class LoadModuleBuiltin extends Builtin {
         try {
             var stream = new DataInputStream(new FileInputStream(fileName));
             var moduleReader = new ModuleReader(language, context);
-            moduleReader.readModule(stream, std);
+            moduleReader.readModule(stream, std, context.getEnv());
             stream.close();
         } catch (Throwable e) {
-            std.err.println(e.getMessage());
+            e.printStackTrace(std.err);
             std.err.flush();
         }
     }

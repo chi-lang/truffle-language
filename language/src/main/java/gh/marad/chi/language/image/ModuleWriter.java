@@ -64,5 +64,16 @@ public class ModuleWriter {
                 std.err.flush();
             }
         }
+
+        // write package variables
+        var variables = module.listVariables(packageName);
+        stream.writeShort(variables.size());
+        for (Package.Variable variable : variables) {
+            stream.writeUTF(variable.name());
+            ValueWriter.writeValue(variable.value(), stream);
+            TypeWriter.writeType(variable.type(), stream);
+            stream.writeBoolean(variable.isPublic());
+            stream.writeBoolean(variable.isMutable());
+        }
     }
 }

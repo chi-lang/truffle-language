@@ -6,24 +6,37 @@ import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.InvalidArrayIndexException;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
+import gh.marad.chi.core.Type;
 
 import java.util.Arrays;
 
 @ExportLibrary(InteropLibrary.class)
 public class ChiArray implements ChiValue {
     private final Object[] array;
+    private final Type elementType;
 
-    public ChiArray(int capacity, Object defaultValue) {
+    public ChiArray(int capacity, Object defaultValue, Type type) {
         array = new Object[capacity];
+        this.elementType = type;
         Arrays.fill(array, defaultValue);
     }
 
-    public ChiArray(int capacity) {
+    public ChiArray(int capacity, Type type) {
         array = new Object[capacity];
+        this.elementType = type;
     }
 
-    public ChiArray(Object[] array) {
+    public ChiArray(Object[] array, Type type) {
         this.array = array;
+        this.elementType = type;
+    }
+
+    public Type getType() {
+        return Type.array(elementType);
+    }
+
+    public Type getElementType() {
+        return elementType;
     }
 
     public Object[] unsafeGetUnderlayingArray() {
