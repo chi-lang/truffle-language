@@ -24,7 +24,9 @@ import gh.marad.chi.language.builtin.time.MillisBuiltin;
 import gh.marad.chi.language.nodes.FnRootNode;
 import gh.marad.chi.language.runtime.ChiFunction;
 import gh.marad.chi.language.runtime.LexicalScope;
+import gh.marad.chi.language.runtime.namespaces.Module;
 import gh.marad.chi.language.runtime.namespaces.Modules;
+import gh.marad.chi.language.runtime.namespaces.Package;
 
 import java.io.OutputStream;
 import java.util.HashMap;
@@ -39,7 +41,7 @@ public class ChiContext {
     }
 
     public final LexicalScope globalScope;
-    public final GlobalCompilationNamespace compilationNamespace;
+//    public final GlobalCompilationNamespace compilationNamespace;
     private EffectHandlers currentEffectHandlers;
 
     private final ChiLanguage chiLanguage;
@@ -51,12 +53,46 @@ public class ChiContext {
     public ChiContext(ChiLanguage chiLanguage, TruffleLanguage.Env env) {
         this.chiLanguage = chiLanguage;
         this.env = env;
-        this.compilationNamespace = new GlobalCompilationNamespace(Prelude.imports);
+//        this.compilationNamespace = new GlobalCompilationNamespace(Prelude.imports);
         this.currentEffectHandlers = new EffectHandlers(null, new HashMap<>());
 
         var frameDescriptor = FrameDescriptor.newBuilder().build();
         this.globalScope = new LexicalScope(Truffle.getRuntime().createMaterializedFrame(new Object[0], frameDescriptor));
         installBuiltins(builtins(env.out()));
+    }
+
+    public GlobalCompilationNamespace createCompilationNamespace() {
+        var ns = new GlobalCompilationNamespace(Prelude.imports);
+        for (Module module : modules.listModules()) {
+            for (String pkg : module.listPackages()) {
+                var desc = ns.getOrCreatePackage(module.getName(), pkg);
+
+                // define package functions
+                for (Package.FunctionLookupResult function : module.listFunctions(pkg)) {
+                    desc.getScope().addSymbol(
+                            function.function().getExecutableName(),
+                            function.type(),
+                            SymbolType.Local,
+                            function.isPublic(),
+                            true
+                    );
+
+                }
+
+                // define package variables
+                for (Package.Variable variable : module.listVariables(pkg)) {
+                    desc.getScope().addSymbol(
+                            variable.name(),
+                            variable.type(),
+                            SymbolType.Local,
+                            variable.isPublic(),
+                            variable.isMutable()
+                    );
+                }
+
+            }
+        }
+        return ns;
     }
 
     private void installBuiltins(List<Builtin> builtins) {
@@ -68,11 +104,6 @@ public class ChiContext {
         var fn = new ChiFunction(rootNode.getCallTarget());
         modules.getOrCreateModule(node.getModuleName())
                .defineFunction(node.getPackageName(), fn, node.type(), true);
-        var compilationScope = compilationNamespace.getOrCreatePackage(
-                node.getModuleName(),
-                node.getPackageName()
-        ).getScope();
-        compilationScope.addSymbol(node.name(), node.type(), SymbolType.Local, true, false);
     }
 
     public TruffleLanguage.Env getEnv() {

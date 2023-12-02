@@ -11,7 +11,7 @@ import java.util.*;
 public class Package {
     private final String name;
     private final HashMap<FunctionKey, FunctionLookupResult> functions;
-    private final HashMap<String, Object> variables;
+    private final HashMap<String, Variable> variables;
 
     public Package(String name) {
         this.name = name;
@@ -45,11 +45,6 @@ public class Package {
     }
 
     @CompilerDirectives.TruffleBoundary
-    public void defineVariable(String name, Object value) {
-        variables.put(name, value);
-    }
-
-    @CompilerDirectives.TruffleBoundary
     public FunctionLookupResult findFunctionOrNull(String name, Type[] paramTypes) {
         var key = new FunctionKey(name, Objects.hash((Object[]) paramTypes));
         return functions.get(key);
@@ -65,8 +60,18 @@ public class Package {
     }
 
     @CompilerDirectives.TruffleBoundary
+    public Collection<Variable> listVariables() {
+        return variables.values();
+    }
+
+    @CompilerDirectives.TruffleBoundary
+    public void defineVariable(String name, Object value, Type type, boolean isPublic, boolean isMutable) {
+        variables.put(name, new Variable(name, value, type, isPublic, isMutable));
+    }
+
+    @CompilerDirectives.TruffleBoundary
     public Object findVariableOrNull(String name) {
-        return variables.get(name);
+        return variables.get(name).value;
     }
 
     public record FunctionKey(String name, int paramTypesHash) {
@@ -78,4 +83,6 @@ public class Package {
             boolean isPublic,
             Assumption assumption) {
     }
+
+    public record Variable(String name, Object value, Type type, boolean isPublic, boolean isMutable) {}
 }

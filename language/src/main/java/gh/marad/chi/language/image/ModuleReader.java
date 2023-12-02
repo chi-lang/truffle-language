@@ -58,13 +58,6 @@ public class ModuleReader {
                 );
                 var function = new ChiFunction(rootNode.getCallTarget());
                 module.defineFunction(packageName, function, type, isPublic);
-                context.compilationNamespace
-                        .getOrCreatePackage(module.getName(), packageName)
-                        .getScope().addSymbol(
-                               functionName,
-                               type, SymbolType.Local,
-                               isPublic, true
-                       );
             } catch (Exception ex) {
                 std.err.printf("Error loading function %s in %s/%s%n", functionName, module.getName(), packageName);
                 ex.printStackTrace(std.err);

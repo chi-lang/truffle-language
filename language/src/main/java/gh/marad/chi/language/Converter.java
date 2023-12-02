@@ -160,16 +160,19 @@ public class Converter {
         var constructorDefinitions =
                 expr.getConstructors().stream()
                     .map(constructor -> {
+                        var type = expr.getBaseVariantType().withVariant(constructor.toVariant());
                         var constructorFunction = createFunctionFromNode(
-                                new ConstructChiObject(
-                                        expr.getBaseVariantType().withVariant(constructor.toVariant())),
+                                new ConstructChiObject(type),
                                 constructor.getName());
                         if (constructor.getFields().isEmpty()) {
                             return WriteModuleVariableNodeGen.create(
                                     new InvokeFunction(new LambdaValue(constructorFunction), new ChiNode[0]),
                                     currentModule,
                                     currentPackage,
-                                    constructor.getName()
+                                    constructor.getName(),
+                                    type,
+                                    constructor.getPublic(),
+                                    true
                             );
                         } else {
                             var returnType = expr.getBaseVariantType().withVariant(constructor.toVariant());
@@ -225,7 +228,11 @@ public class Converter {
         } else if (symbol.getScopeType() == ScopeType.Package) {
             return WriteModuleVariableNodeGen.create(
                     convertExpression(nameDeclaration.getValue()),
-                    currentModule, currentPackage, nameDeclaration.getName());
+                    currentModule, currentPackage, nameDeclaration.getName(),
+                    nameDeclaration.getValue().getType(),
+                    nameDeclaration.getPublic(),
+                    nameDeclaration.getMutable()
+                    );
         } else {
             int slot = currentFdBuilder.addSlot(FrameSlotKind.Illegal, nameDeclaration.getName(), null);
             scope.updateSlot(nameDeclaration.getName(), slot);
@@ -239,6 +246,9 @@ public class Converter {
         var symbolInfo = scope.getSymbol(variableAccess.getName(), true);
         assert symbolInfo != null : "Symbol not found for local '%s'".formatted(variableAccess.getName());
         if (symbolInfo.getScopeType() == ScopeType.Package) {
+            // TODO: change name to ReadPackageVariable
+            // TODO: depending on symbol type it should read package variable or package function
+            //       as they have separate namespaces in runtime (but not in the language itself)
             return new ReadModuleVariable(
                     variableAccess.getModuleName(),
                     variableAccess.getPackageName(),
@@ -273,13 +283,19 @@ public class Converter {
     private ChiNode convertAssignment(Assignment assignment) {
         var scope = assignment.getDefinitionScope();
         var symbolInfo = scope.getSymbol(assignment.getName(), true);
-        assert symbolInfo != null : "Symbol not found for local '%s'".formatted(assignment.getName());
+//        assert symbolInfo != null : "Symbol not found for local '%s'".formatted(assignment.getName());
+        if (symbolInfo == null) {
+            throw new TODO("Symbol not found for local '%s'".formatted(assignment.getName()));
+        }
         if (symbolInfo.getScopeType() == ScopeType.Package) {
             return WriteModuleVariableNodeGen.create(
                     convertExpression(assignment.getValue()),
                     currentModule,
                     currentPackage,
-                    assignment.getName()
+                    assignment.getName(),
+                    assignment.getValue().getType(),
+                    symbolInfo.getPublic(),
+                    symbolInfo.getMutable()
             );
         } else if (symbolInfo.getSymbolType() == SymbolType.Local) {
             assert symbolInfo.getSlot() != -1 : "Slot for local '%s' was not set up!".formatted(assignment.getName());

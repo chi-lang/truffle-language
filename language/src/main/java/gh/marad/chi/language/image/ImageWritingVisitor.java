@@ -259,6 +259,9 @@ public class ImageWritingVisitor implements ChiNodeVisitor {
         stream.writeUTF(writeModuleVariable.getModuleName());
         stream.writeUTF(writeModuleVariable.getPackageName());
         stream.writeUTF(writeModuleVariable.getVariableName());
+        TypeWriter.writeType(writeModuleVariable.getType(), stream);
+        stream.writeBoolean(writeModuleVariable.getIsPublic());
+        stream.writeBoolean(writeModuleVariable.getIsMutable());
     }
 
     @Override

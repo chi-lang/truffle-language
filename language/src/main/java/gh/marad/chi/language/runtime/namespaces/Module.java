@@ -54,9 +54,14 @@ public class Module {
                        .findFunctionOrNull(functionName, paramTypes);
     }
 
-    public void defineVariable(String packageName, String name, Object value) {
+    public Collection<Package.Variable> listVariables(String packageName) {
+        return getOrCreatePackage(packageName)
+                .listVariables();
+    }
+
+    public void defineVariable(String packageName, String name, Object value, Type type, boolean isPublic, boolean isMutable) {
         getOrCreatePackage(packageName)
-                .defineVariable(name, value);
+                .defineVariable(name, value, type, isPublic, isMutable);
     }
 
     public Object findVariableFunctionOrNull(String packageName, String symbolName) {

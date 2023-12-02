@@ -342,7 +342,8 @@ public class NodeSerializationTest {
         var moduleName = "moduleName";
         var packageName = "packageName";
         var variableName = "variableName";
-        var expected = WriteModuleVariableNodeGen.create(value, moduleName, packageName, variableName);
+        var type = Type.getIntType();
+        var expected = WriteModuleVariableNodeGen.create(value, moduleName, packageName, variableName, type, true, false);
         // when
         var result = serializeAndDeserialize(expected);
         // then
@@ -351,6 +352,9 @@ public class NodeSerializationTest {
             assertEquals(expected.getPackageName(), actual.getPackageName());
             assertEquals(expected.getVariableName(), actual.getVariableName());
             assertInstanceOf(LongValue.class, actual.getValue());
+            assertEquals(type, actual.getType());
+            assertEquals(expected.getIsPublic(), actual.getIsPublic());
+            assertEquals(expected.getIsMutable(), actual.getIsMutable());
 
         } else fail("Invalid node read!");
     }

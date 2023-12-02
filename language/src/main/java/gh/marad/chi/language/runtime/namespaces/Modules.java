@@ -18,6 +18,10 @@ public class Modules {
         }
     }
 
+    public Iterable<Module> listModules() {
+        return modules.getValues();
+    }
+
     public void deleteModule(String name) {
         modules.removeKey(name);
     }

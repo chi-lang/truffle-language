@@ -56,7 +56,7 @@ public class ChiLanguage extends TruffleLanguage<ChiContext> {
     @CompilerDirectives.TruffleBoundary
     public CallTarget compile(String sourceString) {
         var context = ChiContext.get(null);
-        var compiled = Compiler.compile(sourceString, context.compilationNamespace);
+        var compiled = Compiler.compile(sourceString, context.createCompilationNamespace());
 
         if (compiled.hasErrors()) {
             CompilerDirectives.transferToInterpreter();

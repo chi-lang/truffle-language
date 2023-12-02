@@ -41,10 +41,11 @@ public class ModuleWriter {
     }
 
     private void writePackage(Module module, String packageName, DataOutputStream stream, StdStreams std) throws Exception {
-        var functions = module.listFunctions(packageName);
         stream.writeUTF(packageName);     // package name
-        stream.writeShort(functions.size());  // function count
 
+        // write package functions
+        var functions = module.listFunctions(packageName);
+        stream.writeShort(functions.size());  // function count
         var imageWritingVisitor = new ImageWritingVisitor(stream);
         for (Package.FunctionLookupResult function : functions) {
             try {
