@@ -9,45 +9,40 @@ import java.util.*;
 
 public class ChiMain {
     public static void main(String[] args) throws IOException {
-        if(args.length == 0 || args[0].equals("repl")) {
-            String[] contextArgs;
-            if (args.length == 0) {
-                contextArgs = new String[] {};
-            } else {
-                contextArgs = Arrays.copyOfRange(args, 1, args.length);
-            }
-            var options = new HashMap<String, String>();
-            new Repl(prepareContext(contextArgs, options))
-                    .loop();
-        } else {
-            var options = new HashMap<String, String>();
-            var programArgs = new ArrayList<String>();
-            String file = null;
-            for (String arg : args) {
-                if (!parseOption(options, arg)) {
-                    if (file == null) {
-                        file = arg;
-                    } else {
-                        programArgs.add(arg);
-                    }
+        var options = new HashMap<String, String>();
+        var modulesToLoad = new ArrayList<String>();
+        var programArgs = new ArrayList<String>();
+        String file = null;
+        for (String arg : args) {
+            if (!parseOption(options, modulesToLoad, arg)) {
+                if (file == null) {
+                    file = arg;
+                } else {
+                    programArgs.add(arg);
                 }
             }
-
-            if (file == null) {
-                System.err.println("No file specified.");
-                System.exit(1);
-            }
-
-            var source = Source.newBuilder("chi", new File(file)).build();
-            var context = prepareContext(programArgs.toArray(new String[]{}), options);
-
-            context.eval(source);
-            context.close();
         }
+
+
+        var context = prepareContext(programArgs.toArray(new String[]{}), options);
+
+        for (String module : modulesToLoad) {
+            context.eval("chi", """
+                        loadModule("%s")
+                        """.stripIndent().formatted(module));
+        }
+
+        if (file == null || "repl".equalsIgnoreCase(file)) {
+            new Repl(context).loop();
+        } else {
+            var source = Source.newBuilder("chi", new File(file)).build();
+            context.eval(source);
+        }
+        context.close();
     }
 
     private static Context prepareContext(String[] contextArgs, HashMap<String, String> options) {
-        return Context.newBuilder("chi")
+        var context = Context.newBuilder("chi")
                               .in(System.in)
                               .out(System.out)
                               .err(System.err)
@@ -56,9 +51,10 @@ public class ChiMain {
                               .allowAllAccess(true)
                               .options(options)
                               .build();
+        return context;
     }
 
-    private static boolean parseOption(HashMap<String, String> options, String arg) {
+    private static boolean parseOption(HashMap<String, String> options, ArrayList<String> modulesToLoad, String arg) {
         if (arg.length() <= 2 || !arg.startsWith("--")) {
             return false;
         }
@@ -72,7 +68,13 @@ public class ChiMain {
             key = arg.substring(2);
             value = "true";
         }
-        options.put(key, value);
+
+        if ("modules".equals(key)) {
+            var modules = value.split(",");
+            modulesToLoad.addAll(Arrays.stream(modules).toList());
+        } else {
+            options.put(key, value);
+        }
         return true;
     }
 }
