@@ -531,6 +531,42 @@ public class NodeSerializationTest {
         } else fail("Invalid node read!");
     }
 
+    @Test
+    void testDefineVariantTypeNodeSerialization() throws Exception {
+        // given
+        var variants = List.of(
+                new VariantType.Variant(
+                        true, // public
+                        "variantName",
+                        List.of(
+                                new VariantType.VariantField(
+                                        true, // public
+                                        "fieldName",
+                                        Type.getIntType()
+                                )
+                        )
+                )
+        );
+        var type = new VariantType(
+                "moduleName",
+                "packageName",
+                "typeName",
+                List.of(), // generic type parameters
+                Map.of(), // concrete parameter types
+                null
+        );
+        var expected = new DefineVariantTypeNode(type, variants);
+
+        // when
+        var result = serializeAndDeserialize(expected);
+
+        // then
+        if (result instanceof DefineVariantTypeNode actual) {
+            assertEquals(type, actual.type);
+            assertIterableEquals(variants, actual.variants);
+        } else fail();
+    }
+
     public ChiNode serializeAndDeserialize(ChiNode node) throws Exception {
         var byteArrayOutputStream = new ByteArrayOutputStream();
         var outputStream = new DataOutputStream(byteArrayOutputStream);

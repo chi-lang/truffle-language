@@ -38,6 +38,7 @@ import gh.marad.chi.language.nodes.function.DefinePackageFunctionFromNodeGen;
 import gh.marad.chi.language.nodes.function.GetDefinedFunction;
 import gh.marad.chi.language.nodes.function.InvokeFunction;
 import gh.marad.chi.language.nodes.objects.ConstructChiObject;
+import gh.marad.chi.language.nodes.objects.DefineVariantTypeNode;
 import gh.marad.chi.language.nodes.objects.ReadMemberNodeGen;
 import gh.marad.chi.language.nodes.objects.WriteMemberNodeGen;
 import gh.marad.chi.language.nodes.value.*;
@@ -47,6 +48,7 @@ import gh.marad.chi.language.runtime.TODO;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class NodeReader {
@@ -110,6 +112,7 @@ public class NodeReader {
             case IndexedAssignment -> readIndexedAssignment();
             case IsExpr -> readIsExpr();
             case ConstructObject -> readConstructObject();
+            case DefineVariantType -> readDefineVariantTypeNode();
             case DefinePackageFunction -> readDefinePackageFunction();
             case InvokeEffect -> readInvokeEffect();
             case HandleEffect -> readHandleEffect();
@@ -443,6 +446,16 @@ public class NodeReader {
         } else {
             throw new TODO("Expected variant type!");
         }
+    }
+
+    public DefineVariantTypeNode readDefineVariantTypeNode() throws IOException {
+        var type = (VariantType) TypeWriter.readType(stream);
+        int variantCount = stream.readShort();
+        var variants = new ArrayList<VariantType.Variant>(variantCount);
+        for (int i = 0; i < variantCount; i++) {
+            variants.add(TypeWriter.readVariant(stream));
+        }
+        return new DefineVariantTypeNode(type, variants);
     }
 
     private ChiNode readDefinePackageFunction() throws IOException {

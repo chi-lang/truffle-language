@@ -86,19 +86,23 @@ public class TypeWriter {
         var variant = type.getVariant();
         if (variant != null) {
             stream.writeBoolean(true);
-            stream.writeBoolean(variant.getPublic());
-            stream.writeUTF(variant.getVariantName());
-
-            // write variant fields
-            var fields = variant.getFields();
-            stream.writeByte(fields.size());
-            for (VariantType.VariantField field : fields) {
-                stream.writeBoolean(field.getPublic());
-                stream.writeUTF(field.getName());
-                writeType(field.getType(), stream);
-            }
+            writeVariant(variant, stream);
         } else {
             stream.writeBoolean(false);
+        }
+    }
+
+    public static void writeVariant(VariantType.Variant variant, DataOutputStream stream) throws IOException {
+        stream.writeBoolean(variant.getPublic());
+        stream.writeUTF(variant.getVariantName());
+
+        // write variant fields
+        var fields = variant.getFields();
+        stream.writeByte(fields.size());
+        for (VariantType.VariantField field : fields) {
+            stream.writeBoolean(field.getPublic());
+            stream.writeUTF(field.getName());
+            writeType(field.getType(), stream);
         }
     }
 
@@ -167,23 +171,7 @@ public class TypeWriter {
         VariantType.Variant variant = null;
         var hasVariant = stream.readBoolean();
         if (hasVariant) {
-            var isPublic = stream.readBoolean();
-            var variantName = stream.readUTF();
-
-            // read variant fields
-            var fieldCount = stream.readByte();
-            var fields = new ArrayList<VariantType.VariantField>();
-            for (byte i = 0; i < fieldCount; i++) {
-                var isFieldPublic = stream.readBoolean();
-                var fieldName = stream.readUTF();
-                var fieldType = readType(stream);
-                fields.add(new VariantType.VariantField(isFieldPublic, fieldName, fieldType));
-            }
-            variant = new VariantType.Variant(
-                    isPublic,
-                    variantName,
-                    fields
-            );
+            variant = readVariant(stream);
         }
 
         return new VariantType(
@@ -193,5 +181,25 @@ public class TypeWriter {
                 genericTypeParams,
                 concreteTypeMap,
                 variant);
+    }
+
+    public static VariantType.Variant readVariant(DataInputStream stream) throws IOException {
+        var isPublic = stream.readBoolean();
+        var variantName = stream.readUTF();
+
+        // read variant fields
+        var fieldCount = stream.readByte();
+        var fields = new ArrayList<VariantType.VariantField>();
+        for (byte i = 0; i < fieldCount; i++) {
+            var isFieldPublic = stream.readBoolean();
+            var fieldName = stream.readUTF();
+            var fieldType = readType(stream);
+            fields.add(new VariantType.VariantField(isFieldPublic, fieldName, fieldType));
+        }
+        return new VariantType.Variant(
+                isPublic,
+                variantName,
+                fields
+        );
     }
 }

@@ -3,10 +3,12 @@ package gh.marad.chi.language.runtime.namespaces;
 import com.oracle.truffle.api.CompilerDirectives;
 import gh.marad.chi.core.FnType;
 import gh.marad.chi.core.Type;
+import gh.marad.chi.core.VariantType;
 import gh.marad.chi.language.runtime.ChiFunction;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 public class Module {
@@ -76,6 +78,21 @@ public class Module {
             return functionLookup.function();
         }
         return null;
+    }
+
+    public Collection<Package.VariantTypeDescriptor> listVariantTypes(String packageName) {
+        return getOrCreatePackage(packageName)
+                .listVariantTypes();
+    }
+
+    public void defineVariantType(String packageName, VariantType variantType, List<VariantType.Variant> variants) {
+        getOrCreatePackage(packageName)
+                .defineVariantType(variantType, variants);
+    }
+
+    public Package.VariantTypeDescriptor findVariantTypeOrNull(String packageName, String typeName) {
+        return getOrCreatePackage(packageName)
+                .findVariantTypeOrNull(typeName);
     }
 
     @CompilerDirectives.TruffleBoundary

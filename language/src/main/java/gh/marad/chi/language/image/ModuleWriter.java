@@ -3,6 +3,7 @@ package gh.marad.chi.language.image;
 import com.oracle.truffle.api.CompilerDirectives;
 import gh.marad.chi.language.ChiContext;
 import gh.marad.chi.language.nodes.FnRootNode;
+import gh.marad.chi.language.nodes.objects.DefineVariantTypeNode;
 import gh.marad.chi.language.runtime.StdStreams;
 import gh.marad.chi.language.runtime.TODO;
 import gh.marad.chi.language.runtime.namespaces.Module;
@@ -42,11 +43,21 @@ public class ModuleWriter {
 
     private void writePackage(Module module, String packageName, DataOutputStream stream, StdStreams std) throws Exception {
         stream.writeUTF(packageName);     // package name
+        var imageWritingVisitor = new ImageWritingVisitor(stream);
+
+        // write types
+        var types = module.listVariantTypes(packageName);
+        stream.writeShort(types.size());
+        for (Package.VariantTypeDescriptor type : types) {
+            var node = new DefineVariantTypeNode(
+                    type.variantType(), type.variants()
+            );
+            node.accept(imageWritingVisitor);
+        }
 
         // write package functions
         var functions = module.listFunctions(packageName);
         stream.writeShort(functions.size());  // function count
-        var imageWritingVisitor = new ImageWritingVisitor(stream);
         for (Package.FunctionLookupResult function : functions) {
             try {
                 var rootNode = function.function().getCallTarget().getRootNode();

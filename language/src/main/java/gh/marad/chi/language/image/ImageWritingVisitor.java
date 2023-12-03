@@ -1,5 +1,6 @@
 package gh.marad.chi.language.image;
 
+import gh.marad.chi.core.VariantType;
 import gh.marad.chi.language.EffectHandlers;
 import gh.marad.chi.language.builtin.Builtin;
 import gh.marad.chi.language.nodes.ChiNodeVisitor;
@@ -30,6 +31,7 @@ import gh.marad.chi.language.nodes.function.DefinePackageFunctionFromNode;
 import gh.marad.chi.language.nodes.function.GetDefinedFunction;
 import gh.marad.chi.language.nodes.function.InvokeFunction;
 import gh.marad.chi.language.nodes.objects.ConstructChiObject;
+import gh.marad.chi.language.nodes.objects.DefineVariantTypeNode;
 import gh.marad.chi.language.nodes.objects.ReadMember;
 import gh.marad.chi.language.nodes.objects.WriteMember;
 import gh.marad.chi.language.nodes.value.*;
@@ -326,6 +328,16 @@ public class ImageWritingVisitor implements ChiNodeVisitor {
     public void visitConstructChiObject(ConstructChiObject constructChiObject) throws IOException {
         writeNodeId(NodeId.ConstructObject);
         TypeWriter.writeType(constructChiObject.type, stream);
+    }
+
+    @Override
+    public void visitDefineVariantTypeNode(DefineVariantTypeNode defineVariantTypeNode) throws Exception {
+        writeNodeId(NodeId.DefineVariantType);
+        TypeWriter.writeType(defineVariantTypeNode.type, stream);
+        stream.writeShort(defineVariantTypeNode.variants.size());
+        for (VariantType.Variant variant : defineVariantTypeNode.variants) {
+            TypeWriter.writeVariant(variant, stream);
+        }
     }
 
     @Override

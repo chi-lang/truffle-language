@@ -8,6 +8,7 @@ import gh.marad.chi.core.FnType;
 import gh.marad.chi.language.ChiContext;
 import gh.marad.chi.language.ChiLanguage;
 import gh.marad.chi.language.nodes.FnRootNode;
+import gh.marad.chi.language.nodes.objects.DefineVariantTypeNode;
 import gh.marad.chi.language.runtime.ChiFunction;
 import gh.marad.chi.language.runtime.StdStreams;
 import gh.marad.chi.language.runtime.namespaces.Module;
@@ -35,10 +36,17 @@ public class ModuleReader {
 
     private void readPackage(Module module, DataInputStream stream, StdStreams std, TruffleLanguage.Env env) throws Exception {
         var packageName = stream.readUTF();
+        var nodeReader = new NodeReader(stream, context.getEnv().out());
+
+        // read types
+        int typeCount = stream.readShort();
+        for (int i = 0; i < typeCount; i++) {
+            var node = (DefineVariantTypeNode) nodeReader.readNode();
+            module.defineVariantType(packageName, node.type, node.variants);
+        }
 
         // read package functions
         var functionCount = stream.readShort();
-        var nodeReader = new NodeReader(stream, context.getEnv().out());
         for (int i = 0; i < functionCount; i++) {
             var functionName = stream.readUTF();
             var type = (FnType) TypeWriter.readType(stream);
@@ -68,7 +76,6 @@ public class ModuleReader {
         // read package variables
         var variableCount = stream.readShort();
         for (int i = 0; i < variableCount; i++) {
-            std.out.println(i);
             var name = stream.readUTF();
             var value = ValueWriter.readValue(stream, env);
             var type = TypeWriter.readType(stream);

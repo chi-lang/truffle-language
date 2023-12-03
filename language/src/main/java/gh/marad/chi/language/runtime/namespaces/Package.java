@@ -4,6 +4,7 @@ import com.oracle.truffle.api.Assumption;
 import com.oracle.truffle.api.CompilerDirectives;
 import gh.marad.chi.core.FnType;
 import gh.marad.chi.core.Type;
+import gh.marad.chi.core.VariantType;
 import gh.marad.chi.language.runtime.ChiFunction;
 
 import java.util.*;
@@ -12,11 +13,13 @@ public class Package {
     private final String name;
     private final HashMap<FunctionKey, FunctionLookupResult> functions;
     private final HashMap<String, Variable> variables;
+    private final HashMap<String, VariantTypeDescriptor> variantTypes;
 
     public Package(String name) {
         this.name = name;
         this.functions = new HashMap<>();
         this.variables = new HashMap<>();
+        this.variantTypes = new HashMap<>();
     }
 
     public String getName() {
@@ -71,8 +74,27 @@ public class Package {
 
     @CompilerDirectives.TruffleBoundary
     public Object findVariableOrNull(String name) {
-        return variables.get(name).value;
+        var variable = variables.get(name);
+        if (variable == null) return null;
+        return variable.value;
     }
+
+    @CompilerDirectives.TruffleBoundary
+    public Collection<VariantTypeDescriptor> listVariantTypes() {
+        return variantTypes.values();
+    }
+
+    @CompilerDirectives.TruffleBoundary
+    public void defineVariantType(VariantType variantType, List<VariantType.Variant> variants) {
+        variantTypes.put(variantType.getName(),
+                new VariantTypeDescriptor(variantType, variants));
+    }
+
+    @CompilerDirectives.TruffleBoundary
+    public VariantTypeDescriptor findVariantTypeOrNull(String name) {
+        return variantTypes.get(name);
+    }
+
 
     public record FunctionKey(String name, int paramTypesHash) {
     }
@@ -85,4 +107,6 @@ public class Package {
     }
 
     public record Variable(String name, Object value, Type type, boolean isPublic, boolean isMutable) {}
+
+    public record VariantTypeDescriptor(VariantType variantType, List<VariantType.Variant> variants) {}
 }

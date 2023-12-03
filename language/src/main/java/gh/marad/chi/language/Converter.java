@@ -38,6 +38,7 @@ import gh.marad.chi.language.nodes.function.DefinePackageFunctionFromNodeGen;
 import gh.marad.chi.language.nodes.function.GetDefinedFunction;
 import gh.marad.chi.language.nodes.function.InvokeFunction;
 import gh.marad.chi.language.nodes.objects.ConstructChiObject;
+import gh.marad.chi.language.nodes.objects.DefineVariantTypeNode;
 import gh.marad.chi.language.nodes.objects.ReadMemberNodeGen;
 import gh.marad.chi.language.nodes.objects.WriteMemberNodeGen;
 import gh.marad.chi.language.nodes.value.*;
@@ -186,6 +187,11 @@ public class Converter {
                                     constructor.getPublic());
                         }
                     }).collect(Collectors.toList());
+
+        var variants = expr.getConstructors().stream().map(VariantTypeConstructor::toVariant).toList();
+        constructorDefinitions.add(new DefineVariantTypeNode(
+                expr.getBaseVariantType(), variants
+        ));
         constructorDefinitions.add(new UnitValue());
         return new BlockExpr(constructorDefinitions.toArray(new ChiNode[0]));
     }

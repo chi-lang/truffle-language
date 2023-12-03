@@ -41,7 +41,6 @@ public class ChiContext {
     }
 
     public final LexicalScope globalScope;
-//    public final GlobalCompilationNamespace compilationNamespace;
     private EffectHandlers currentEffectHandlers;
 
     private final ChiLanguage chiLanguage;
@@ -53,7 +52,6 @@ public class ChiContext {
     public ChiContext(ChiLanguage chiLanguage, TruffleLanguage.Env env) {
         this.chiLanguage = chiLanguage;
         this.env = env;
-//        this.compilationNamespace = new GlobalCompilationNamespace(Prelude.imports);
         this.currentEffectHandlers = new EffectHandlers(null, new HashMap<>());
 
         var frameDescriptor = FrameDescriptor.newBuilder().build();
@@ -66,6 +64,15 @@ public class ChiContext {
         for (Module module : modules.listModules()) {
             for (String pkg : module.listPackages()) {
                 var desc = ns.getOrCreatePackage(module.getName(), pkg);
+
+                // define types
+                for (Package.VariantTypeDescriptor variantType : module.listVariantTypes(pkg)) {
+                    desc.getTypeRegistry().defineVariantType(
+                            variantType.variantType(),
+                            variantType.variants()
+                    );
+                }
+
 
                 // define package functions
                 for (Package.FunctionLookupResult function : module.listFunctions(pkg)) {

@@ -49,6 +49,7 @@ public enum NodeId {
     IndexedAssignment,
     IsExpr,
     ConstructObject,
+    DefineVariantType,
     DefinePackageFunction,
     InvokeEffect,
     HandleEffect,
