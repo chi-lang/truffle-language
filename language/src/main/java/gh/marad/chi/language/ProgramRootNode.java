@@ -38,7 +38,9 @@ public class ProgramRootNode extends RootNode {
             return body.executeGeneric(mainFrame);
         } catch (Exception ex) {
             CompilerDirectives.transferToInterpreter();
-            for (TruffleStackTraceElement element : TruffleStackTrace.getStackTrace(ex)) {
+            var truffleStackTrace = TruffleStackTrace.getStackTrace(ex);
+            stderr.printf("Error: %s%n", ex.getMessage());
+            for (TruffleStackTraceElement element : truffleStackTrace) {
                 var functionName = element.getTarget().getRootNode().getName();
                 var source = element.getTarget().getRootNode().getSourceSection();
                 String location = "";
@@ -51,12 +53,12 @@ public class ProgramRootNode extends RootNode {
                 }
 
                 stderr.printf(
-                        "\t%s%s%n",
+                        " - %s%s%n",
                         functionName,
                         location
                 );
-                stderr.flush();
             }
+            stderr.flush();
 
             Throwable cause = ex.getCause();
             while (cause != null) {
