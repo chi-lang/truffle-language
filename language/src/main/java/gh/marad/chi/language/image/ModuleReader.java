@@ -56,8 +56,8 @@ public class ModuleReader {
             try {
                 var frameDescriptorBuilder = FrameDescriptor.newBuilder();
                 var localCounter = new LocalVarsCountingVisitor();
-                frameDescriptorBuilder.addSlots(localCounter.getCount(), FrameSlotKind.Illegal);
                 functionBody.accept(localCounter);
+                frameDescriptorBuilder.addSlots(localCounter.getCount(), FrameSlotKind.Illegal);
                 var rootNode = new FnRootNode(
                         language,
                         frameDescriptorBuilder.build(),

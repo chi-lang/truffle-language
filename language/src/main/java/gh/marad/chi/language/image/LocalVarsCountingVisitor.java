@@ -6,9 +6,6 @@ import gh.marad.chi.language.nodes.expr.variables.ReadLocalVariable;
 import gh.marad.chi.language.nodes.expr.variables.WriteLocalVariable;
 import org.graalvm.collections.EconomicSet;
 
-import java.util.HashSet;
-import java.util.Set;
-
 public class LocalVarsCountingVisitor implements NodeVisitor {
 
     private final EconomicSet<String> localVarsSet = EconomicSet.create();
