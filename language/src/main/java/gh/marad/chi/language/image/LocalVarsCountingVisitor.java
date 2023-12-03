@@ -4,12 +4,14 @@ import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeVisitor;
 import gh.marad.chi.language.nodes.expr.variables.ReadLocalVariable;
 import gh.marad.chi.language.nodes.expr.variables.WriteLocalVariable;
+import org.graalvm.collections.EconomicSet;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class LocalVarsCountingVisitor implements NodeVisitor {
-    private final Set<String> localVarsSet = new HashSet<>();
+
+    private final EconomicSet<String> localVarsSet = EconomicSet.create();
 
     @Override
     public boolean visit(Node node) {

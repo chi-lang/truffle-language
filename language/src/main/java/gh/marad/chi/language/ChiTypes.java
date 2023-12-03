@@ -15,6 +15,7 @@ import gh.marad.chi.language.runtime.TODO;
 @TypeSystem({long.class, float.class, boolean.class, TruffleString.class, ChiFunction.class, ChiObject.class, ChiArray.class})
 public class ChiTypes {
 
+    @CompilerDirectives.TruffleBoundary
     public static Type getType(Object object) {
         if(object instanceof Long) {
             return Type.getIntType();

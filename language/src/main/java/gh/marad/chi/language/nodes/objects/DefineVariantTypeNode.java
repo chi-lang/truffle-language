@@ -1,5 +1,6 @@
 package gh.marad.chi.language.nodes.objects;
 
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import gh.marad.chi.core.VariantType;
 import gh.marad.chi.language.ChiContext;
@@ -21,11 +22,17 @@ public class DefineVariantTypeNode extends ExpressionNode {
 
     @Override
     public Object executeGeneric(VirtualFrame frame) {
-        var context = ChiContext.get(this);
-        context.modules.getOrCreateModule(type.getModuleName())
-                .defineVariantType(type.getPackageName(), type, variants);
+        defineType();
         return Unit.instance;
     }
+
+    @CompilerDirectives.TruffleBoundary
+    private void defineType() {
+        var context = ChiContext.get(this);
+        context.modules.getOrCreateModule(type.getModuleName())
+                       .defineVariantType(type.getPackageName(), type, variants);
+    }
+
 
     @Override
     public void accept(ChiNodeVisitor visitor) throws Exception {

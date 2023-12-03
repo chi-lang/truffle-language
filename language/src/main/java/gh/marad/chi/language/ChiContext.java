@@ -1,5 +1,6 @@
 package gh.marad.chi.language;
 
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.FrameDescriptor;
@@ -59,6 +60,7 @@ public class ChiContext {
         installBuiltins(builtins(env.out()));
     }
 
+    @CompilerDirectives.TruffleBoundary
     public GlobalCompilationNamespace createCompilationNamespace() {
         var ns = new GlobalCompilationNamespace(Prelude.imports);
         for (Module module : modules.listModules()) {
