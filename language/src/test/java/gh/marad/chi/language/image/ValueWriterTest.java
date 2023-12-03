@@ -1,14 +1,17 @@
 package gh.marad.chi.language.image;
 
+import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.strings.TruffleString;
 import gh.marad.chi.core.Type;
 import gh.marad.chi.core.VariantType;
 import gh.marad.chi.language.ChiLanguage;
 import gh.marad.chi.language.runtime.ChiArray;
+import gh.marad.chi.language.runtime.ChiHostSymbol;
 import gh.marad.chi.language.runtime.ChiObject;
 import gh.marad.chi.language.runtime.ChiObjectGen;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.io.*;
 import java.util.List;
@@ -79,15 +82,33 @@ class ValueWriterTest {
 
     }
 
-    Object serializeAndDeserialize(Object value) throws Exception {
+    @Test
+    void testHostSymbolSerialization() throws Exception {
+        // given
+        var env = Mockito.mock(TruffleLanguage.Env.class);
+        Mockito.when(env.lookupHostSymbol("java.lang.System")).thenReturn(System.class);
+        var hostSymbol = new ChiHostSymbol("java.lang.System", System.class);
+        // when
+        var result = serializeAndDeserialize(hostSymbol, env);
+        // then
+        if (result instanceof ChiHostSymbol actual) {
+            assertEquals(hostSymbol.getSymbolName(), actual.getSymbolName());
+            assertEquals(hostSymbol.getSymbol(), actual.getSymbol());
+        } else fail();
+    }
 
+    Object serializeAndDeserialize(Object value) throws Exception {
+        return serializeAndDeserialize(value, null);
+    }
+
+    Object serializeAndDeserialize(Object value, TruffleLanguage.Env env) throws Exception {
         var baos = new ByteArrayOutputStream();
         var dos = new DataOutputStream(baos);
 
         ValueWriter.writeValue(value, dos);
 
         var dis = new DataInputStream(new ByteArrayInputStream(baos.toByteArray()));
-        return ValueWriter.readValue(dis, null);
+        return ValueWriter.readValue(dis, env);
     }
 
 }

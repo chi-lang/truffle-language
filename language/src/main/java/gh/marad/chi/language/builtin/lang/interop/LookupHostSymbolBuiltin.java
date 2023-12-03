@@ -7,6 +7,7 @@ import gh.marad.chi.core.Type;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.ChiContext;
 import gh.marad.chi.language.image.NodeId;
+import gh.marad.chi.language.runtime.ChiHostSymbol;
 
 public class LookupHostSymbolBuiltin extends LangInteropBuiltin {
     @Child
@@ -30,7 +31,9 @@ public class LookupHostSymbolBuiltin extends LangInteropBuiltin {
     public Object executeGeneric(VirtualFrame frame) {
         var hostSymbolName = ChiArgs.getTruffleString(frame, 0);
         var env = ChiContext.get(this).getEnv();
-        return env.lookupHostSymbol(toJavaString.execute(hostSymbolName));
+        var symbolName = toJavaString.execute(hostSymbolName);
+        var symbol = env.lookupHostSymbol(symbolName);
+        return new ChiHostSymbol(symbolName, symbol);
     }
 
     @Override

@@ -32,7 +32,7 @@ public class IsMemberInvocableBuiltin extends LangInteropBuiltin {
 
     @Override
     public Object executeGeneric(VirtualFrame frame) {
-        var receiver = ChiArgs.getObject(frame, 0);
+        var receiver = ChiArgs.getObjectAndUnwrapHostSymbol(frame, 0);
         var member = ChiArgs.getTruffleString(frame, 1);
         return library.isMemberInvocable(receiver, toJavaString.execute(member));
     }

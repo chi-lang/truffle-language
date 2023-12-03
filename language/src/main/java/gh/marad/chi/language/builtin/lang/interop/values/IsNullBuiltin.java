@@ -5,8 +5,11 @@ import com.oracle.truffle.api.interop.InteropLibrary;
 import gh.marad.chi.core.FnType;
 import gh.marad.chi.core.Type;
 import gh.marad.chi.language.ChiArgs;
+import gh.marad.chi.language.ChiTypes;
+import gh.marad.chi.language.ChiTypesGen;
 import gh.marad.chi.language.builtin.lang.interop.LangInteropBuiltin;
 import gh.marad.chi.language.image.NodeId;
+import gh.marad.chi.language.runtime.ChiHostSymbol;
 
 public class IsNullBuiltin extends LangInteropBuiltin {
     @Child
@@ -28,7 +31,7 @@ public class IsNullBuiltin extends LangInteropBuiltin {
 
     @Override
     public Object executeGeneric(VirtualFrame frame) {
-        var arg = ChiArgs.getObject(frame, 0);
+        var arg = ChiArgs.getObjectAndUnwrapHostSymbol(frame, 0);
         return library.isNull(arg);
     }
 

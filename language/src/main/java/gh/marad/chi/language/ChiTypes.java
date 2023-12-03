@@ -7,12 +7,9 @@ import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.strings.TruffleString;
 import gh.marad.chi.core.Type;
-import gh.marad.chi.language.runtime.ChiArray;
-import gh.marad.chi.language.runtime.ChiFunction;
-import gh.marad.chi.language.runtime.ChiObject;
-import gh.marad.chi.language.runtime.TODO;
+import gh.marad.chi.language.runtime.*;
 
-@TypeSystem({long.class, float.class, boolean.class, TruffleString.class, ChiFunction.class, ChiObject.class, ChiArray.class})
+@TypeSystem({long.class, float.class, boolean.class, TruffleString.class, ChiFunction.class, ChiObject.class, ChiArray.class, ChiHostSymbol.class})
 public class ChiTypes {
 
     @CompilerDirectives.TruffleBoundary
@@ -33,6 +30,13 @@ public class ChiTypes {
             return a.getType();
         }
         throw new TODO("Cannot determine type of object %s".formatted(object));
+    }
+
+    public static Object unwrapHostSymbol(Object o) {
+        if (ChiTypesGen.isChiHostSymbol(o)) {
+            return ((ChiHostSymbol)o).getSymbol();
+        }
+        return o;
     }
 
     @ImplicitCast

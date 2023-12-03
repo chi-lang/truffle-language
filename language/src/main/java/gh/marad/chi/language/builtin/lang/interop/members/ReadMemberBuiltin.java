@@ -36,7 +36,7 @@ public class ReadMemberBuiltin extends LangInteropBuiltin {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         try {
-            var receiver = ChiArgs.getObject(frame, 0);
+            var receiver = ChiArgs.getObjectAndUnwrapHostSymbol(frame, 0);
             var member = ChiArgs.getTruffleString(frame, 1);
             return library.readMember(receiver, toJavaString.execute(member));
         } catch (UnsupportedMessageException | UnknownIdentifierException e) {

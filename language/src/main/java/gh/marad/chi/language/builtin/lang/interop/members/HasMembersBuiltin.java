@@ -28,7 +28,7 @@ public class HasMembersBuiltin extends LangInteropBuiltin {
 
     @Override
     public Object executeGeneric(VirtualFrame frame) {
-        return library.hasMembers(ChiArgs.getObject(frame, 0));
+        return library.hasMembers(ChiArgs.getObjectAndUnwrapHostSymbol(frame, 0));
     }
 
     @Override

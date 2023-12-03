@@ -43,7 +43,7 @@ public class WriteMemberBuiltin extends LangInteropBuiltin {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         try {
-            var receiver = ChiArgs.getObject(frame, 0);
+            var receiver = ChiArgs.getObjectAndUnwrapHostSymbol(frame, 0);
             var member = ChiArgs.getTruffleString(frame, 1);
             var value = ChiArgs.getObject(frame, 2);
             library.writeMember(receiver, toJavaString.execute(member), value);

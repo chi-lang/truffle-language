@@ -31,7 +31,7 @@ public class HasArrayElementsBuiltin extends LangInteropBuiltin {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         try {
-            var receiver = ChiArgs.getObject(frame, 0);
+            var receiver = ChiArgs.getObjectAndUnwrapHostSymbol(frame, 0);
             var includeInternal = ChiArgs.getBoolean(frame, 1);
             return library.getMembers(receiver, includeInternal);
         } catch (UnsupportedMessageException e) {

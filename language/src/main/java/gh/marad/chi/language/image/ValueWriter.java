@@ -8,10 +8,7 @@ import gh.marad.chi.core.VariantType;
 import gh.marad.chi.language.ChiLanguage;
 import gh.marad.chi.language.ChiTypes;
 import gh.marad.chi.language.ChiTypesGen;
-import gh.marad.chi.language.runtime.ChiArray;
-import gh.marad.chi.language.runtime.ChiObject;
-import gh.marad.chi.language.runtime.ChiObjectGen;
-import gh.marad.chi.language.runtime.TODO;
+import gh.marad.chi.language.runtime.*;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -21,19 +18,19 @@ public class ValueWriter {
 
     public static void writeValue(Object value, DataOutputStream stream) throws IOException, UnsupportedMessageException, UnknownIdentifierException {
         if (value instanceof Long v) {
-            stream.writeByte(TypeId.Int.id());
+            stream.writeByte(ValueId.Int.id());
             stream.writeLong(v);
         } else if (value instanceof Float f) {
-            stream.writeByte(TypeId.Float.id());
+            stream.writeByte(ValueId.Float.id());
             stream.writeFloat(f);
         } else if (value instanceof Boolean b) {
-            stream.writeByte(TypeId.Bool.id());
+            stream.writeByte(ValueId.Bool.id());
             stream.writeBoolean(b);
         } else if (value instanceof TruffleString s) {
-            stream.writeByte(TypeId.String.id());
+            stream.writeByte(ValueId.String.id());
             stream.writeUTF(s.toJavaStringUncached());
         } else if (value instanceof ChiObject o) {
-            stream.writeByte(TypeId.Variant.id());
+            stream.writeByte(ValueId.Variant.id());
             TypeWriter.writeType(o.getType(), stream);
             var interop = ChiObjectGen.InteropLibraryExports.Cached.getUncached();
             var members = ChiTypesGen.asChiArray(interop.getMembers(o)).unsafeGetUnderlayingArray();
@@ -45,13 +42,16 @@ public class ValueWriter {
                 writeValue(fieldValue, stream);
             }
         } else if (value instanceof ChiArray a) {
-            stream.writeByte(TypeId.Array.id());
+            stream.writeByte(ValueId.Array.id());
             TypeWriter.writeType(a.getElementType(), stream);
             var items = a.unsafeGetUnderlayingArray();
             stream.writeInt(items.length);
             for (Object o : items) {
                 writeValue(o, stream);
             }
+        } else if (value instanceof ChiHostSymbol hostSymbol) {
+            stream.writeByte(ValueId.HostObject.id());
+            stream.writeUTF(hostSymbol.getSymbolName());
         } else {
             throw new TODO("Cannot write unsupported value of type '%s'".formatted(ChiTypes.getType(value)));
         }
@@ -72,7 +72,7 @@ public class ValueWriter {
     }
 
     public static Object readValue(DataInputStream stream, TruffleLanguage.Env env) throws Exception {
-        var typeId = TypeId.fromId(stream.readByte());
+        var typeId = ValueId.fromId(stream.readByte());
         return switch (typeId) {
             case Bool -> stream.readBoolean();
             case Float -> stream.readFloat();
@@ -80,7 +80,7 @@ public class ValueWriter {
             case String -> TruffleString.fromJavaStringUncached(stream.readUTF(), TruffleString.Encoding.UTF_8);
             case Array -> readArray(stream, env);
             case Variant -> readVariantType(stream, env);
-            default -> throw new TODO("Cannot read type id: " + typeId);
+            case HostObject -> readHostObject(stream, env);
         };
     }
 
@@ -92,5 +92,10 @@ public class ValueWriter {
             arr[i] = readValue(stream, env);
         }
         return new ChiArray(arr, type);
+    }
+
+    private static Object readHostObject(DataInputStream stream, TruffleLanguage.Env env) throws IOException {
+        var symbolName = stream.readUTF();
+        return new ChiHostSymbol(symbolName, env.lookupHostSymbol(symbolName));
     }
 }
