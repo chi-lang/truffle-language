@@ -39,7 +39,7 @@ public class ChiArray implements ChiValue {
         return elementType;
     }
 
-    public Object[] unsafeGetUnderlayingArray() {
+    public Object[] unsafeGetUnderlyingArray() {
         return array;
     }
 

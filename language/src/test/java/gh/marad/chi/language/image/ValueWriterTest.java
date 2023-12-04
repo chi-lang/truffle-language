@@ -48,7 +48,7 @@ class ValueWriterTest {
         // then
         if (result instanceof ChiArray actual) {
             assertEquals(array.getType(), actual.getType());
-            assertArrayEquals(data, array.unsafeGetUnderlayingArray());
+            assertArrayEquals(data, array.unsafeGetUnderlyingArray());
         } else fail("Did not deserialize array!");
     }
 

@@ -33,7 +33,7 @@ public class ValueWriter {
             stream.writeByte(ValueId.Variant.id());
             TypeWriter.writeType(o.getType(), stream);
             var interop = ChiObjectGen.InteropLibraryExports.Cached.getUncached();
-            var members = ChiTypesGen.asChiArray(interop.getMembers(o)).unsafeGetUnderlayingArray();
+            var members = ChiTypesGen.asChiArray(interop.getMembers(o)).unsafeGetUnderlyingArray();
             stream.writeInt(members.length);
             for (Object member : members) {
                 var fieldName = (String) member;
@@ -44,7 +44,7 @@ public class ValueWriter {
         } else if (value instanceof ChiArray a) {
             stream.writeByte(ValueId.Array.id());
             TypeWriter.writeType(a.getElementType(), stream);
-            var items = a.unsafeGetUnderlayingArray();
+            var items = a.unsafeGetUnderlyingArray();
             stream.writeInt(items.length);
             for (Object o : items) {
                 writeValue(o, stream);
