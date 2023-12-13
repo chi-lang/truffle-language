@@ -29,7 +29,7 @@ public class ChiTypes {
         } else if (object instanceof ChiArray a) {
             return a.getType();
         }
-        throw new TODO("Cannot determine type of object %s".formatted(object));
+        return Type.getAny();
     }
 
     public static Object unwrapHostSymbol(Object o) {
@@ -104,4 +104,13 @@ public class ChiTypes {
         return (float) d.doubleValue();
     }
 
+    @ImplicitCast
+    public static Object[] toJavaArray(ChiArray array) {
+        return array.unsafeGetUnderlyingArray();
+    }
+
+    @ImplicitCast
+    public static ChiArray toChiArray(Object[] array) {
+        return new ChiArray(array, Type.getAny());
+    }
 }

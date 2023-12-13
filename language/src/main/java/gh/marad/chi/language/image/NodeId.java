@@ -59,6 +59,7 @@ public enum NodeId {
     // std/collections.array
     ArraySizeBuiltin,
     ArrayBuiltin,
+    ArraySortBuiltin,
     // std/io
     ArgsBuiltin,
     PrintBuiltin,
@@ -84,6 +85,7 @@ public enum NodeId {
     ReadMemberBuiltin,
     IsMemberRemovableBuiltin,
     IsMemberWritableBuiltin,
+    NewInstanceBuiltin,
     IsMemberExistingBuiltin,
     GetMembersBuitlin,
     HasMemberReadSideEffectsBuiltin,

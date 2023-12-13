@@ -26,9 +26,9 @@ public class ChiArray implements ChiValue {
         this.elementType = type;
     }
 
-    public ChiArray(Object[] array, Type type) {
+    public ChiArray(Object[] array, Type elementType) {
         this.array = array;
-        this.elementType = type;
+        this.elementType = elementType;
     }
 
     public Type getType() {

@@ -10,6 +10,7 @@ import gh.marad.chi.core.namespace.SymbolType;
 import gh.marad.chi.language.builtin.Builtin;
 import gh.marad.chi.language.builtin.Prelude;
 import gh.marad.chi.language.builtin.collections.ArrayBuiltin;
+import gh.marad.chi.language.builtin.collections.ArraySortBuiltin;
 import gh.marad.chi.language.builtin.collections.SizeBuiltin;
 import gh.marad.chi.language.builtin.io.*;
 import gh.marad.chi.language.builtin.lang.EvalBuiltin;
@@ -158,6 +159,7 @@ public class ChiContext {
                 new ReadMemberBuiltin(),
                 new WriteMemberBuiltin(),
                 new RemoveMemberBuiltin(),
+                new NewInstanceBuiltin(),
                 new InvokeMemberBuiltin(),
                 new IsNullBuiltin(),
                 // io
@@ -170,6 +172,7 @@ public class ChiContext {
                 new MillisBuiltin(),
                 // collections
                 new ArrayBuiltin(),
+                new ArraySortBuiltin(),
                 new SizeBuiltin(),
                 new HasArrayElementsBuiltin(),
                 // string

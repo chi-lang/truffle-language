@@ -7,6 +7,7 @@ import gh.marad.chi.core.VariantType;
 import gh.marad.chi.language.ChiLanguage;
 import gh.marad.chi.language.EffectHandlers;
 import gh.marad.chi.language.builtin.collections.ArrayBuiltin;
+import gh.marad.chi.language.builtin.collections.ArraySortBuiltin;
 import gh.marad.chi.language.builtin.collections.SizeBuiltin;
 import gh.marad.chi.language.builtin.io.*;
 import gh.marad.chi.language.builtin.lang.EvalBuiltin;
@@ -120,6 +121,7 @@ public class NodeReader {
             // builtins
             case ArraySizeBuiltin -> new SizeBuiltin();
             case ArrayBuiltin -> new ArrayBuiltin();
+            case ArraySortBuiltin -> new ArraySortBuiltin();
             case ArgsBuiltin -> new ArgsBuiltin();
             case PrintBuiltin -> new PrintBuiltin(stdOutputStream);
             case PrintlnBuiltin -> new PrintlnBuiltin(stdOutputStream);
@@ -139,6 +141,7 @@ public class NodeReader {
             case ReadMemberBuiltin -> new ReadMemberBuiltin();
             case IsMemberRemovableBuiltin -> new IsMemberRemovableBuiltin();
             case IsMemberWritableBuiltin -> new IsMemberWritableBuiltin();
+            case NewInstanceBuiltin -> new NewInstanceBuiltin();
             case IsMemberExistingBuiltin -> new IsMemberExistingBuiltin();
             case GetMembersBuitlin -> new GetMembersBuiltin();
             case HasMemberReadSideEffectsBuiltin -> new HasMemberReadSideEffectsBuiltin();
