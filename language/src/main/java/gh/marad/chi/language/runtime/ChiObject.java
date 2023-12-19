@@ -14,7 +14,6 @@ import com.oracle.truffle.api.object.Shape;
 import com.oracle.truffle.api.utilities.TriState;
 import gh.marad.chi.core.Type;
 import gh.marad.chi.core.VariantType;
-import gh.marad.chi.language.ChiContext;
 
 import java.util.Objects;
 
@@ -142,10 +141,12 @@ public class ChiObject extends DynamicObject implements ChiValue {
                     if (receiver.env.isHostObject(thisField) && receiver.env.isHostObject(otherField)) {
                         equal = equal && receiver.env.asHostObject(thisField)
                                                      .equals(receiver.env.asHostObject(otherField));
-                    } else {
+                    } else if(thisField instanceof ChiObject && otherField instanceof ChiObject) {
                         var thisIop = InteropLibrary.getUncached(thisField);
                         var otherIop = InteropLibrary.getUncached(otherField);
                         equal = equal && thisIop.isIdentical(thisField, otherField, otherIop);
+                    } else {
+                        equal = equal && thisField.equals(otherField);
                     }
                 }
                 return equal ? TriState.TRUE : TriState.FALSE;
