@@ -10,9 +10,11 @@ import gh.marad.chi.core.namespace.SymbolType;
 import gh.marad.chi.language.builtin.Builtin;
 import gh.marad.chi.language.builtin.Prelude;
 import gh.marad.chi.language.builtin.collections.ArrayBuiltin;
+import gh.marad.chi.language.builtin.collections.ArrayHashBuiltin;
 import gh.marad.chi.language.builtin.collections.ArraySortBuiltin;
 import gh.marad.chi.language.builtin.collections.SizeBuiltin;
 import gh.marad.chi.language.builtin.io.*;
+import gh.marad.chi.language.builtin.lang.ClearPackageBuiltin;
 import gh.marad.chi.language.builtin.lang.EvalBuiltin;
 import gh.marad.chi.language.builtin.lang.LoadModuleBuiltin;
 import gh.marad.chi.language.builtin.lang.SaveModuleBuiltin;
@@ -137,6 +139,7 @@ public class ChiContext {
          return List.of(
                 // lang
                 new EvalBuiltin(),
+                new ClearPackageBuiltin(),
                 // lang.image
                 new SaveModuleBuiltin(),
                 new LoadModuleBuiltin(),
@@ -174,6 +177,7 @@ public class ChiContext {
                 new ArrayBuiltin(),
                 new ArraySortBuiltin(),
                 new SizeBuiltin(),
+                new ArrayHashBuiltin(),
                 new HasArrayElementsBuiltin(),
                 // string
                 new StringLengthBuiltin(),

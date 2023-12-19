@@ -95,6 +95,12 @@ public class Package {
         return variantTypes.get(name);
     }
 
+    public void invalidate() {
+        functions.forEach((key, lookupResult) -> {
+            lookupResult.assumption.invalidate();
+        });
+    }
+
 
     public record FunctionKey(String name, int paramTypesHash) {
     }

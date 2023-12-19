@@ -7,9 +7,11 @@ import gh.marad.chi.core.VariantType;
 import gh.marad.chi.language.ChiLanguage;
 import gh.marad.chi.language.EffectHandlers;
 import gh.marad.chi.language.builtin.collections.ArrayBuiltin;
+import gh.marad.chi.language.builtin.collections.ArrayHashBuiltin;
 import gh.marad.chi.language.builtin.collections.ArraySortBuiltin;
 import gh.marad.chi.language.builtin.collections.SizeBuiltin;
 import gh.marad.chi.language.builtin.io.*;
+import gh.marad.chi.language.builtin.lang.ClearPackageBuiltin;
 import gh.marad.chi.language.builtin.lang.EvalBuiltin;
 import gh.marad.chi.language.builtin.lang.LoadModuleBuiltin;
 import gh.marad.chi.language.builtin.lang.SaveModuleBuiltin;
@@ -120,6 +122,7 @@ public class NodeReader {
             case ResumeEffect -> new ResumeNode();
             // builtins
             case ArraySizeBuiltin -> new SizeBuiltin();
+            case ArrayHashBuiltin -> new ArrayHashBuiltin();
             case ArrayBuiltin -> new ArrayBuiltin();
             case ArraySortBuiltin -> new ArraySortBuiltin();
             case ArgsBuiltin -> new ArgsBuiltin();
@@ -127,6 +130,7 @@ public class NodeReader {
             case PrintlnBuiltin -> new PrintlnBuiltin(stdOutputStream);
             case ReadStringBuiltin -> new ReadStringBuiltin();
             case ReadLinesBuiltin -> new ReadLinesBuiltin();
+            case ClearPackageBuiltin -> new ClearPackageBuiltin();
             case LoadModuleBuiltin -> new LoadModuleBuiltin();
             case SaveModuleBuiltin -> new SaveModuleBuiltin();
             case EvalBuiltin -> new EvalBuiltin();

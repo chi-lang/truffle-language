@@ -96,6 +96,13 @@ public class Module {
     }
 
     @CompilerDirectives.TruffleBoundary
+    public void removePackage(String packageName) {
+        getOrCreatePackage(packageName).invalidate();
+        packages.remove(packageName);
+    }
+
+
+    @CompilerDirectives.TruffleBoundary
     private Package getOrCreatePackage(String packageName) {
         var pkg = packages.get(packageName);
         if (pkg != null) {

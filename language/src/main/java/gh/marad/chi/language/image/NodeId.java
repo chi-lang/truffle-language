@@ -58,6 +58,7 @@ public enum NodeId {
     // builtins
     // std/collections.array
     ArraySizeBuiltin,
+    ArrayHashBuiltin,
     ArrayBuiltin,
     ArraySortBuiltin,
     // std/io
@@ -69,6 +70,7 @@ public enum NodeId {
     // std/lang
     LoadModuleBuiltin,
     SaveModuleBuiltin,
+    ClearPackageBuiltin,
     EvalBuiltin,
     // std/lang.unsafe
     UnsafeArrayBuiltin,
