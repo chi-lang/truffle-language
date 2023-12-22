@@ -1,6 +1,7 @@
 package gh.marad.chi.language.runtime;
 
 import com.oracle.truffle.api.TruffleLanguage;
+import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.TruffleObject;
 import gh.marad.chi.language.ChiLanguage;
 
@@ -13,7 +14,7 @@ public interface ChiValue extends TruffleObject {
         return ChiLanguage.class;
     }
 
-    default Object toDisplayString(boolean allowSideEffects) {
-        return toString();
+    default Object toDisplayString(boolean allowSideEffects, InteropLibrary interopLibrary) {
+        return interopLibrary.toDisplayString(this, allowSideEffects);
     }
 }

@@ -75,7 +75,7 @@ public class ChiTypes {
 
     @ImplicitCast
     public static TruffleString toTruffleString(ChiArray arr) {
-        return TruffleString.fromJavaStringUncached((String) arr.toDisplayString(false), TruffleString.Encoding.UTF_8);
+        return TruffleString.fromJavaStringUncached((String) arr.toDisplayString(false, InteropLibrary.getUncached()), TruffleString.Encoding.UTF_8);
     }
 
     @ImplicitCast
