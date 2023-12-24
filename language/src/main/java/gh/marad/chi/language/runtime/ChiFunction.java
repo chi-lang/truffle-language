@@ -8,6 +8,7 @@ import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.ReportPolymorphism;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.interop.InteropLibrary;
+import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
 import com.oracle.truffle.api.nodes.DirectCallNode;
@@ -106,7 +107,8 @@ public class ChiFunction implements ChiValue {
     @Override
     @ExportMessage
     @CompilerDirectives.TruffleBoundary
-    public Object toDisplayString(boolean allowSideEffects) {
+    public Object toDisplayString(boolean allowSideEffects,
+                                  @CachedLibrary(limit = "3") InteropLibrary interopLibrary) {
         if (hasExecutableName()) {
             return "<function: %s>".formatted(getExecutableName());
         } else {

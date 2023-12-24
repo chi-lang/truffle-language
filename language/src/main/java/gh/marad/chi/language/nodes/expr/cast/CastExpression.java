@@ -6,4 +6,5 @@ import gh.marad.chi.language.nodes.expr.ExpressionNode;
 
 @NodeChild(value = "value", type = ChiNode.class)
 public abstract class CastExpression extends ExpressionNode {
+    public abstract ChiNode getValue();
 }

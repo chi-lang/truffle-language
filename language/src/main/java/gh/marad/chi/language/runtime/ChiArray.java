@@ -4,29 +4,43 @@ import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.InvalidArrayIndexException;
+import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
+import gh.marad.chi.core.Type;
 
 import java.util.Arrays;
 
 @ExportLibrary(InteropLibrary.class)
 public class ChiArray implements ChiValue {
     private final Object[] array;
+    private final Type elementType;
 
-    public ChiArray(int capacity, Object defaultValue) {
+    public ChiArray(int capacity, Object defaultValue, Type type) {
         array = new Object[capacity];
+        this.elementType = type;
         Arrays.fill(array, defaultValue);
     }
 
-    public ChiArray(int capacity) {
+    public ChiArray(int capacity, Type type) {
         array = new Object[capacity];
+        this.elementType = type;
     }
 
-    public ChiArray(Object[] array) {
+    public ChiArray(Object[] array, Type elementType) {
         this.array = array;
+        this.elementType = elementType;
     }
 
-    public Object[] unsafeGetUnderlayingArray() {
+    public Type getType() {
+        return Type.array(elementType);
+    }
+
+    public Type getElementType() {
+        return elementType;
+    }
+
+    public Object[] unsafeGetUnderlyingArray() {
         return array;
     }
 
@@ -68,20 +82,21 @@ public class ChiArray implements ChiValue {
     }
 
     @ExportMessage
-    @Override
     @CompilerDirectives.TruffleBoundary
-    public Object toDisplayString(boolean allowSideEffects) {
+    @Override
+    public Object toDisplayString(boolean allowSideEffects,
+                                  @CachedLibrary(limit = "3") InteropLibrary interopLibrary) {
         var sb = new StringBuilder();
-        sb.append("arrayOf(");
+        sb.append("[");
         var index = 0;
         for (Object element : array) {
-            sb.append(element.toString());
+            sb.append(interopLibrary.toDisplayString(element));
             if (index < array.length - 1) {
                 sb.append(", ");
             }
             index += 1;
         }
-        sb.append(")");
+        sb.append("]");
         return sb.toString();
     }
 

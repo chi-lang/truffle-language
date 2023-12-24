@@ -7,13 +7,14 @@ import gh.marad.chi.core.Type;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.ChiTypesGen;
 import gh.marad.chi.language.builtin.Builtin;
+import gh.marad.chi.language.image.NodeId;
 import gh.marad.chi.language.runtime.Unit;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
 
 public class PrintBuiltin extends Builtin {
-    private PrintWriter writer;
+    private final PrintWriter writer;
 
     @CompilerDirectives.TruffleBoundary
     public PrintBuiltin(OutputStream stream) {
@@ -51,5 +52,10 @@ public class PrintBuiltin extends Builtin {
     @Override
     public String name() {
         return "print";
+    }
+
+    @Override
+    public NodeId getNodeId() {
+        return NodeId.PrintBuiltin;
     }
 }

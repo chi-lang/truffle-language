@@ -5,6 +5,7 @@ import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.UnsupportedMessageException;
 import gh.marad.chi.core.FnType;
 import gh.marad.chi.language.ChiArgs;
+import gh.marad.chi.language.image.NodeId;
 import gh.marad.chi.language.runtime.TODO;
 
 import java.util.List;
@@ -40,5 +41,10 @@ public class SizeBuiltin extends CollectionsArrayBuiltin {
     @Override
     public String name() {
         return "size";
+    }
+
+    @Override
+    public NodeId getNodeId() {
+        return NodeId.ArraySizeBuiltin;
     }
 }

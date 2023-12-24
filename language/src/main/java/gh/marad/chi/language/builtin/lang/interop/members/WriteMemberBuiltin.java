@@ -10,6 +10,7 @@ import gh.marad.chi.core.FnType;
 import gh.marad.chi.core.Type;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.builtin.lang.interop.LangInteropBuiltin;
+import gh.marad.chi.language.image.NodeId;
 import gh.marad.chi.language.runtime.TODO;
 
 import java.util.List;
@@ -42,7 +43,7 @@ public class WriteMemberBuiltin extends LangInteropBuiltin {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         try {
-            var receiver = ChiArgs.getObject(frame, 0);
+            var receiver = ChiArgs.getObjectAndUnwrapHostSymbol(frame, 0);
             var member = ChiArgs.getTruffleString(frame, 1);
             var value = ChiArgs.getObject(frame, 2);
             library.writeMember(receiver, toJavaString.execute(member), value);
@@ -50,5 +51,10 @@ public class WriteMemberBuiltin extends LangInteropBuiltin {
         } catch (UnsupportedMessageException | UnknownIdentifierException | UnsupportedTypeException e) {
             throw new TODO(e);
         }
+    }
+
+    @Override
+    public NodeId getNodeId() {
+        return NodeId.WriteMemberBuiltin;
     }
 }

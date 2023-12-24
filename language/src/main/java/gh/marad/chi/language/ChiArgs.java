@@ -37,6 +37,10 @@ public class ChiArgs {
         return frame.getArguments()[ARGS_OFFSET + argumentIndex];
     }
 
+    public static Object getObjectAndUnwrapHostSymbol(Frame frame, int argumentIndex) {
+        return ChiTypes.unwrapHostSymbol(getObject(frame, argumentIndex));
+    }
+
     public static long getLong(Frame frame, int argumentIndex) {
         return ChiTypesGen.asImplicitLong(getObject(frame, argumentIndex));
     }
@@ -54,7 +58,7 @@ public class ChiArgs {
     }
 
     public static ChiArray getChiArray(Frame frame, int argumentIndex) {
-        return ChiTypesGen.asImplicitChiArray(getObject(frame, argumentIndex));
+        return ChiTypesGen.asChiArray(getObject(frame, argumentIndex));
     }
 
     public static void setArgument(Frame frame, int argumentIndex, Object value) {

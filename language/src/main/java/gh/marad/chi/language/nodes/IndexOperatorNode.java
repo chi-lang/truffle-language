@@ -15,6 +15,9 @@ import gh.marad.chi.language.runtime.TODO;
 @NodeChild(value = "variable", type = ChiNode.class)
 @NodeChild(value = "index", type = ChiNode.class)
 public abstract class IndexOperatorNode extends ExpressionNode {
+    public abstract ChiNode getVariable();
+    public abstract ChiNode getIndex();
+
     @Specialization
     public Object doChiArray(ChiArray array, long index) {
         try {
@@ -39,5 +42,12 @@ public abstract class IndexOperatorNode extends ExpressionNode {
         } catch (UnsupportedMessageException | InvalidArrayIndexException e) {
             throw new TODO(e);
         }
+    }
+
+    @Override
+    public void accept(ChiNodeVisitor visitor) throws Exception {
+        visitor.visitIndexOperator(this);
+        getVariable().accept(visitor);
+        getIndex().accept(visitor);
     }
 }

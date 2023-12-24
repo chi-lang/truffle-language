@@ -7,6 +7,7 @@ import gh.marad.chi.core.FnType;
 import gh.marad.chi.core.Type;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.builtin.Builtin;
+import gh.marad.chi.language.image.NodeId;
 import gh.marad.chi.language.runtime.ChiArray;
 
 import java.io.IOException;
@@ -28,7 +29,7 @@ public class ReadLinesBuiltin extends Builtin {
             var data = lines.stream()
                             .map(it -> TruffleString.fromJavaStringUncached(it, TruffleString.Encoding.UTF_8))
                             .toList();
-            return new ChiArray(data.toArray(new TruffleString[0]));
+            return new ChiArray(data.toArray(new TruffleString[0]), Type.getString());
         } catch (IOException e) {
             CompilerDirectives.transferToInterpreter();
             throw new RuntimeException(e);
@@ -53,5 +54,10 @@ public class ReadLinesBuiltin extends Builtin {
     @Override
     public String name() {
         return "readLines";
+    }
+
+    @Override
+    public NodeId getNodeId() {
+        return NodeId.ReadLinesBuiltin;
     }
 }

@@ -2,6 +2,7 @@ package gh.marad.chi.language.runtime;
 
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.interop.InteropLibrary;
+import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
 
@@ -26,7 +27,8 @@ public class Unit implements ChiValue {
 
     @Override
     @ExportMessage
-    public Object toDisplayString(boolean allowSideEffects) {
+    public Object toDisplayString(boolean allowSideEffects,
+                                  @CachedLibrary(limit = "3") InteropLibrary interopLibrary) {
         return "()";
     }
 }

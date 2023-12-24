@@ -7,13 +7,16 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import gh.marad.chi.language.nodes.ChiNode;
+import gh.marad.chi.language.nodes.ChiNodeVisitor;
 import gh.marad.chi.language.nodes.expr.ExpressionNode;
 import gh.marad.chi.language.runtime.LexicalScope;
 
 @NodeField(name = "name", type = String.class)
 @NodeChild(value = "valueNode", type = ChiNode.class)
 public abstract class WriteOuterVariable extends ExpressionNode {
-    protected abstract String getName();
+    public abstract String getName();
+    public abstract ChiNode getValueNode();
+
 
     @Specialization(guards = "isLongOrIllegal(frame)")
     protected long writeLong(VirtualFrame frame, long value) {
@@ -68,5 +71,11 @@ public abstract class WriteOuterVariable extends ExpressionNode {
     protected boolean isBooleanOrIllegal(VirtualFrame frame) {
         final var kind = findScope(frame, getName()).getSlotKind(getName());
         return kind == FrameSlotKind.Boolean || kind == FrameSlotKind.Illegal;
+    }
+
+    @Override
+    public void accept(ChiNodeVisitor visitor) throws Exception {
+        visitor.visitWriteOuterVariable(this);
+        getValueNode().accept(visitor);
     }
 }

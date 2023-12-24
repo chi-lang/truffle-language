@@ -24,6 +24,7 @@ public abstract class ChiNode extends Node {
         hasRootTag = true;
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean hasTag(Class<? extends Tag> tag) {
         return hasRootTag && (tag == StandardTags.RootTag.class || tag == StandardTags.RootBodyTag.class);
     }
@@ -59,4 +60,6 @@ public abstract class ChiNode extends Node {
     }
 
     public abstract Object executeGeneric(VirtualFrame frame);
+
+    public abstract void accept(ChiNodeVisitor visitor) throws Exception;
 }

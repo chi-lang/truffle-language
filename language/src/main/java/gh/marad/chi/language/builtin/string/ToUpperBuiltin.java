@@ -7,6 +7,7 @@ import gh.marad.chi.core.FnType;
 import gh.marad.chi.core.Type;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.builtin.Builtin;
+import gh.marad.chi.language.image.NodeId;
 
 public class ToUpperBuiltin extends Builtin {
     @Child
@@ -50,5 +51,10 @@ public class ToUpperBuiltin extends Builtin {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         return executeString(frame);
+    }
+
+    @Override
+    public NodeId getNodeId() {
+        return NodeId.ToUpperBuiltin;
     }
 }

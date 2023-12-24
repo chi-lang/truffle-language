@@ -8,13 +8,14 @@ import com.oracle.truffle.api.interop.UnsupportedMessageException;
 import com.oracle.truffle.api.interop.UnsupportedTypeException;
 import gh.marad.chi.language.ChiContext;
 import gh.marad.chi.language.EffectHandlers;
+import gh.marad.chi.language.nodes.ChiNodeVisitor;
 import gh.marad.chi.language.nodes.expr.ExpressionNode;
 import gh.marad.chi.language.runtime.TODO;
 
 public class InvokeEffect extends ExpressionNode {
-    private final String moduleName;
-    private final String packageName;
-    private final String effectName;
+    public final String moduleName;
+    public final String packageName;
+    public final String effectName;
     @Child
     private InteropLibrary library;
 
@@ -47,5 +48,10 @@ public class InvokeEffect extends ExpressionNode {
         } catch (ResumeValueException ex) {
             return ex.getValue();
         }
+    }
+
+    @Override
+    public void accept(ChiNodeVisitor visitor) throws Exception {
+        visitor.visitInvokeEffect(this);
     }
 }

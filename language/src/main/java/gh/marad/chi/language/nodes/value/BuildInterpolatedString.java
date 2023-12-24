@@ -6,6 +6,7 @@ import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import com.oracle.truffle.api.strings.TruffleString;
 import gh.marad.chi.language.nodes.ChiNode;
+import gh.marad.chi.language.nodes.ChiNodeVisitor;
 import gh.marad.chi.language.nodes.expr.ExpressionNode;
 import gh.marad.chi.language.runtime.TODO;
 
@@ -18,6 +19,10 @@ public class BuildInterpolatedString extends ExpressionNode {
 
     public BuildInterpolatedString(ChiNode[] parts) {
         this.parts = parts;
+    }
+
+    public ChiNode[] getParts() {
+        return parts;
     }
 
     @Override
@@ -33,6 +38,14 @@ public class BuildInterpolatedString extends ExpressionNode {
             return acc;
         } catch (UnexpectedResultException e) {
             throw new TODO("Unexpected value!", e);
+        }
+    }
+
+    @Override
+    public void accept(ChiNodeVisitor visitor) throws Exception {
+        visitor.visitBuildInterpolatedString(this);
+        for (ChiNode part : parts) {
+            part.accept(visitor);
         }
     }
 }

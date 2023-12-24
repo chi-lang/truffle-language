@@ -4,6 +4,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import gh.marad.chi.core.FnType;
 import gh.marad.chi.core.Type;
 import gh.marad.chi.language.builtin.Builtin;
+import gh.marad.chi.language.image.NodeId;
 
 public class MillisBuiltin extends Builtin {
     @Override
@@ -34,5 +35,10 @@ public class MillisBuiltin extends Builtin {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         return System.currentTimeMillis();
+    }
+
+    @Override
+    public NodeId getNodeId() {
+        return NodeId.MillisBuiltin;
     }
 }

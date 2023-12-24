@@ -6,6 +6,7 @@ import gh.marad.chi.core.FnType;
 import gh.marad.chi.core.Type;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.builtin.lang.interop.LangInteropBuiltin;
+import gh.marad.chi.language.image.NodeId;
 
 public class HasMembersBuiltin extends LangInteropBuiltin {
     @Child
@@ -27,6 +28,11 @@ public class HasMembersBuiltin extends LangInteropBuiltin {
 
     @Override
     public Object executeGeneric(VirtualFrame frame) {
-        return library.hasMembers(ChiArgs.getObject(frame, 0));
+        return library.hasMembers(ChiArgs.getObjectAndUnwrapHostSymbol(frame, 0));
+    }
+
+    @Override
+    public NodeId getNodeId() {
+        return NodeId.HasMembersBuiltin;
     }
 }

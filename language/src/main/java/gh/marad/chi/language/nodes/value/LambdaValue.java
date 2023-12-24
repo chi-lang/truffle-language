@@ -4,11 +4,12 @@ import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.RootCallTarget;
 import com.oracle.truffle.api.frame.MaterializedFrame;
 import com.oracle.truffle.api.frame.VirtualFrame;
+import gh.marad.chi.language.nodes.ChiNodeVisitor;
 import gh.marad.chi.language.runtime.ChiFunction;
 import gh.marad.chi.language.runtime.LexicalScope;
 
 public class LambdaValue extends ValueNode {
-    private final RootCallTarget callTarget;
+    public final RootCallTarget callTarget;
 
     public LambdaValue(RootCallTarget callTarget) {
         this.callTarget = callTarget;
@@ -29,5 +30,10 @@ public class LambdaValue extends ValueNode {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         return executeFunction(frame);
+    }
+
+    @Override
+    public void accept(ChiNodeVisitor visitor) throws Exception {
+        visitor.visitLambdaValue(this);
     }
 }

@@ -7,6 +7,7 @@ import gh.marad.chi.core.FnType;
 import gh.marad.chi.core.Type;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.builtin.Builtin;
+import gh.marad.chi.language.image.NodeId;
 import gh.marad.chi.language.runtime.ChiArray;
 
 public class SplitStringBuiltin extends Builtin {
@@ -51,6 +52,11 @@ public class SplitStringBuiltin extends Builtin {
         for (int i = 0; i < result.length; i++) {
             data[i] = fromJava.execute(result[i], TruffleString.Encoding.UTF_8);
         }
-        return new ChiArray(data);
+        return new ChiArray(data, Type.getString());
+    }
+
+    @Override
+    public NodeId getNodeId() {
+        return NodeId.SplitStringBuiltin;
     }
 }

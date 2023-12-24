@@ -53,4 +53,9 @@ public class FnRootNode extends RootNode {
     public String toString() {
         return getName();
     }
+
+    public void accept(ChiNodeVisitor visitor) throws Exception {
+        body.accept(visitor);
+    }
+
 }

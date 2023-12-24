@@ -2,6 +2,7 @@ package gh.marad.chi.language.nodes.expr.operators;
 
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.dsl.Fallback;
+import gh.marad.chi.language.nodes.ChiNode;
 
 public abstract class BinaryOperatorWithFallback extends BinaryOperator {
     @Fallback

@@ -5,6 +5,7 @@ import com.oracle.truffle.api.nodes.RepeatingNode;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import com.oracle.truffle.api.profiles.BranchProfile;
 import gh.marad.chi.language.nodes.ChiNode;
+import gh.marad.chi.language.nodes.ChiNodeVisitor;
 import gh.marad.chi.language.nodes.expr.ExpressionNode;
 import gh.marad.chi.language.runtime.TODO;
 
@@ -45,6 +46,19 @@ public class WhileRepeatingNode extends ExpressionNode implements RepeatingNode 
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         throw new TODO("while is not a regular expression node");
+    }
+
+    public ChiNode getConditionNode() {
+        return conditionNode;
+    }
+
+    public ChiNode getBodyNode() {
+        return bodyNode;
+    }
+
+    @Override
+    public void accept(ChiNodeVisitor visitor) throws Exception {
+        throw new TODO("Visitor should not reach here!");
     }
 
     //    @Override

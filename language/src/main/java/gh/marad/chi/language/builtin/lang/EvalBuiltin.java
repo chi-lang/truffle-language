@@ -8,14 +8,13 @@ import gh.marad.chi.core.Type;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.ChiLanguage;
 import gh.marad.chi.language.builtin.Builtin;
+import gh.marad.chi.language.image.NodeId;
 
 public class EvalBuiltin extends Builtin {
-    private final ChiLanguage language;
     @Child
     private IndirectCallNode indirectCallNode;
 
-    public EvalBuiltin(ChiLanguage language) {
-        this.language = language;
+    public EvalBuiltin() {
         this.indirectCallNode = Truffle.getRuntime().createIndirectCallNode();
     }
 
@@ -42,7 +41,12 @@ public class EvalBuiltin extends Builtin {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         var string = ChiArgs.getTruffleString(frame, 0);
-        var callTarget = language.compile(string.toJavaStringUncached());
+        var callTarget = ChiLanguage.get(this).compile(string.toJavaStringUncached());
         return indirectCallNode.call(callTarget);
+    }
+
+    @Override
+    public NodeId getNodeId() {
+        return NodeId.EvalBuiltin;
     }
 }

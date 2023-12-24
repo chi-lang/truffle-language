@@ -6,12 +6,38 @@ import com.oracle.truffle.api.dsl.TypeSystem;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.strings.TruffleString;
-import gh.marad.chi.language.runtime.ChiArray;
-import gh.marad.chi.language.runtime.ChiFunction;
-import gh.marad.chi.language.runtime.ChiObject;
+import gh.marad.chi.core.Type;
+import gh.marad.chi.language.runtime.*;
 
-@TypeSystem({long.class, float.class, boolean.class, TruffleString.class, ChiFunction.class, ChiObject.class})
+@TypeSystem({long.class, float.class, boolean.class, TruffleString.class, ChiFunction.class, ChiObject.class, ChiArray.class, ChiHostSymbol.class})
 public class ChiTypes {
+
+    @CompilerDirectives.TruffleBoundary
+    public static Type getType(Object object) {
+        if(object instanceof Long) {
+            return Type.getIntType();
+        } else if (object instanceof Float) {
+            return Type.getFloatType();
+        } else if (object instanceof Boolean) {
+            return Type.getBool();
+        } else if (object instanceof TruffleString) {
+            return Type.getString();
+        } else if (object instanceof ChiFunction f) {
+            throw new TODO("Determining function type is unsupported! (yet?)");
+        } else if (object instanceof ChiObject o) {
+            return o.getType();
+        } else if (object instanceof ChiArray a) {
+            return a.getType();
+        }
+        return Type.getAny();
+    }
+
+    public static Object unwrapHostSymbol(Object o) {
+        if (ChiTypesGen.isChiHostSymbol(o)) {
+            return ((ChiHostSymbol)o).getSymbol();
+        }
+        return o;
+    }
 
     @ImplicitCast
     public static TruffleString toTruffleString(int i) {
@@ -49,7 +75,7 @@ public class ChiTypes {
 
     @ImplicitCast
     public static TruffleString toTruffleString(ChiArray arr) {
-        return TruffleString.fromJavaStringUncached((String) arr.toDisplayString(false), TruffleString.Encoding.UTF_8);
+        return TruffleString.fromJavaStringUncached((String) arr.toDisplayString(false, InteropLibrary.getUncached()), TruffleString.Encoding.UTF_8);
     }
 
     @ImplicitCast
@@ -69,6 +95,11 @@ public class ChiTypes {
     }
 
     @ImplicitCast
+    public static float toFloat(long l) {
+        return (float) l;
+    }
+
+    @ImplicitCast
     public static float toFloat(double d) {
         return (float) d;
     }
@@ -79,7 +110,12 @@ public class ChiTypes {
     }
 
     @ImplicitCast
-    public static ChiArray toChiArray(Object[] arr) {
-        return new ChiArray(arr);
+    public static Object[] toJavaArray(ChiArray array) {
+        return array.unsafeGetUnderlyingArray();
+    }
+
+    @ImplicitCast
+    public static ChiArray toChiArray(Object[] array) {
+        return new ChiArray(array, Type.getAny());
     }
 }

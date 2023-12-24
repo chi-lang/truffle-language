@@ -7,6 +7,7 @@ import gh.marad.chi.core.FnType;
 import gh.marad.chi.core.Type;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.builtin.lang.interop.LangInteropBuiltin;
+import gh.marad.chi.language.image.NodeId;
 
 public class IsMemberWritableBuiltin extends LangInteropBuiltin {
     @Child
@@ -31,8 +32,13 @@ public class IsMemberWritableBuiltin extends LangInteropBuiltin {
 
     @Override
     public Object executeGeneric(VirtualFrame frame) {
-        var receiver = ChiArgs.getObject(frame, 0);
+        var receiver = ChiArgs.getObjectAndUnwrapHostSymbol(frame, 0);
         var member = ChiArgs.getTruffleString(frame, 1);
         return library.isMemberWritable(receiver, toJavaString.execute(member));
+    }
+
+    @Override
+    public NodeId getNodeId() {
+        return NodeId.IsMemberWritableBuiltin;
     }
 }

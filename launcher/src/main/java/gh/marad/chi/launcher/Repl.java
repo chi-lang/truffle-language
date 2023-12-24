@@ -8,7 +8,7 @@ import org.graalvm.polyglot.Value;
 import java.util.Scanner;
 
 public class Repl {
-    private Context context;
+    private final Context context;
 
     public Repl(Context context) {
         this.context = context;
@@ -25,8 +25,6 @@ public class Repl {
             } catch (PolyglotException ex) {
                 if (!ex.getMessage().contains("Compilation failed")) {
                     ex.printStackTrace();
-                } else {
-                    System.err.println(ex.getMessage());
                 }
             }
         }

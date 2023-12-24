@@ -38,6 +38,7 @@ import gh.marad.chi.language.nodes.function.DefinePackageFunctionFromNodeGen;
 import gh.marad.chi.language.nodes.function.GetDefinedFunction;
 import gh.marad.chi.language.nodes.function.InvokeFunction;
 import gh.marad.chi.language.nodes.objects.ConstructChiObject;
+import gh.marad.chi.language.nodes.objects.DefineVariantTypeNode;
 import gh.marad.chi.language.nodes.objects.ReadMemberNodeGen;
 import gh.marad.chi.language.nodes.objects.WriteMemberNodeGen;
 import gh.marad.chi.language.nodes.value.*;
@@ -45,7 +46,6 @@ import gh.marad.chi.language.runtime.ChiFunction;
 import gh.marad.chi.language.runtime.TODO;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -161,27 +161,37 @@ public class Converter {
         var constructorDefinitions =
                 expr.getConstructors().stream()
                     .map(constructor -> {
+                        var type = expr.getBaseVariantType().withVariant(constructor.toVariant());
                         var constructorFunction = createFunctionFromNode(
-                                new ConstructChiObject(
-                                        language,
-                                        expr.getBaseVariantType().withVariant(constructor.toVariant())),
+                                new ConstructChiObject(type),
                                 constructor.getName());
                         if (constructor.getFields().isEmpty()) {
                             return WriteModuleVariableNodeGen.create(
-                                    new InvokeFunction(new LambdaValue(constructorFunction), Collections.emptyList()),
+                                    new InvokeFunction(new LambdaValue(constructorFunction), new ChiNode[0]),
                                     currentModule,
                                     currentPackage,
-                                    constructor.getName()
+                                    constructor.getName(),
+                                    type,
+                                    constructor.getPublic(),
+                                    true
                             );
                         } else {
+                            var returnType = expr.getBaseVariantType().withVariant(constructor.toVariant());
                             var paramTypes = constructor.getFields().stream().map(VariantTypeField::getType).toList().toArray(new Type[0]);
+                            var fnType = Type.fn(returnType, paramTypes);
                             return new DefinePackageFunction(
                                     currentModule,
                                     currentPackage,
                                     new ChiFunction(constructorFunction),
-                                    paramTypes);
+                                    fnType,
+                                    constructor.getPublic());
                         }
                     }).collect(Collectors.toList());
+
+        var variants = expr.getConstructors().stream().map(VariantTypeConstructor::toVariant).toList();
+        constructorDefinitions.add(new DefineVariantTypeNode(
+                expr.getBaseVariantType(), variants
+        ));
         constructorDefinitions.add(new UnitValue());
         return new BlockExpr(constructorDefinitions.toArray(new ChiNode[0]));
     }
@@ -211,18 +221,24 @@ public class Converter {
             return convertModuleFunctionDefinitionFromFunctionNode(
                     nameDeclaration.getName(),
                     convertFnExpr(fn, nameDeclaration.getName()),
-                    (FnType) fn.getType()
+                    (FnType) fn.getType(),
+                    nameDeclaration.getPublic()
             );
         } else if (symbol.getScopeType() == ScopeType.Package && nameDeclaration.getValue().getType() instanceof FnType fnType) {
             return convertModuleFunctionDefinitionFromFunctionNode(
                     nameDeclaration.getName(),
                     convertExpression(nameDeclaration.getValue()),
-                    fnType
+                    fnType,
+                    nameDeclaration.getPublic()
             );
         } else if (symbol.getScopeType() == ScopeType.Package) {
             return WriteModuleVariableNodeGen.create(
                     convertExpression(nameDeclaration.getValue()),
-                    currentModule, currentPackage, nameDeclaration.getName());
+                    currentModule, currentPackage, nameDeclaration.getName(),
+                    nameDeclaration.getValue().getType(),
+                    nameDeclaration.getPublic(),
+                    nameDeclaration.getMutable()
+                    );
         } else {
             int slot = currentFdBuilder.addSlot(FrameSlotKind.Illegal, nameDeclaration.getName(), null);
             scope.updateSlot(nameDeclaration.getName(), slot);
@@ -236,6 +252,9 @@ public class Converter {
         var symbolInfo = scope.getSymbol(variableAccess.getName(), true);
         assert symbolInfo != null : "Symbol not found for local '%s'".formatted(variableAccess.getName());
         if (symbolInfo.getScopeType() == ScopeType.Package) {
+            // TODO: change name to ReadPackageVariable
+            // TODO: depending on symbol type it should read package variable or package function
+            //       as they have separate namespaces in runtime (but not in the language itself)
             return new ReadModuleVariable(
                     variableAccess.getModuleName(),
                     variableAccess.getPackageName(),
@@ -270,13 +289,19 @@ public class Converter {
     private ChiNode convertAssignment(Assignment assignment) {
         var scope = assignment.getDefinitionScope();
         var symbolInfo = scope.getSymbol(assignment.getName(), true);
-        assert symbolInfo != null : "Symbol not found for local '%s'".formatted(assignment.getName());
+//        assert symbolInfo != null : "Symbol not found for local '%s'".formatted(assignment.getName());
+        if (symbolInfo == null) {
+            throw new TODO("Symbol not found for local '%s'".formatted(assignment.getName()));
+        }
         if (symbolInfo.getScopeType() == ScopeType.Package) {
             return WriteModuleVariableNodeGen.create(
                     convertExpression(assignment.getValue()),
                     currentModule,
                     currentPackage,
-                    assignment.getName()
+                    assignment.getName(),
+                    assignment.getValue().getType(),
+                    symbolInfo.getPublic(),
+                    symbolInfo.getMutable()
             );
         } else if (symbolInfo.getSymbolType() == SymbolType.Local) {
             assert symbolInfo.getSlot() != -1 : "Slot for local '%s' was not set up!".formatted(assignment.getName());
@@ -381,7 +406,7 @@ public class Converter {
         if (ifElse.getElseBranch() != null) {
             elseBranch = convertExpression(ifElse.getElseBranch());
         } else {
-            elseBranch = null;
+            elseBranch = new UnitValue();
         }
         return IfExpr.create(condition, thenBranch, elseBranch);
     }
@@ -395,9 +420,8 @@ public class Converter {
         return convertFnExpr(fn, "[lambda]");
     }
 
-    private ChiNode convertModuleFunctionDefinitionFromFunctionNode(String name, ChiNode fnExprNode, FnType type) {
-        var paramTypes = type.getParamTypes().toArray(new Type[0]);
-        return DefinePackageFunctionFromNodeGen.create(fnExprNode, currentModule, currentPackage, name, paramTypes);
+    private ChiNode convertModuleFunctionDefinitionFromFunctionNode(String name, ChiNode fnExprNode, FnType type, boolean isPublic) {
+        return DefinePackageFunctionFromNodeGen.create(fnExprNode, currentModule, currentPackage, name, type, isPublic);
     }
 
     private RootCallTarget createFunctionFromNode(ExpressionNode body, String name) {
@@ -440,7 +464,11 @@ public class Converter {
         }
         assert fnType != null;
         var paramTypes = fnType.getParamTypes().toArray(new Type[0]);
-        var parameters = fnCall.getParameters().stream().map(this::convertExpression).toList();
+        ChiNode[] parameters = new ChiNode[fnCall.getParameters().size()];
+        var i = 0;
+        for (Expression parameter : fnCall.getParameters()) {
+            parameters[i++] = convertExpression(parameter);
+        }
         if (functionExpr instanceof VariableAccess variableAccess) {
             var scope = variableAccess.getDefinitionScope();
             var symbol = scope.getSymbol(variableAccess.getName(), true);
@@ -487,7 +515,8 @@ public class Converter {
         return new DefinePackageFunction(
                 currentModule, currentPackage,
                 new ChiFunction(callTarget),
-                fnType.getParamTypes().toArray(new Type[0])
+                fnType,
+                definition.getPublic()
         );
     }
 
@@ -505,7 +534,7 @@ public class Converter {
                                      var resumeSlot = currentFdBuilder.addSlot(FrameSlotKind.Illegal, "resume", null);
                                      it.getScope().updateSlot("resume", resumeSlot);
 
-                                     var resumeFunc = ResumeNode.createResumeFunction(language);
+                                     var resumeFunc = ResumeNode.createResumeFunction();
                                      var bodyNode2 = new BlockExpr(new ChiNode[]{
                                              WriteLocalVariableNodeGen.create(
                                                      new LambdaValue(resumeFunc.getCallTarget()),

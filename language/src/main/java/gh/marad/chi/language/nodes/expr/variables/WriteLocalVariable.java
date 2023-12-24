@@ -8,6 +8,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.instrumentation.StandardTags;
 import com.oracle.truffle.api.instrumentation.Tag;
 import gh.marad.chi.language.nodes.ChiNode;
+import gh.marad.chi.language.nodes.ChiNodeVisitor;
 import gh.marad.chi.language.nodes.expr.ExpressionNode;
 
 @NodeField(name = "slot", type = int.class)
@@ -15,8 +16,9 @@ import gh.marad.chi.language.nodes.expr.ExpressionNode;
 @NodeChild(value = "valueNode", type = ChiNode.class)
 public abstract class WriteLocalVariable extends ExpressionNode {
 
-    protected abstract int getSlot();
-    protected abstract String getName();
+    public abstract ChiNode getValueNode();
+    public abstract int getSlot();
+    public abstract String getName();
 
 
     @Specialization(guards = "isLongOrIllegal(frame)")
@@ -65,5 +67,11 @@ public abstract class WriteLocalVariable extends ExpressionNode {
     @Override
     public boolean hasTag(Class<? extends Tag> tag) {
         return tag == StandardTags.WriteVariableTag.class || super.hasTag(tag);
+    }
+
+    @Override
+    public void accept(ChiNodeVisitor visitor) throws Exception {
+        visitor.visitWriteLocalVariable(this);
+        getValueNode().accept(visitor);
     }
 }
