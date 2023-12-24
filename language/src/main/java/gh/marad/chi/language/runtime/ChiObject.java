@@ -14,6 +14,7 @@ import com.oracle.truffle.api.object.Shape;
 import com.oracle.truffle.api.utilities.TriState;
 import gh.marad.chi.core.Type;
 import gh.marad.chi.core.VariantType;
+import gh.marad.chi.language.ChiContext;
 
 import java.util.Objects;
 
@@ -123,6 +124,13 @@ public class ChiObject extends DynamicObject implements ChiValue {
         }
         sb.append(")");
         return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+        return (String) toDisplayString(false,
+                DynamicObjectLibrary.getUncached(),
+                InteropLibrary.getUncached());
     }
 
     @ExportMessage
