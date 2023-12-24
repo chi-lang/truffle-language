@@ -95,6 +95,11 @@ public class ChiTypes {
     }
 
     @ImplicitCast
+    public static float toFloat(long l) {
+        return (float) l;
+    }
+
+    @ImplicitCast
     public static float toFloat(double d) {
         return (float) d;
     }
