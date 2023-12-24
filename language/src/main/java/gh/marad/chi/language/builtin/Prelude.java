@@ -14,6 +14,9 @@ public class Prelude {
             new PreludeImport("std", "io", "println", null),
             new PreludeImport("std", "io", "print", null),
             new PreludeImport("std", "lang", "Option", null),
-            new PreludeImport("std", "lang", "Result", null)
+            new PreludeImport("std", "lang", "Result", null),
+            new PreludeImport("std", "lang", "Pair", null),
+            new PreludeImport("std", "lang.image", "saveModule", null),
+            new PreludeImport("std", "lang.image", "loadModule", null)
     );
 }
