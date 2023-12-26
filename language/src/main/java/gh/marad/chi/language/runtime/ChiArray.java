@@ -110,7 +110,7 @@ public class ChiArray implements ChiValue {
 
     @ExportMessage
     public boolean isArrayElementInsertable(long index) {
-        return false;
+        return withinBounds(index);
     }
 
     @ExportMessage
