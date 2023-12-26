@@ -10,30 +10,31 @@ import java.util.*;
 
 public class ChiMain {
     private static final String doc =
-            "Chi\n"
-            + "\n"
-            + "Usage:\n"
-            + "  chi [-m MODULES ...] [-L OPTS] [FILE]"
-            + "\n"
-            + "Options:\n"
-            + "  -m --modules=MODULES       Module files to load on startup\n"
-            + "  -L --lang-opts=OPT         Language options\n"
-            + "\n"
-            + "Examples:\n"
-            + "  chi -m std.chim,test.chim run.chi"
+            """
+            Usage:
+              chi repl [ARGS ...]
+              chi [-m MODULE ...] [-L OPT ...] [FILE] [ARGS ...]
+              
+            Options:
+              -m --module=MODULE       Module file or directory to load on startup
+              -L --lang-opt=OPT        Language options
+
+            Examples:
+              chi -m std.chim program.chi
+              chi repl preload.chi
+            """.stripIndent()
             ;
     public static void main(String[] args) throws IOException {
         var opts = new Docopt(doc).parse(args);
         var options = new HashMap<String, String>();
-        var programArgs = new ArrayList<String>();
-//        opts.forEach((key, value) -> {
-//            System.out.println(key + " " + value);
-//        });
+        @SuppressWarnings("unchecked")
+        var programArgs = (ArrayList<String>) opts.get("ARGS");
         String file = (String) opts.get("FILE");
 
-        var optsSpec = (String) opts.get("--lang-opts");
+        @SuppressWarnings("unchecked")
+        var optsSpec = (ArrayList<String>) opts.get("--lang-opt");
         if (optsSpec != null) {
-            for (String opt : optsSpec.split(",")) {
+            for (String opt : optsSpec) {
                 var tmp = opt.split(":", 1);
                 options.put(tmp[0], tmp[1]);
             }
@@ -42,17 +43,18 @@ public class ChiMain {
         var context = prepareContext(programArgs.toArray(new String[]{}), options);
 
         @SuppressWarnings("unchecked")
-        var modulesSpec = (ArrayList<String>) opts.get("--modules");
-
+        var modulesSpec = (ArrayList<String>) opts.get("--module");
         if (modulesSpec != null) {
-            for (String module : modulesSpec) {
-                context.eval("chi", """
-                        loadModule("%s")
-                        """.stripIndent().formatted(module));
-            }
+            loadModules(modulesSpec, context);
         }
 
         if (file == null || "repl".equalsIgnoreCase(file)) {
+            var preloadFile = programArgs.stream().findFirst()
+                       .filter(it -> it.endsWith(".chi"));
+            if (preloadFile.isPresent()) {
+                var preloadSource = Source.newBuilder("chi", new File(preloadFile.get())).build();
+                context.eval(preloadSource);
+            }
             new Repl(context).loop();
         } else {
             var source = Source.newBuilder("chi", new File(file)).build();
@@ -61,42 +63,38 @@ public class ChiMain {
         context.close();
     }
 
-    private static Context prepareContext(String[] contextArgs, HashMap<String, String> options) {
-        var context = Context.newBuilder("chi")
-                              .in(System.in)
-                              .out(System.out)
-                              .err(System.err)
-                              .arguments("chi", contextArgs)
-                              .allowExperimentalOptions(true)
-                              .allowAllAccess(true)
-                              .options(options)
-                              .build();
-        return context;
+    private static void loadModules(ArrayList<String> modules, Context context) {
+        for (String module : modules) {
+            var file = new File(module);
+            if (!file.exists()) {
+                System.err.println("Path %s does not exist. Skipping it...");
+                continue;
+            }
+
+            if (module.endsWith("chim")) {
+                var path = module.replaceAll("\\\\", "\\\\\\\\");
+                context.eval("chi", "loadModule(\"%s\")".formatted(path));
+            } else if (file.isDirectory()) {
+                var children = file.listFiles((dir, name) -> name.endsWith("chim"));
+                assert children != null;
+                for (File moduleFile : children) {
+                    var path = moduleFile.getPath().replaceAll("\\\\", "\\\\\\\\");
+                    context.eval("chi","loadModule(\"%s\")".formatted(path));
+                }
+            }
+        }
     }
 
-    private static boolean parseOption(HashMap<String, String> options, ArrayList<String> modulesToLoad, String arg) {
-        System.out.println("Parsing arg: " + arg);
-        if (arg.length() <= 2 || !arg.startsWith("--")) {
-            return false;
-        }
-
-        String key, value;
-        if (arg.contains("=")) {
-            var tmp = arg.substring(2).split("=");
-            key = tmp[0];
-            value = tmp[1];
-        } else {
-            key = arg.substring(2);
-            value = "true";
-        }
-
-        if ("modules".equals(key)) {
-            var modules = value.split(",");
-            modulesToLoad.addAll(Arrays.stream(modules).toList());
-        } else {
-            options.put(key, value);
-        }
-        return true;
+    private static Context prepareContext(String[] contextArgs, HashMap<String, String> options) {
+        return Context.newBuilder("chi")
+                      .in(System.in)
+                      .out(System.out)
+                      .err(System.err)
+                      .arguments("chi", contextArgs)
+                      .allowExperimentalOptions(true)
+                      .allowAllAccess(true)
+                      .options(options)
+                      .build();
     }
 }
 
