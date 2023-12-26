@@ -60,7 +60,6 @@ public enum NodeId {
     ArraySizeBuiltin,
     ArrayHashBuiltin,
     ArrayBuiltin,
-    ArraySortBuiltin,
     // std/io
     ArgsBuiltin,
     PrintBuiltin,
@@ -73,7 +72,7 @@ public enum NodeId {
     ClearPackageBuiltin,
     EvalBuiltin,
     // std/lang.unsafe
-    UnsafeArrayBuiltin,
+    EmptyArrayBuiltin,
     // std/lang.interop
     LookupHostSymbolBuiltin,
     // std/lang.interop.array
@@ -114,7 +113,7 @@ public enum NodeId {
     StringReplaceBuiltin,
     // std/time
     MillisBuiltin,
-    ;
+    ArrayAddBuiltin, ArrayAddAtBuiltin, ArrayRemoveAtBuiltin, ArrayRemoveBuiltin, ArrayClearBuiltin;
 
 
 

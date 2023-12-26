@@ -5,7 +5,6 @@ import gh.marad.chi.core.FnType;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.image.NodeId;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static gh.marad.chi.core.Type.*;
@@ -14,7 +13,7 @@ public class ArrayHashBuiltin extends CollectionsArrayBuiltin {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         var array = ChiArgs.getChiArray(frame, 0);
-        return Arrays.hashCode(array.unsafeGetUnderlyingArray());
+        return array.hashCode();
     }
 
     @Override

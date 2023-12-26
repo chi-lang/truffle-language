@@ -6,10 +6,7 @@ import gh.marad.chi.core.FnType;
 import gh.marad.chi.core.VariantType;
 import gh.marad.chi.language.ChiLanguage;
 import gh.marad.chi.language.EffectHandlers;
-import gh.marad.chi.language.builtin.collections.ArrayBuiltin;
-import gh.marad.chi.language.builtin.collections.ArrayHashBuiltin;
-import gh.marad.chi.language.builtin.collections.ArraySortBuiltin;
-import gh.marad.chi.language.builtin.collections.SizeBuiltin;
+import gh.marad.chi.language.builtin.collections.*;
 import gh.marad.chi.language.builtin.io.*;
 import gh.marad.chi.language.builtin.lang.ClearPackageBuiltin;
 import gh.marad.chi.language.builtin.lang.EvalBuiltin;
@@ -19,7 +16,6 @@ import gh.marad.chi.language.builtin.lang.interop.LookupHostSymbolBuiltin;
 import gh.marad.chi.language.builtin.lang.interop.array.HasArrayElementsBuiltin;
 import gh.marad.chi.language.builtin.lang.interop.members.*;
 import gh.marad.chi.language.builtin.lang.interop.values.IsNullBuiltin;
-import gh.marad.chi.language.builtin.lang.usafe.UnsafeArrayBuiltin;
 import gh.marad.chi.language.builtin.string.*;
 import gh.marad.chi.language.builtin.time.MillisBuiltin;
 import gh.marad.chi.language.nodes.*;
@@ -124,7 +120,6 @@ public class NodeReader {
             case ArraySizeBuiltin -> new SizeBuiltin();
             case ArrayHashBuiltin -> new ArrayHashBuiltin();
             case ArrayBuiltin -> new ArrayBuiltin();
-            case ArraySortBuiltin -> new ArraySortBuiltin();
             case ArgsBuiltin -> new ArgsBuiltin();
             case PrintBuiltin -> new PrintBuiltin(stdOutputStream);
             case PrintlnBuiltin -> new PrintlnBuiltin(stdOutputStream);
@@ -134,7 +129,7 @@ public class NodeReader {
             case LoadModuleBuiltin -> new LoadModuleBuiltin();
             case SaveModuleBuiltin -> new SaveModuleBuiltin();
             case EvalBuiltin -> new EvalBuiltin();
-            case UnsafeArrayBuiltin -> new UnsafeArrayBuiltin();
+            case EmptyArrayBuiltin -> new EmptyArrayBuiltin();
             case LookupHostSymbolBuiltin -> new LookupHostSymbolBuiltin();
             case HasArrayElementsBuiltin -> new HasArrayElementsBuiltin();
             case IsMemberInvocableBuiltin -> new IsMemberInvocableBuiltin();
@@ -169,7 +164,11 @@ public class NodeReader {
             case IndexOfStringBuiltin -> new IndexOfStringBuiltin();
             case StringReplaceBuiltin -> new StringReplaceBuiltin();
             case MillisBuiltin -> new MillisBuiltin();
-            // end builtins
+            case ArrayAddBuiltin -> new ArrayAddBuiltin();
+            case ArrayAddAtBuiltin -> new ArrayAddAtBuiltin();
+            case ArrayRemoveAtBuiltin -> new ArrayRemoveAtBuiltin();
+            case ArrayRemoveBuiltin -> new ArrayRemoveBuiltin();
+            case ArrayClearBuiltin -> new ArrayClearBuiltin();
         };
     }
 

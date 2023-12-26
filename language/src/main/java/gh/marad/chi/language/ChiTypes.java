@@ -111,7 +111,7 @@ public class ChiTypes {
 
     @ImplicitCast
     public static Object[] toJavaArray(ChiArray array) {
-        return array.unsafeGetUnderlyingArray();
+        return array.copyToJavaArray();
     }
 
     @ImplicitCast

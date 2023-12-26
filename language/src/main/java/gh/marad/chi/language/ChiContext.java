@@ -9,10 +9,7 @@ import gh.marad.chi.core.namespace.GlobalCompilationNamespace;
 import gh.marad.chi.core.namespace.SymbolType;
 import gh.marad.chi.language.builtin.Builtin;
 import gh.marad.chi.language.builtin.Prelude;
-import gh.marad.chi.language.builtin.collections.ArrayBuiltin;
-import gh.marad.chi.language.builtin.collections.ArrayHashBuiltin;
-import gh.marad.chi.language.builtin.collections.ArraySortBuiltin;
-import gh.marad.chi.language.builtin.collections.SizeBuiltin;
+import gh.marad.chi.language.builtin.collections.*;
 import gh.marad.chi.language.builtin.io.*;
 import gh.marad.chi.language.builtin.lang.ClearPackageBuiltin;
 import gh.marad.chi.language.builtin.lang.EvalBuiltin;
@@ -22,7 +19,6 @@ import gh.marad.chi.language.builtin.lang.interop.LookupHostSymbolBuiltin;
 import gh.marad.chi.language.builtin.lang.interop.array.HasArrayElementsBuiltin;
 import gh.marad.chi.language.builtin.lang.interop.members.*;
 import gh.marad.chi.language.builtin.lang.interop.values.IsNullBuiltin;
-import gh.marad.chi.language.builtin.lang.usafe.UnsafeArrayBuiltin;
 import gh.marad.chi.language.builtin.string.*;
 import gh.marad.chi.language.builtin.time.MillisBuiltin;
 import gh.marad.chi.language.nodes.FnRootNode;
@@ -136,7 +132,7 @@ public class ChiContext {
     }
 
     public static List<Builtin> builtins(OutputStream outputStream) {
-         return List.of(
+        return List.of(
                 // lang
                 new EvalBuiltin(),
                 new ClearPackageBuiltin(),
@@ -144,7 +140,6 @@ public class ChiContext {
                 new SaveModuleBuiltin(),
                 new LoadModuleBuiltin(),
                 // lang.unsafe
-                new UnsafeArrayBuiltin(),
                 // lang.interop
                 new LookupHostSymbolBuiltin(),
                 new HasMembersBuiltin(),
@@ -175,9 +170,14 @@ public class ChiContext {
                 new MillisBuiltin(),
                 // collections
                 new ArrayBuiltin(),
-                new ArraySortBuiltin(),
+                new EmptyArrayBuiltin(),
                 new SizeBuiltin(),
                 new ArrayHashBuiltin(),
+                new ArrayAddBuiltin(),
+                new ArrayRemoveBuiltin(),
+                new ArrayAddAtBuiltin(),
+                new ArrayRemoveAtBuiltin(),
+                new ArrayClearBuiltin(),
                 new HasArrayElementsBuiltin(),
                 // string
                 new StringLengthBuiltin(),

@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -48,7 +49,7 @@ class ValueWriterTest {
         // then
         if (result instanceof ChiArray actual) {
             assertEquals(array.getType(), actual.getType());
-            assertArrayEquals(data, array.unsafeGetUnderlyingArray());
+            assertIterableEquals(Arrays.stream(data).toList(), array.getUnderlayingArrayList());
         } else fail("Did not deserialize array!");
     }
 

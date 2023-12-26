@@ -21,11 +21,12 @@ public class ArrayBuiltin extends CollectionsArrayBuiltin {
 
     @Override
     public FnType type() {
+        var T = typeParameter("T");
         return genericFn(
-                List.of(typeParameter("T")),
-                array(typeParameter("T")),
-                getIntType(),
-                typeParameter("T"));
+                List.of(T),    // genericTypeParameters
+                array(T),      // return type
+                getIntType(),  // argument types...
+                T);
     }
 
     @Override
