@@ -41,6 +41,11 @@ public class ChiArray implements ChiValue {
         }
     }
 
+    public ChiArray(ArrayList<Object> array, Type elementType) {
+        this.array = array;
+        this.elementType = elementType;
+    }
+
     public void add(Object element) {
         array.add(element);
     }
