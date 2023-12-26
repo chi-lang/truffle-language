@@ -37,10 +37,10 @@ public class StringFromCodePointsBuiltin extends Builtin {
     @Override
     public TruffleString executeString(VirtualFrame frame) {
         var codePointArray = ChiArgs.getChiArray(frame, 0);
-        var objects = codePointArray.unsafeGetUnderlyingArray();
-        var codePoints = new int[objects.length];
-        for (int i = 0; i < objects.length; i++) {
-            codePoints[i] = (int) ChiTypesGen.asImplicitLong(objects[i]);
+        var objects = codePointArray.getUnderlayingArrayList();
+        var codePoints = new int[objects.size()];
+        for (int i = 0; i < objects.size(); i++) {
+            codePoints[i] = (int) ChiTypesGen.asImplicitLong(objects.get(i));
         }
         var s = makeString(codePoints);
         return node.execute(s, TruffleString.Encoding.UTF_8);

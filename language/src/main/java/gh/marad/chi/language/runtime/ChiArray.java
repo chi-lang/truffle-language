@@ -9,27 +9,61 @@ import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
 import gh.marad.chi.core.Type;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Objects;
 
 @ExportLibrary(InteropLibrary.class)
 public class ChiArray implements ChiValue {
-    private final Object[] array;
+    private final ArrayList<Object> array;
     private final Type elementType;
 
-    public ChiArray(int capacity, Object defaultValue, Type type) {
-        array = new Object[capacity];
+    public ChiArray(Type type) {
+        this.array = new ArrayList<>();
         this.elementType = type;
-        Arrays.fill(array, defaultValue);
+    }
+
+    public ChiArray(int capacity, Object defaultValue, Type type) {
+        this(capacity, type);
+        for (int i = 0; i < capacity; i++) {
+            this.array.add(i, defaultValue);
+        }
     }
 
     public ChiArray(int capacity, Type type) {
-        array = new Object[capacity];
+        this.array = new ArrayList<>(capacity);
         this.elementType = type;
     }
 
     public ChiArray(Object[] array, Type elementType) {
+        this(array.length, elementType);
+        for (int i = 0; i < array.length; i++) {
+            this.array.add(i, array[i]);
+        }
+    }
+
+    public ChiArray(ArrayList<Object> array, Type elementType) {
         this.array = array;
         this.elementType = elementType;
+    }
+
+    public void add(Object element) {
+        array.add(element);
+    }
+
+    public void add(int index, Object element) {
+        array.add(index, element);
+    }
+
+    public void removeAt(int index) {
+        array.remove(index);
+    }
+
+    public void remove(Object object) {
+        array.remove(object);
+    }
+
+    public void clear() {
+        array.clear();
     }
 
     public Type getType() {
@@ -40,8 +74,12 @@ public class ChiArray implements ChiValue {
         return elementType;
     }
 
-    public Object[] unsafeGetUnderlyingArray() {
+    public ArrayList<Object> getUnderlayingArrayList() {
         return array;
+    }
+
+    public Object[] copyToJavaArray() {
+        return array.toArray();
     }
 
     @ExportMessage
@@ -57,12 +95,12 @@ public class ChiArray implements ChiValue {
     @ExportMessage
     public Object readArrayElement(long index) throws InvalidArrayIndexException {
         assertIndexValid(index);
-        return array[(int) index];
+        return array.get((int) index);
     }
 
     @ExportMessage
     public long getArraySize() {
-        return array.length;
+        return array.size();
     }
 
     @ExportMessage
@@ -72,13 +110,13 @@ public class ChiArray implements ChiValue {
 
     @ExportMessage
     public boolean isArrayElementInsertable(long index) {
-        return false;
+        return withinBounds(index);
     }
 
     @ExportMessage
     public void writeArrayElement(long index, Object value) throws InvalidArrayIndexException {
         assertIndexValid(index);
-        array[(int) index] = value;
+        array.set((int) index, value);
     }
 
     @ExportMessage
@@ -88,24 +126,23 @@ public class ChiArray implements ChiValue {
                                   @CachedLibrary(limit = "3") InteropLibrary interopLibrary) {
         var sb = new StringBuilder();
         sb.append("[");
-        var index = 0;
-        for (Object element : array) {
-            sb.append(interopLibrary.toDisplayString(element));
-            if (index < array.length - 1) {
+        var iter = array.iterator();
+        while (iter.hasNext()) {
+            sb.append(interopLibrary.toDisplayString(iter.next(), allowSideEffects));
+            if (iter.hasNext()) {
                 sb.append(", ");
             }
-            index += 1;
         }
         sb.append("]");
         return sb.toString();
     }
 
     private boolean withinBounds(long index) {
-        return 0 <= index && index < array.length;
+        return 0 <= index && index < array.size();
     }
 
     private void assertIndexValid(long index) throws InvalidArrayIndexException {
-        if (index < 0 || index >= array.length) {
+        if (index < 0 || index >= array.size()) {
             CompilerDirectives.transferToInterpreter();
             throw InvalidArrayIndexException.create(index);
         }
@@ -121,5 +158,18 @@ public class ChiArray implements ChiValue {
     @Override
     public Class<? extends TruffleLanguage<?>> getLanguage() {
         return ChiValue.super.getLanguage();
+    }
+
+    @Override
+    public int hashCode() {
+        return array.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        ChiArray chiArray = (ChiArray) object;
+        return Objects.equals(array, chiArray.array) && Objects.equals(elementType, chiArray.elementType);
     }
 }

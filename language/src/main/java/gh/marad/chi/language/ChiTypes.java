@@ -22,7 +22,7 @@ public class ChiTypes {
             return Type.getBool();
         } else if (object instanceof TruffleString) {
             return Type.getString();
-        } else if (object instanceof ChiFunction f) {
+        } else if (object instanceof ChiFunction) {
             throw new TODO("Determining function type is unsupported! (yet?)");
         } else if (object instanceof ChiObject o) {
             return o.getType();
@@ -111,7 +111,7 @@ public class ChiTypes {
 
     @ImplicitCast
     public static Object[] toJavaArray(ChiArray array) {
-        return array.unsafeGetUnderlyingArray();
+        return array.copyToJavaArray();
     }
 
     @ImplicitCast

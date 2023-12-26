@@ -10,6 +10,8 @@ import gh.marad.chi.language.builtin.Builtin;
 import gh.marad.chi.language.image.NodeId;
 import gh.marad.chi.language.runtime.ChiArray;
 
+import java.util.ArrayList;
+
 public class SplitStringBuiltin extends Builtin {
     @Child
     private TruffleString.ToJavaStringNode toJava = TruffleString.ToJavaStringNode.create();
@@ -48,9 +50,9 @@ public class SplitStringBuiltin extends Builtin {
     @CompilerDirectives.TruffleBoundary
     private ChiArray split(String s, String splitter, int limit) {
         var result = s.split(splitter, limit);
-        var data = new TruffleString[result.length];
-        for (int i = 0; i < result.length; i++) {
-            data[i] = fromJava.execute(result[i], TruffleString.Encoding.UTF_8);
+        var data = new ArrayList<>();
+        for (String string : result) {
+            data.add(fromJava.execute(string, TruffleString.Encoding.UTF_8));
         }
         return new ChiArray(data, Type.getString());
     }
