@@ -1,5 +1,6 @@
 package gh.marad.chi.launcher;
 
+import org.docopt.Docopt;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Source;
 
@@ -8,28 +9,47 @@ import java.io.IOException;
 import java.util.*;
 
 public class ChiMain {
+    private static final String doc =
+            "Chi\n"
+            + "\n"
+            + "Usage:\n"
+            + "  chi [-m MODULES ...] [-L OPTS] [FILE]"
+            + "\n"
+            + "Options:\n"
+            + "  -m --modules=MODULES       Module files to load on startup\n"
+            + "  -L --lang-opts=OPT         Language options\n"
+            + "\n"
+            + "Examples:\n"
+            + "  chi -m std.chim,test.chim run.chi"
+            ;
     public static void main(String[] args) throws IOException {
+        var opts = new Docopt(doc).parse(args);
         var options = new HashMap<String, String>();
-        var modulesToLoad = new ArrayList<String>();
         var programArgs = new ArrayList<String>();
-        String file = null;
-        for (String arg : args) {
-            if (!parseOption(options, modulesToLoad, arg)) {
-                if (file == null) {
-                    file = arg;
-                } else {
-                    programArgs.add(arg);
-                }
+//        opts.forEach((key, value) -> {
+//            System.out.println(key + " " + value);
+//        });
+        String file = (String) opts.get("FILE");
+
+        var optsSpec = (String) opts.get("--lang-opts");
+        if (optsSpec != null) {
+            for (String opt : optsSpec.split(",")) {
+                var tmp = opt.split(":", 1);
+                options.put(tmp[0], tmp[1]);
             }
         }
 
-
         var context = prepareContext(programArgs.toArray(new String[]{}), options);
 
-        for (String module : modulesToLoad) {
-            context.eval("chi", """
+        @SuppressWarnings("unchecked")
+        var modulesSpec = (ArrayList<String>) opts.get("--modules");
+
+        if (modulesSpec != null) {
+            for (String module : modulesSpec) {
+                context.eval("chi", """
                         loadModule("%s")
                         """.stripIndent().formatted(module));
+            }
         }
 
         if (file == null || "repl".equalsIgnoreCase(file)) {
@@ -55,6 +75,7 @@ public class ChiMain {
     }
 
     private static boolean parseOption(HashMap<String, String> options, ArrayList<String> modulesToLoad, String arg) {
+        System.out.println("Parsing arg: " + arg);
         if (arg.length() <= 2 || !arg.startsWith("--")) {
             return false;
         }
