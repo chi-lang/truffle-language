@@ -24,7 +24,7 @@ public abstract class CastToLongExpr extends CastExpression {
     @Specialization
     @CompilerDirectives.TruffleBoundary
     long fromString(String value) {
-        return Integer.parseInt(value);
+        return Long.parseLong(value);
     }
 
     @Override
