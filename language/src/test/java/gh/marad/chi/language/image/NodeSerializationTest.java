@@ -5,9 +5,7 @@ import gh.marad.chi.core.VariantType;
 import gh.marad.chi.language.nodes.*;
 import gh.marad.chi.language.nodes.expr.BlockExpr;
 import gh.marad.chi.language.nodes.expr.cast.*;
-import gh.marad.chi.language.nodes.expr.flow.IfExpr;
-import gh.marad.chi.language.nodes.expr.flow.IsNode;
-import gh.marad.chi.language.nodes.expr.flow.IsNodeGen;
+import gh.marad.chi.language.nodes.expr.flow.*;
 import gh.marad.chi.language.nodes.expr.flow.loop.WhileBreakNode;
 import gh.marad.chi.language.nodes.expr.flow.loop.WhileContinueNode;
 import gh.marad.chi.language.nodes.expr.flow.loop.WhileExprNode;
@@ -565,6 +563,30 @@ public class NodeSerializationTest {
             assertEquals(type, actual.type);
             assertIterableEquals(variants, actual.variants);
         } else fail();
+    }
+
+    @Test
+    void testReturnNodeSerialization() throws Exception {
+        // given
+        var value = new LongValue(5);
+        var expected = new ReturnNode(value);
+
+        // when
+        var result = serializeAndDeserialize(expected);
+
+        // then
+        if (result instanceof ReturnNode actual) {
+            assertEquals(value, actual.getValue());
+        }
+    }
+
+    @Test
+    void testReturnUnitNodeSerialization() throws Exception {
+        // when
+        var result = serializeAndDeserialize(ReturnUnitNode.instance);
+
+        // then
+        assertEquals(ReturnUnitNode.instance, result);
     }
 
     public ChiNode serializeAndDeserialize(ChiNode node) throws Exception {

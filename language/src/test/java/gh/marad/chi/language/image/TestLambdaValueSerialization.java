@@ -1,5 +1,6 @@
 package gh.marad.chi.language.image;
 
+import gh.marad.chi.language.TestContext;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
