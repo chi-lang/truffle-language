@@ -113,7 +113,13 @@ public enum NodeId {
     StringReplaceBuiltin,
     // std/time
     MillisBuiltin,
-    ArrayAddBuiltin, ArrayAddAtBuiltin, ArrayRemoveAtBuiltin, ArrayRemoveBuiltin, ArrayClearBuiltin;
+    ArrayAddBuiltin,
+    ArrayAddAtBuiltin,
+    ArrayRemoveAtBuiltin,
+    ArrayRemoveBuiltin,
+    ArrayClearBuiltin,
+    ReturnNode,
+    ReturnUnitNode;
 
 
 

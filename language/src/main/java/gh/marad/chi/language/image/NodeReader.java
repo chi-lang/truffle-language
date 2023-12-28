@@ -23,6 +23,8 @@ import gh.marad.chi.language.nodes.expr.BlockExpr;
 import gh.marad.chi.language.nodes.expr.cast.*;
 import gh.marad.chi.language.nodes.expr.flow.IfExpr;
 import gh.marad.chi.language.nodes.expr.flow.IsNodeGen;
+import gh.marad.chi.language.nodes.expr.flow.ReturnNode;
+import gh.marad.chi.language.nodes.expr.flow.ReturnUnitNode;
 import gh.marad.chi.language.nodes.expr.flow.effect.HandleEffectNode;
 import gh.marad.chi.language.nodes.expr.flow.effect.InvokeEffect;
 import gh.marad.chi.language.nodes.expr.flow.effect.ResumeNode;
@@ -169,6 +171,8 @@ public class NodeReader {
             case ArrayRemoveAtBuiltin -> new ArrayRemoveAtBuiltin();
             case ArrayRemoveBuiltin -> new ArrayRemoveBuiltin();
             case ArrayClearBuiltin -> new ArrayClearBuiltin();
+            case ReturnNode -> readReturnNode();
+            case ReturnUnitNode -> ReturnUnitNode.instance;
         };
     }
 
@@ -517,6 +521,11 @@ public class NodeReader {
         }
         var blockNode = (BlockExpr) readNode();
         return new HandleEffectNode(blockNode, handlers);
+    }
+
+    private ChiNode readReturnNode() throws IOException {
+        var value = readNode();
+        return new ReturnNode(value);
     }
 
 }

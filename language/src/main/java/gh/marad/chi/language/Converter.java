@@ -20,6 +20,8 @@ import gh.marad.chi.language.nodes.expr.cast.CastToLongExprNodeGen;
 import gh.marad.chi.language.nodes.expr.cast.CastToStringNodeGen;
 import gh.marad.chi.language.nodes.expr.flow.IfExpr;
 import gh.marad.chi.language.nodes.expr.flow.IsNodeGen;
+import gh.marad.chi.language.nodes.expr.flow.ReturnNode;
+import gh.marad.chi.language.nodes.expr.flow.ReturnUnitNode;
 import gh.marad.chi.language.nodes.expr.flow.effect.HandleEffectNode;
 import gh.marad.chi.language.nodes.expr.flow.effect.InvokeEffect;
 import gh.marad.chi.language.nodes.expr.flow.effect.ResumeNode;
@@ -141,6 +143,12 @@ public class Converter {
             return convertEffectDefinition(definition);
         } else if (expr instanceof Handle handle) {
             return convertHandle(handle);
+        } else if (expr instanceof Return ret) {
+            if (ret.getValue() != null) {
+                return new ReturnNode(convertExpression(ret.getValue()));
+            } else {
+                return ReturnUnitNode.instance;
+            }
         }
 
         throw new TODO("Unhandled expression conversion: %s".formatted(expr));

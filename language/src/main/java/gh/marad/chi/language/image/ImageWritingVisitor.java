@@ -13,6 +13,8 @@ import gh.marad.chi.language.nodes.expr.cast.CastToLongExpr;
 import gh.marad.chi.language.nodes.expr.cast.CastToString;
 import gh.marad.chi.language.nodes.expr.flow.IfExpr;
 import gh.marad.chi.language.nodes.expr.flow.IsNode;
+import gh.marad.chi.language.nodes.expr.flow.ReturnNode;
+import gh.marad.chi.language.nodes.expr.flow.ReturnUnitNode;
 import gh.marad.chi.language.nodes.expr.flow.effect.HandleEffectNode;
 import gh.marad.chi.language.nodes.expr.flow.effect.InvokeEffect;
 import gh.marad.chi.language.nodes.expr.flow.effect.ResumeNode;
@@ -391,6 +393,16 @@ public class ImageWritingVisitor implements ChiNodeVisitor {
     @Override
     public void visitBuiltin(Builtin builtin) throws Exception {
         writeNodeId(builtin.getNodeId());
+    }
+
+    @Override
+    public void visitReturnNode(ReturnNode returnNode) throws Exception {
+        writeNodeId(NodeId.ReturnNode);
+    }
+
+    @Override
+    public void visitReturnUnitNode(ReturnUnitNode returnUnitNode) throws Exception {
+        writeNodeId(NodeId.ReturnUnitNode);
     }
 
     private void writeNodeId(NodeId nodeId) throws IOException {

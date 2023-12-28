@@ -1,4 +1,4 @@
-package gh.marad.chi.language.image;
+package gh.marad.chi.language;
 
 import org.graalvm.polyglot.Context;
 

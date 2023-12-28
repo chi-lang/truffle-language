@@ -7,6 +7,8 @@ import gh.marad.chi.language.nodes.expr.cast.CastToLongExpr;
 import gh.marad.chi.language.nodes.expr.cast.CastToString;
 import gh.marad.chi.language.nodes.expr.flow.IfExpr;
 import gh.marad.chi.language.nodes.expr.flow.IsNode;
+import gh.marad.chi.language.nodes.expr.flow.ReturnNode;
+import gh.marad.chi.language.nodes.expr.flow.ReturnUnitNode;
 import gh.marad.chi.language.nodes.expr.flow.effect.HandleEffectNode;
 import gh.marad.chi.language.nodes.expr.flow.effect.InvokeEffect;
 import gh.marad.chi.language.nodes.expr.flow.effect.ResumeNode;
@@ -86,5 +88,6 @@ public interface ChiNodeVisitor {
     void visitHandleEffect(HandleEffectNode visitor) throws Exception;
     void visitResumeNode(ResumeNode resumeNode) throws Exception;
     void visitBuiltin(Builtin builtin) throws Exception;
-
+    void visitReturnNode(ReturnNode returnNode) throws Exception;
+    void visitReturnUnitNode(ReturnUnitNode returnUnitNode) throws Exception;
 }

@@ -6,6 +6,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 import com.oracle.truffle.api.source.Source;
 import com.oracle.truffle.api.source.SourceSection;
+import gh.marad.chi.language.nodes.expr.flow.ReturnException;
 
 public class FnRootNode extends RootNode {
     @Child
@@ -46,7 +47,11 @@ public class FnRootNode extends RootNode {
 
     @Override
     public Object execute(VirtualFrame frame) {
-        return body.executeGeneric(frame);
+        try {
+            return body.executeGeneric(frame);
+        } catch (ReturnException e) {
+            return e.value;
+        }
     }
 
     @Override
