@@ -11,10 +11,7 @@ import gh.marad.chi.language.builtin.Builtin;
 import gh.marad.chi.language.builtin.Prelude;
 import gh.marad.chi.language.builtin.collections.*;
 import gh.marad.chi.language.builtin.io.*;
-import gh.marad.chi.language.builtin.lang.ClearPackageBuiltin;
-import gh.marad.chi.language.builtin.lang.EvalBuiltin;
-import gh.marad.chi.language.builtin.lang.LoadModuleBuiltin;
-import gh.marad.chi.language.builtin.lang.SaveModuleBuiltin;
+import gh.marad.chi.language.builtin.lang.*;
 import gh.marad.chi.language.builtin.lang.interop.LookupHostSymbolBuiltin;
 import gh.marad.chi.language.builtin.lang.interop.array.HasArrayElementsBuiltin;
 import gh.marad.chi.language.builtin.lang.interop.members.*;
@@ -136,6 +133,7 @@ public class ChiContext {
                 // lang
                 new EvalBuiltin(),
                 new ClearPackageBuiltin(),
+                ExitProcessBuiltin.instance,
                 // lang.image
                 new SaveModuleBuiltin(),
                 new LoadModuleBuiltin(),

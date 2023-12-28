@@ -14,6 +14,7 @@ public class Prelude {
             new PreludeImport("std", "collections.vector", "of", "vectorOf"),
             new PreludeImport("std", "io", "println", null),
             new PreludeImport("std", "io", "print", null),
+            new PreludeImport("std", "lang", "exitProcess", null),
             new PreludeImport("std", "lang", "Option", null),
             new PreludeImport("std", "lang", "Result", null),
             new PreludeImport("std", "lang", "Pair", null),

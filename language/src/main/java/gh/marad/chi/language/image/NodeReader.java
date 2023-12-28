@@ -8,10 +8,7 @@ import gh.marad.chi.language.ChiLanguage;
 import gh.marad.chi.language.EffectHandlers;
 import gh.marad.chi.language.builtin.collections.*;
 import gh.marad.chi.language.builtin.io.*;
-import gh.marad.chi.language.builtin.lang.ClearPackageBuiltin;
-import gh.marad.chi.language.builtin.lang.EvalBuiltin;
-import gh.marad.chi.language.builtin.lang.LoadModuleBuiltin;
-import gh.marad.chi.language.builtin.lang.SaveModuleBuiltin;
+import gh.marad.chi.language.builtin.lang.*;
 import gh.marad.chi.language.builtin.lang.interop.LookupHostSymbolBuiltin;
 import gh.marad.chi.language.builtin.lang.interop.array.HasArrayElementsBuiltin;
 import gh.marad.chi.language.builtin.lang.interop.members.*;
@@ -173,6 +170,7 @@ public class NodeReader {
             case ArrayClearBuiltin -> new ArrayClearBuiltin();
             case ReturnNode -> readReturnNode();
             case ReturnUnitNode -> ReturnUnitNode.instance;
+            case ExitProcessBuiltin -> ExitProcessBuiltin.instance;
         };
     }
 

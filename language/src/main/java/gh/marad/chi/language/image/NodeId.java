@@ -119,7 +119,7 @@ public enum NodeId {
     ArrayRemoveBuiltin,
     ArrayClearBuiltin,
     ReturnNode,
-    ReturnUnitNode;
+    ReturnUnitNode, ExitProcessBuiltin;
 
 
 
