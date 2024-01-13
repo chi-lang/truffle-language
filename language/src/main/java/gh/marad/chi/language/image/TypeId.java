@@ -6,13 +6,12 @@ public enum TypeId {
     Float,
     Int,
     String,
-    Undefined,
     Unit,
-    Array,
+    Simple,
     Fn,
-    GenericFn,
-    GenericTypeParameter,
-    Variant,
+    TypeVariable,
+    Product,
+    Sum
     ;
 
     public static TypeId fromId(int typeId) {

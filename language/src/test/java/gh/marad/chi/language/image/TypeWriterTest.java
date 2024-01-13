@@ -1,11 +1,12 @@
 package gh.marad.chi.language.image;
 
+import gh.marad.chi.core.namespace.TypeInfo;
+import gh.marad.chi.core.namespace.VariantField;
 import gh.marad.chi.core.types.*;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 class TypeWriterTest {
@@ -86,12 +87,42 @@ class TypeWriterTest {
 
     @Test
     public void testSumTypeSerialization() throws IOException {
-        fail();
+        // given
+        var T = new TypeVariable("T");
+        var type = new SumType(
+                "moduleName", "packageName", "TypeName",
+                List.of(Types.getInt()),
+                List.of("A", "B"),
+                List.of(T)
+        );
+
+        // when
+        var result = serializeAndDeserializeType(type);
+
+        // then
+        assertEquals(type, result);
     }
 
     @Test
     public void testTypeInfoSerialization() throws IOException {
-        fail();
+        // given
+        var type = new SimpleType("moduleName", "packageName", "TypeName");
+        var typeInfo = new TypeInfo(
+                "moduleName", "packageName", "TypeName",
+                type,
+                true,
+                List.of(new VariantField("field", Types.getInt(), false))
+        );
+
+        // when
+        var byteArrayStream = new ByteArrayOutputStream();
+        var outputStream = new DataOutputStream(byteArrayStream);
+        TypeWriter.writeTypeInfo(typeInfo, outputStream);
+        var inputStream = new DataInputStream(new ByteArrayInputStream(byteArrayStream.toByteArray()));
+        var result = TypeWriter.readTypeInfo(inputStream);
+
+        // then
+        assertEquals(typeInfo, result);
     }
 
     private Type serializeAndDeserializeType(Type type) throws IOException {
