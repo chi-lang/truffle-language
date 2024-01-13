@@ -367,6 +367,10 @@ public class Converter {
     }
 
     private ChiNode convertBlock(Block block, Type returnType) {
+        if (block.getBody().isEmpty()) {
+            return new UnitValue();
+        }
+
         var body = new ArrayList<>(block.getBody().stream().map(this::convertExpression).toList());
         if (returnType == Types.getUnit()) {
             body.add(new UnitValue());
