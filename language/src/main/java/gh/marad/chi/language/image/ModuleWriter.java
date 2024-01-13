@@ -51,7 +51,7 @@ public class ModuleWriter {
         var types = module.listTypes(packageName);
         stream.writeShort(types.size());
         for (TypeInfo type : types) {
-            throw new TODO("Implement reading and writing types");
+            TypeWriter.writeTypeInfo(type, stream);
         }
 
         // write package functions

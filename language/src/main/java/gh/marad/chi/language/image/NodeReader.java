@@ -390,7 +390,16 @@ public class NodeReader {
     }
 
     public ChiNode readDefineModuleVariable() throws IOException {
-        throw new TODO();
+        var moduleName = stream.readUTF();
+        var packageName = stream.readUTF();
+        var name = stream.readUTF();
+        var type = TypeWriter.readType(stream);
+        var isPublic = stream.readBoolean();
+        var isMutable = stream.readBoolean();
+        var value = readNode();
+        return DefineModuleVariableNodeGen.create(
+                value, moduleName, packageName,
+                name, type, isPublic, isMutable);
     }
 
     public ChiNode readWriteOuterVariable() throws IOException {

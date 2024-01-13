@@ -39,14 +39,11 @@ public class ModuleReader {
         var nodeReader = new NodeReader(stream, context.getEnv().out());
 
         // read types
-        if (true) {
-            throw new TODO("Package type reading/writing should be reworked");
+        int typeCount = stream.readShort();
+        for (int i = 0; i < typeCount; i++) {
+            var typeInfo = TypeWriter.readTypeInfo(stream);
+            module.defineType(packageName, typeInfo);
         }
-//        int typeCount = stream.readShort();
-//        for (int i = 0; i < typeCount; i++) {
-//            var node = (DefineVariantTypeNode) nodeReader.readNode();
-//            module.defineVariantType(packageName, node.type, node.variants);
-//        }
 
         // read package functions
         var functionCount = stream.readShort();
