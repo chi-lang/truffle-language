@@ -13,23 +13,25 @@ import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.object.Shape;
 import com.oracle.truffle.api.utilities.TriState;
 import gh.marad.chi.core.types.ProductType;
+import gh.marad.chi.core.types.SimpleType;
+import gh.marad.chi.core.types.Type;
 import gh.marad.chi.core.types.Types;
 
 import java.util.Objects;
 
 @ExportLibrary(InteropLibrary.class)
 public class ChiObject extends DynamicObject implements ChiValue {
-    private final ProductType type;
+    private final Type type;
 
     private final TruffleLanguage.Env env;
 
-    public ChiObject(ProductType type, Shape shape, TruffleLanguage.Env env) {
+    public ChiObject(Type type, Shape shape, TruffleLanguage.Env env) {
         super(shape);
         this.type = type;
         this.env = env;
     }
 
-    public ProductType getType() {
+    public Type getType() {
         return type;
     }
 
@@ -107,7 +109,11 @@ public class ChiObject extends DynamicObject implements ChiValue {
                                   @CachedLibrary("this") @Cached.Exclusive DynamicObjectLibrary objectLibrary,
                                   @CachedLibrary(limit = "3") @Cached.Exclusive InteropLibrary interopLibrary) {
         var sb = new StringBuilder();
-        sb.append(type.getName());
+        if (type instanceof SimpleType t) {
+            sb.append(t.getName());
+        } else if (type instanceof ProductType t) {
+            sb.append(t.getName());
+        }
         sb.append("(");
         var index = 0;
         var fieldNames = objectLibrary.getKeyArray(this);

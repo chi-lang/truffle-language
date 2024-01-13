@@ -3,6 +3,8 @@ package gh.marad.chi.language.nodes.expr.flow;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
+import gh.marad.chi.core.types.ProductType;
+import gh.marad.chi.core.types.SimpleType;
 import gh.marad.chi.language.nodes.ChiNode;
 import gh.marad.chi.language.nodes.ChiNodeVisitor;
 import gh.marad.chi.language.nodes.expr.ExpressionNode;
@@ -17,7 +19,13 @@ public abstract class IsNode extends ExpressionNode {
     @Specialization
     public boolean doChiObject(ChiObject object) {
         var type = object.getType();
-        return getTypeName().equals(type.getName());
+        String name = null;
+        if (type instanceof SimpleType t) {
+            name = t.getName();
+        } else if (type instanceof ProductType t) {
+            name = t.getName();
+        }
+        return getTypeName().equals(name);
     }
 
     @Override
