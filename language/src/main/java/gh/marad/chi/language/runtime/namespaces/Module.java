@@ -1,14 +1,13 @@
 package gh.marad.chi.language.runtime.namespaces;
 
 import com.oracle.truffle.api.CompilerDirectives;
-import gh.marad.chi.core.FnType;
-import gh.marad.chi.core.Type;
-import gh.marad.chi.core.VariantType;
+import gh.marad.chi.core.namespace.TypeInfo;
+import gh.marad.chi.core.types.FunctionType;
+import gh.marad.chi.core.types.Type;
 import gh.marad.chi.language.runtime.ChiFunction;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 
 public class Module {
@@ -40,20 +39,20 @@ public class Module {
     }
 
     @CompilerDirectives.TruffleBoundary
-    public void defineFunction(String packageName, ChiFunction function, FnType type, boolean isPublic) {
+    public void defineFunction(String packageName, ChiFunction function, FunctionType type, boolean isPublic) {
         getOrCreatePackage(packageName)
                 .defineFunction(function, type, isPublic);
     }
 
     @CompilerDirectives.TruffleBoundary
-    public void defineNamedFunction(String packageName, String name, ChiFunction function, FnType type, boolean isPublic) {
+    public void defineNamedFunction(String packageName, String name, ChiFunction function, FunctionType type, boolean isPublic) {
         getOrCreatePackage(packageName)
                 .defineNamedFunction(name, function, type, isPublic);
     }
 
-    public Package.FunctionLookupResult findFunctionOrNull(String packageName, String functionName, Type[] paramTypes) {
+    public Package.FunctionLookupResult findFunctionOrNull(String packageName, String functionName) {
         return getPackage(packageName)
-                       .findFunctionOrNull(functionName, paramTypes);
+                       .findFunctionOrNull(functionName);
     }
 
     public Collection<Package.Variable> listVariables(String packageName) {
@@ -64,6 +63,11 @@ public class Module {
     public void defineVariable(String packageName, String name, Object value, Type type, boolean isPublic, boolean isMutable) {
         getOrCreatePackage(packageName)
                 .defineVariable(name, value, type, isPublic, isMutable);
+    }
+
+    public void setVariable(String packageName, String name, Object value) {
+        getOrCreatePackage(packageName)
+                .setVariable(name, value);
     }
 
     public Object findVariableFunctionOrNull(String packageName, String symbolName) {
@@ -80,19 +84,17 @@ public class Module {
         return null;
     }
 
-    public Collection<Package.VariantTypeDescriptor> listVariantTypes(String packageName) {
-        return getOrCreatePackage(packageName)
-                .listVariantTypes();
+
+    public Collection<TypeInfo> listTypes(String packageName) {
+        return getOrCreatePackage(packageName).listTypes();
     }
 
-    public void defineVariantType(String packageName, VariantType variantType, List<VariantType.Variant> variants) {
-        getOrCreatePackage(packageName)
-                .defineVariantType(variantType, variants);
+    public void defineType(String packageName, TypeInfo typeInfo) {
+        getOrCreatePackage(packageName).defineType(typeInfo);
     }
 
-    public Package.VariantTypeDescriptor findVariantTypeOrNull(String packageName, String typeName) {
-        return getOrCreatePackage(packageName)
-                .findVariantTypeOrNull(typeName);
+    public TypeInfo findTypeOrNull(String packageName, String typeName) {
+        return getOrCreatePackage(packageName).getTypeOrNull(typeName);
     }
 
     @CompilerDirectives.TruffleBoundary

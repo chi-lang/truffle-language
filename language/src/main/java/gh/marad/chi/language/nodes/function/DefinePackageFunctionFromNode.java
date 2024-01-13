@@ -3,7 +3,7 @@ package gh.marad.chi.language.nodes.function;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
-import gh.marad.chi.core.FnType;
+import gh.marad.chi.core.types.FunctionType;
 import gh.marad.chi.language.ChiContext;
 import gh.marad.chi.language.nodes.ChiNode;
 import gh.marad.chi.language.nodes.ChiNodeVisitor;
@@ -14,7 +14,7 @@ import gh.marad.chi.language.runtime.ChiFunction;
 @NodeField(name = "moduleName", type = String.class)
 @NodeField(name = "packageName", type = String.class)
 @NodeField(name = "functionName", type = String.class)
-@NodeField(name = "type", type = FnType.class)
+@NodeField(name = "type", type = FunctionType.class)
 @NodeField(name = "isPublic", type = Boolean.class)
 public abstract class DefinePackageFunctionFromNode extends ExpressionNode {
 
@@ -26,7 +26,7 @@ public abstract class DefinePackageFunctionFromNode extends ExpressionNode {
 
     public abstract String getFunctionName();
 
-    public abstract FnType getType();
+    public abstract FunctionType getType();
 
     public abstract boolean getIsPublic();
 

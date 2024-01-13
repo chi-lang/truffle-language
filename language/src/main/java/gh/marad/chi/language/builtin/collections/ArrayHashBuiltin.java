@@ -1,13 +1,14 @@
 package gh.marad.chi.language.builtin.collections;
 
 import com.oracle.truffle.api.frame.VirtualFrame;
-import gh.marad.chi.core.FnType;
+import gh.marad.chi.core.types.FunctionType;
+import gh.marad.chi.core.types.TypeVariable;
+import gh.marad.chi.core.types.Types;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.image.NodeId;
 
 import java.util.List;
 
-import static gh.marad.chi.core.Type.*;
 
 public class ArrayHashBuiltin extends CollectionsArrayBuiltin {
     @Override
@@ -17,11 +18,12 @@ public class ArrayHashBuiltin extends CollectionsArrayBuiltin {
     }
 
     @Override
-    public FnType type() {
-        return genericFn(
-                List.of(typeParameter("T")),
-                getIntType(),
-                array(typeParameter("T")));
+    public FunctionType type() {
+        var T = new TypeVariable("T");
+        return new FunctionType(
+                List.of(Types.array(T), Types.getInt()),
+                List.of(T)
+        );
     }
 
     @Override

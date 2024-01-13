@@ -2,8 +2,8 @@ package gh.marad.chi.language.builtin.string;
 
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.strings.TruffleString;
-import gh.marad.chi.core.FnType;
-import gh.marad.chi.core.Type;
+import gh.marad.chi.core.types.FunctionType;
+import gh.marad.chi.core.types.Types;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.builtin.Builtin;
 import gh.marad.chi.language.image.NodeId;
@@ -16,8 +16,8 @@ public class StringCodePointsBuiltin extends Builtin {
     private TruffleString.CreateCodePointIteratorNode node = TruffleString.CreateCodePointIteratorNode.create();
 
     @Override
-    public FnType type() {
-        return Type.fn(Type.array(Type.getIntType()), Type.getString());
+    public FunctionType type() {
+        return Types.fn(Types.getString(), Types.array(Types.getInt()));
     }
 
     @Override
@@ -45,7 +45,7 @@ public class StringCodePointsBuiltin extends Builtin {
         while (iterator.hasNext()) {
             data[index++] = (long) iterator.nextUncached();
         }
-        return new ChiArray(data, Type.getIntType());
+        return new ChiArray(data, Types.getInt());
     }
 
     @Override

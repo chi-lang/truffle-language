@@ -3,8 +3,8 @@ package gh.marad.chi.language.builtin.string;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.strings.TruffleString;
-import gh.marad.chi.core.FnType;
-import gh.marad.chi.core.Type;
+import gh.marad.chi.core.types.FunctionType;
+import gh.marad.chi.core.types.Types;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.builtin.Builtin;
 import gh.marad.chi.language.image.NodeId;
@@ -20,8 +20,8 @@ public class SplitStringBuiltin extends Builtin {
 
 
     @Override
-    public FnType type() {
-        return Type.fn(Type.array(Type.getString()), Type.getString(), Type.getString(), Type.getIntType());
+    public FunctionType type() {
+        return Types.fn(Types.getString(), Types.getString(), Types.getInt(), Types.array(Types.getString()));
     }
 
     @Override
@@ -54,7 +54,7 @@ public class SplitStringBuiltin extends Builtin {
         for (String string : result) {
             data.add(fromJava.execute(string, TruffleString.Encoding.UTF_8));
         }
-        return new ChiArray(data, Type.getString());
+        return new ChiArray(data, Types.getString());
     }
 
     @Override

@@ -4,8 +4,6 @@ import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.interop.UnknownIdentifierException;
 import com.oracle.truffle.api.interop.UnsupportedMessageException;
 import com.oracle.truffle.api.strings.TruffleString;
-import gh.marad.chi.core.VariantType;
-import gh.marad.chi.language.ChiLanguage;
 import gh.marad.chi.language.ChiTypes;
 import gh.marad.chi.language.ChiTypesGen;
 import gh.marad.chi.language.runtime.*;
@@ -57,20 +55,6 @@ public class ValueWriter {
         }
     }
 
-    private static Object readVariantType(DataInputStream stream, TruffleLanguage.Env env) throws Exception {
-        var interop = ChiObjectGen.InteropLibraryExports.Uncached.getUncached();
-        var type = (VariantType) TypeWriter.readType(stream);
-        var obj = ChiLanguage.createObject(type, env);
-        var fieldCount = stream.readInt();
-        for (int i = 0; i < fieldCount; i++) {
-            var fieldName = stream.readUTF();
-            var fieldValue = readValue(stream, env);
-            interop.writeMember(obj, fieldName, fieldValue);
-        }
-
-        return obj;
-    }
-
     public static Object readValue(DataInputStream stream, TruffleLanguage.Env env) throws Exception {
         var typeId = ValueId.fromId(stream.readByte());
         return switch (typeId) {
@@ -79,8 +63,9 @@ public class ValueWriter {
             case Int -> stream.readLong();
             case String -> TruffleString.fromJavaStringUncached(stream.readUTF(), TruffleString.Encoding.UTF_8);
             case Array -> readArray(stream, env);
-            case Variant -> readVariantType(stream, env);
+//            case Variant -> readVariantType(stream, env);
             case HostObject -> readHostObject(stream, env);
+            default -> throw new IllegalStateException("Unexpected value: " + typeId);
         };
     }
 

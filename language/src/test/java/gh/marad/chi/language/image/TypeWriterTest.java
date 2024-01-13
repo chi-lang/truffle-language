@@ -1,9 +1,6 @@
 package gh.marad.chi.language.image;
 
-import gh.marad.chi.core.FnType;
-import gh.marad.chi.core.GenericTypeParameter;
-import gh.marad.chi.core.Type;
-import gh.marad.chi.core.VariantType;
+import gh.marad.chi.core.types.*;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
@@ -16,27 +13,26 @@ class TypeWriterTest {
     @Test
     public void testBasicTypesSerializationAndDeserialization() throws IOException {
         var types = new Type[] {
-                Type.getAny(),
-                Type.getBool(),
-                Type.getFloatType(),
-                Type.getIntType(),
-                Type.getString(),
-                Type.getUndefined(),
-                Type.getUnit(),
+                Types.getAny(),
+                Types.getBool(),
+                Types.getFloat(),
+                Types.getInt(),
+                Types.getString(),
+                Types.getUnit(),
         };
 
         for (Type type : types) {
             assertEquals(
                     type,
                     serializeAndDeserializeType(type),
-                    String.format("Type '%s' did not serialize correctly!", type.getName()));
+                    String.format("Type '%s' did not serialize correctly!", type));
         }
     }
 
     @Test
     public void testArrayTypeSerializationAndDeserialization() throws IOException {
         // given
-        var arrayType = Type.array(Type.getIntType());
+        var arrayType = Types.array(Types.getInt());
         // when
         var result = serializeAndDeserializeType(arrayType);
         // then
@@ -46,7 +42,7 @@ class TypeWriterTest {
     @Test
     public void testFnTypeSerializationAndDeserialization() throws IOException {
         // given
-        var fnType = Type.fn(Type.getIntType(), Type.getString(), Type.Companion.getFloatType());
+        var fnType = Types.fn(Types.getInt(), Types.getString(), Types.getFloat());
         // when
         var result = serializeAndDeserializeType(fnType);
         // then
@@ -56,45 +52,46 @@ class TypeWriterTest {
     @Test
     public void testGenericFnTypeSerializationAndDeserialization() throws IOException {
         // given
-        var genericTypeParam = Type.typeParameter("T");
-        var type = Type.genericFn(List.of(genericTypeParam), Type.getFloatType(), genericTypeParam);
+        var T = new TypeVariable("T");
+        var type = new FunctionType(
+                List.of(T, Types.getFloat()),
+                List.of(T)
+        );
         // when
         var result = serializeAndDeserializeType(type);
         // then
-        if (result instanceof FnType fnType) {
-            assertIterableEquals(type.getGenericTypeParameters(), fnType.getGenericTypeParameters());
-            assertIterableEquals(type.getParamTypes(), fnType.getParamTypes());
-            assertEquals(type.getReturnType(), fnType.getReturnType());
+        if (result instanceof FunctionType fnType) {
+            assertIterableEquals(type.typeSchemeVariables(), fnType.getTypeSchemeVariables());
+            assertIterableEquals(type.getTypes(), fnType.getTypes());
         } else {
             fail("Result did not deserialize to function type.");
         }
     }
 
     @Test
-    public void testVariantTypeSerialization() throws IOException {
+    public void testProductTypeSerialization() throws IOException {
         // given
-        var variantType = new VariantType(
-                "moduleName",
-                "packageName",
-                "SimpleName",
-                List.of(new GenericTypeParameter("T")),
-                Map.of(new GenericTypeParameter("T"), Type.getIntType()),
-                new VariantType.Variant(
-                        true, // public
-                        "VariantName",
-                        List.of(
-                                new VariantType.VariantField(
-                                        true, // public
-                                        "fieldName",
-                                        Type.getIntType()
-                                )
-                        )
-                )
+        var T = new TypeVariable("T");
+        var type = new ProductType(
+                "moduleName", "packageName", "TypeName",
+                List.of(Types.getInt()),
+                List.of(Types.getString()),
+                List.of(T)
         );
         // when
-        var result = serializeAndDeserializeType(variantType);
+        var result = serializeAndDeserializeType(type);
         // then
-        assertEquals(variantType, result);
+        assertEquals(type, result);
+    }
+
+    @Test
+    public void testSumTypeSerialization() throws IOException {
+        fail();
+    }
+
+    @Test
+    public void testTypeInfoSerialization() throws IOException {
+        fail();
     }
 
     private Type serializeAndDeserializeType(Type type) throws IOException {

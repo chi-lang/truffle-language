@@ -1,6 +1,5 @@
 package gh.marad.chi.language.image;
 
-import gh.marad.chi.core.VariantType;
 import gh.marad.chi.language.EffectHandlers;
 import gh.marad.chi.language.builtin.Builtin;
 import gh.marad.chi.language.nodes.ChiNodeVisitor;
@@ -258,14 +257,22 @@ public class ImageWritingVisitor implements ChiNodeVisitor {
     }
 
     @Override
+    public void visitDefineModuleVariable(DefineModuleVariable defineModuleVariable) throws Exception {
+        writeNodeId(NodeId.DefineModuleVariable);
+        stream.writeUTF(defineModuleVariable.getModuleName());
+        stream.writeUTF(defineModuleVariable.getPackageName());
+        stream.writeUTF(defineModuleVariable.getVariableName());
+        TypeWriter.writeType(defineModuleVariable.getType(), stream);
+        stream.writeBoolean(defineModuleVariable.getIsPublic());
+        stream.writeBoolean(defineModuleVariable.getIsMutable());
+    }
+
+    @Override
     public void visitWriteModuleVariable(WriteModuleVariable writeModuleVariable) throws IOException {
         writeNodeId(NodeId.WriteModuleVariable);
         stream.writeUTF(writeModuleVariable.getModuleName());
         stream.writeUTF(writeModuleVariable.getPackageName());
         stream.writeUTF(writeModuleVariable.getVariableName());
-        TypeWriter.writeType(writeModuleVariable.getType(), stream);
-        stream.writeBoolean(writeModuleVariable.getIsPublic());
-        stream.writeBoolean(writeModuleVariable.getIsMutable());
     }
 
     @Override
@@ -334,12 +341,13 @@ public class ImageWritingVisitor implements ChiNodeVisitor {
 
     @Override
     public void visitDefineVariantTypeNode(DefineVariantTypeNode defineVariantTypeNode) throws Exception {
-        writeNodeId(NodeId.DefineVariantType);
-        TypeWriter.writeType(defineVariantTypeNode.type, stream);
-        stream.writeShort(defineVariantTypeNode.variants.size());
-        for (VariantType.Variant variant : defineVariantTypeNode.variants) {
-            TypeWriter.writeVariant(variant, stream);
-        }
+        throw new TODO("REWORK this");
+//        writeNodeId(NodeId.DefineVariantType);
+//        TypeWriter.writeType(defineVariantTypeNode.type, stream);
+//        stream.writeShort(defineVariantTypeNode.variants.size());
+//        for (VariantType.Variant variant : defineVariantTypeNode.variants) {
+//            TypeWriter.writeVariant(variant, stream);
+//        }
     }
 
     @Override

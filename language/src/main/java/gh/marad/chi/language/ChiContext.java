@@ -6,7 +6,8 @@ import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.nodes.Node;
 import gh.marad.chi.core.namespace.GlobalCompilationNamespace;
-import gh.marad.chi.core.namespace.SymbolType;
+import gh.marad.chi.core.namespace.Symbol;
+import gh.marad.chi.core.namespace.TypeInfo;
 import gh.marad.chi.language.builtin.Builtin;
 import gh.marad.chi.language.builtin.Prelude;
 import gh.marad.chi.language.builtin.collections.*;
@@ -64,34 +65,35 @@ public class ChiContext {
                 var desc = ns.getOrCreatePackage(module.getName(), pkg);
 
                 // define types
-                for (Package.VariantTypeDescriptor variantType : module.listVariantTypes(pkg)) {
-                    desc.getTypeRegistry().defineVariantType(
-                            variantType.variantType(),
-                            variantType.variants()
-                    );
+                for (TypeInfo typeInfo : module.listTypes(pkg)) {
+                    desc.getTypes().add(typeInfo);
                 }
-
 
                 // define package functions
                 for (Package.FunctionLookupResult function : module.listFunctions(pkg)) {
-                    desc.getScope().addSymbol(
-                            function.function().getExecutableName(),
-                            function.type(),
-                            SymbolType.Local,
-                            function.isPublic(),
-                            true
+                    desc.getSymbols().add(
+                            new Symbol(
+                                    desc.getModuleName(),
+                                    desc.getPackageName(),
+                                    function.function().getExecutableName(),
+                                    function.type(),
+                                    function.isPublic(),
+                                    true
+                            )
                     );
-
                 }
 
                 // define package variables
                 for (Package.Variable variable : module.listVariables(pkg)) {
-                    desc.getScope().addSymbol(
-                            variable.name(),
-                            variable.type(),
-                            SymbolType.Local,
-                            variable.isPublic(),
-                            variable.isMutable()
+                    desc.getSymbols().add(
+                            new Symbol(
+                                    desc.getModuleName(),
+                                    desc.getPackageName(),
+                                    variable.getName(),
+                                    variable.getType(),
+                                    variable.isPublic(),
+                                    variable.isMutable()
+                            )
                     );
                 }
 

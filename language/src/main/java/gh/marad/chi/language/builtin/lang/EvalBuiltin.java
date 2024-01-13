@@ -3,8 +3,8 @@ package gh.marad.chi.language.builtin.lang;
 import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.IndirectCallNode;
-import gh.marad.chi.core.FnType;
-import gh.marad.chi.core.Type;
+import gh.marad.chi.core.types.FunctionType;
+import gh.marad.chi.core.types.Types;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.ChiLanguage;
 import gh.marad.chi.language.builtin.Builtin;
@@ -19,8 +19,8 @@ public class EvalBuiltin extends Builtin {
     }
 
     @Override
-    public FnType type() {
-        return Type.fn(Type.getUnit(), Type.getString());
+    public FunctionType type() {
+        return Types.fn(Types.getString(), Types.getUnit());
     }
 
     @Override

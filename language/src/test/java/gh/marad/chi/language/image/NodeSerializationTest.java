@@ -1,7 +1,7 @@
 package gh.marad.chi.language.image;
 
-import gh.marad.chi.core.Type;
-import gh.marad.chi.core.VariantType;
+import gh.marad.chi.core.types.ProductType;
+import gh.marad.chi.core.types.Types;
 import gh.marad.chi.language.nodes.*;
 import gh.marad.chi.language.nodes.expr.BlockExpr;
 import gh.marad.chi.language.nodes.expr.cast.*;
@@ -333,6 +333,31 @@ public class NodeSerializationTest {
         } else fail("Invalid node read!");
     }
 
+
+    @Test
+    void testDefineModuleVariableSerialization() throws Exception {
+        // given
+        var value = new LongValue(5);
+        var moduleName = "moduleName";
+        var packageName = "packageName";
+        var variableName = "variableName";
+        var type = Types.getInt();
+        var expected = DefineModuleVariableNodeGen.create(value, moduleName, packageName, variableName, type, true, false);
+        // when
+        var result = serializeAndDeserialize(expected);
+        // then
+        if (result instanceof DefineModuleVariable actual) {
+            assertEquals(expected.getModuleName(), actual.getModuleName());
+            assertEquals(expected.getPackageName(), actual.getPackageName());
+            assertEquals(expected.getVariableName(), actual.getVariableName());
+            assertInstanceOf(LongValue.class, actual.getValue());
+            assertEquals(type, actual.getType());
+            assertEquals(expected.getIsPublic(), actual.getIsPublic());
+            assertEquals(expected.getIsMutable(), actual.getIsMutable());
+
+        } else fail("Invalid node read!");
+    }
+
     @Test
     void testWriteModuleVariableSerialization() throws Exception {
         // given
@@ -340,8 +365,8 @@ public class NodeSerializationTest {
         var moduleName = "moduleName";
         var packageName = "packageName";
         var variableName = "variableName";
-        var type = Type.getIntType();
-        var expected = WriteModuleVariableNodeGen.create(value, moduleName, packageName, variableName, type, true, false);
+        var type = Types.getInt();
+        var expected = WriteModuleVariableNodeGen.create(value, moduleName, packageName, variableName);
         // when
         var result = serializeAndDeserialize(expected);
         // then
@@ -350,9 +375,6 @@ public class NodeSerializationTest {
             assertEquals(expected.getPackageName(), actual.getPackageName());
             assertEquals(expected.getVariableName(), actual.getVariableName());
             assertInstanceOf(LongValue.class, actual.getValue());
-            assertEquals(type, actual.getType());
-            assertEquals(expected.getIsPublic(), actual.getIsPublic());
-            assertEquals(expected.getIsMutable(), actual.getIsMutable());
 
         } else fail("Invalid node read!");
     }
@@ -476,30 +498,17 @@ public class NodeSerializationTest {
     @Test
     void testConstructChiObject() throws Exception {
         // given
-        var type = new VariantType(
-                "moduleName",
-                "packageName",
-                "typeName",
-                List.of(), // generic type parameters
-                Map.of(), // concrete parameter types
-                new VariantType.Variant(
-                        true, // public
-                        "variantName",
-                        List.of(
-                                new VariantType.VariantField(
-                                        true, // public
-                                        "fieldName",
-                                        Type.getIntType()
-                                )
-                        )
-                )
-        );
-        var expected = new ConstructChiObject(type);
+        var type = new ProductType("moduleName", "packageName", "TypeName",
+                List.of(Types.getInt()),
+                List.of(),
+                List.of());
+        var fieldNames = new String[] { "i" };
+        var expected = new ConstructChiObject(type, fieldNames);
         // when
         var result = serializeAndDeserialize(expected);
         // then
         if (result instanceof ConstructChiObject actual) {
-            assertEquals(expected.type, actual.type);
+            assertEquals(type, actual.type);
         } else fail("Invalid node read!");
     }
 
@@ -513,7 +522,7 @@ public class NodeSerializationTest {
                 "moduleName",
                 "packageName",
                 "functionName",
-                Type.fn(Type.getIntType(), Type.getFloatType()),
+                Types.fn(Types.getFloat(), Types.getInt()),
                 true // public
         );
         // when
@@ -531,38 +540,39 @@ public class NodeSerializationTest {
 
     @Test
     void testDefineVariantTypeNodeSerialization() throws Exception {
-        // given
-        var variants = List.of(
-                new VariantType.Variant(
-                        true, // public
-                        "variantName",
-                        List.of(
-                                new VariantType.VariantField(
-                                        true, // public
-                                        "fieldName",
-                                        Type.getIntType()
-                                )
-                        )
-                )
-        );
-        var type = new VariantType(
-                "moduleName",
-                "packageName",
-                "typeName",
-                List.of(), // generic type parameters
-                Map.of(), // concrete parameter types
-                null
-        );
-        var expected = new DefineVariantTypeNode(type, variants);
-
-        // when
-        var result = serializeAndDeserialize(expected);
-
-        // then
-        if (result instanceof DefineVariantTypeNode actual) {
-            assertEquals(type, actual.type);
-            assertIterableEquals(variants, actual.variants);
-        } else fail();
+        fail("this will be reworked");
+//        // given
+//        var variants = List.of(
+//                new VariantType.Variant(
+//                        true, // public
+//                        "variantName",
+//                        List.of(
+//                                new VariantType.VariantField(
+//                                        true, // public
+//                                        "fieldName",
+//                                        Type.getIntType()
+//                                )
+//                        )
+//                )
+//        );
+//        var type = new VariantType(
+//                "moduleName",
+//                "packageName",
+//                "typeName",
+//                List.of(), // generic type parameters
+//                Map.of(), // concrete parameter types
+//                null
+//        );
+//        var expected = new DefineVariantTypeNode(type, variants);
+//
+//        // when
+//        var result = serializeAndDeserialize(expected);
+//
+//        // then
+//        if (result instanceof DefineVariantTypeNode actual) {
+//            assertEquals(type, actual.type);
+//            assertIterableEquals(variants, actual.variants);
+//        } else fail();
     }
 
     @Test

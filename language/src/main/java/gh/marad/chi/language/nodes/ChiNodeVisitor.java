@@ -69,6 +69,7 @@ public interface ChiNodeVisitor {
     void visitCastToString(CastToString castToString) throws Exception;
     void visitIfExpr(IfExpr ifExpr) throws Exception;
     void visitLambdaValue(LambdaValue lambdaValue) throws Exception;
+    void visitDefineModuleVariable(DefineModuleVariable defineModuleVariable) throws Exception;
     void visitWriteModuleVariable(WriteModuleVariable writeModuleVariable) throws Exception;
     void visitWriteOuterVariable(WriteOuterVariable writeOuterVariable) throws Exception;
     void visitWriteLocalArgument(WriteLocalArgument writeLocalArgument) throws Exception;
@@ -90,4 +91,5 @@ public interface ChiNodeVisitor {
     void visitBuiltin(Builtin builtin) throws Exception;
     void visitReturnNode(ReturnNode returnNode) throws Exception;
     void visitReturnUnitNode(ReturnUnitNode returnUnitNode) throws Exception;
+
 }

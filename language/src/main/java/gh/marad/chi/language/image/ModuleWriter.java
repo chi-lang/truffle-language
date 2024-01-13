@@ -1,6 +1,8 @@
 package gh.marad.chi.language.image;
 
 import com.oracle.truffle.api.CompilerDirectives;
+import gh.marad.chi.core.namespace.TypeInfo;
+import gh.marad.chi.core.types.Type;
 import gh.marad.chi.language.ChiContext;
 import gh.marad.chi.language.nodes.FnRootNode;
 import gh.marad.chi.language.nodes.objects.DefineVariantTypeNode;
@@ -46,13 +48,10 @@ public class ModuleWriter {
         var imageWritingVisitor = new ImageWritingVisitor(stream);
 
         // write types
-        var types = module.listVariantTypes(packageName);
+        var types = module.listTypes(packageName);
         stream.writeShort(types.size());
-        for (Package.VariantTypeDescriptor type : types) {
-            var node = new DefineVariantTypeNode(
-                    type.variantType(), type.variants()
-            );
-            node.accept(imageWritingVisitor);
+        for (TypeInfo type : types) {
+            throw new TODO("Implement reading and writing types");
         }
 
         // write package functions
@@ -80,9 +79,9 @@ public class ModuleWriter {
         var variables = module.listVariables(packageName);
         stream.writeShort(variables.size());
         for (Package.Variable variable : variables) {
-            stream.writeUTF(variable.name());
-            ValueWriter.writeValue(variable.value(), stream);
-            TypeWriter.writeType(variable.type(), stream);
+            stream.writeUTF(variable.getName());
+            ValueWriter.writeValue(variable.getValue(), stream);
+            TypeWriter.writeType(variable.getType(), stream);
             stream.writeBoolean(variable.isPublic());
             stream.writeBoolean(variable.isMutable());
         }

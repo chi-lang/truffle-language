@@ -3,8 +3,8 @@ package gh.marad.chi.language.builtin.io;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.strings.TruffleString;
-import gh.marad.chi.core.FnType;
-import gh.marad.chi.core.Type;
+import gh.marad.chi.core.types.FunctionType;
+import gh.marad.chi.core.types.Types;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.builtin.Builtin;
 import gh.marad.chi.language.image.NodeId;
@@ -29,7 +29,7 @@ public class ReadLinesBuiltin extends Builtin {
             var data = lines.stream()
                             .map(it -> TruffleString.fromJavaStringUncached(it, TruffleString.Encoding.UTF_8))
                             .toList();
-            return new ChiArray(data.toArray(new TruffleString[0]), Type.getString());
+            return new ChiArray(data.toArray(new TruffleString[0]), Types.getString());
         } catch (IOException e) {
             CompilerDirectives.transferToInterpreter();
             throw new RuntimeException(e);
@@ -37,8 +37,8 @@ public class ReadLinesBuiltin extends Builtin {
     }
 
     @Override
-    public FnType type() {
-        return Type.fn(Type.array(Type.getString()), Type.getString());
+    public FunctionType type() {
+        return Types.fn(Types.getString(), Types.array(Types.getString()));
     }
 
     @Override

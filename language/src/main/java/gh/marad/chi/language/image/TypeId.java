@@ -1,8 +1,5 @@
 package gh.marad.chi.language.image;
 
-import gh.marad.chi.core.AnyType;
-import gh.marad.chi.core.Type;
-
 public enum TypeId {
     Any,
     Bool,

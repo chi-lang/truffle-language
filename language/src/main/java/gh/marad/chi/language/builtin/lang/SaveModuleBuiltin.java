@@ -2,8 +2,8 @@ package gh.marad.chi.language.builtin.lang;
 
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import gh.marad.chi.core.FnType;
-import gh.marad.chi.core.Type;
+import gh.marad.chi.core.types.FunctionType;
+import gh.marad.chi.core.types.Types;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.ChiContext;
 import gh.marad.chi.language.builtin.Builtin;
@@ -20,8 +20,8 @@ import java.io.IOException;
 
 public class SaveModuleBuiltin extends Builtin {
     @Override
-    public FnType type() {
-        return Type.fn(Type.getUnit(), Type.getString(), Type.getString());
+    public FunctionType type() {
+        return Types.fn(Types.getString(), Types.getString(), Types.getUnit());
     }
 
     @Override

@@ -1,26 +1,28 @@
 package gh.marad.chi.language.builtin.collections;
 
 import com.oracle.truffle.api.frame.VirtualFrame;
-import gh.marad.chi.core.FnType;
-import gh.marad.chi.core.Type;
+import gh.marad.chi.core.types.FunctionType;
+import gh.marad.chi.core.types.TypeVariable;
+import gh.marad.chi.core.types.Types;
 import gh.marad.chi.language.image.NodeId;
 import gh.marad.chi.language.runtime.ChiArray;
 
 import java.util.List;
 
-import static gh.marad.chi.core.Type.*;
 
 public class EmptyArrayBuiltin extends CollectionsArrayBuiltin {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
-        return new ChiArray(Type.getUndefined());
+        return new ChiArray(Types.getAny());
     }
 
     @Override
-    public FnType type() {
-        return genericFn(
-                List.of(typeParameter("T")),
-                array(typeParameter("T")));
+    public FunctionType type() {
+        var T = new TypeVariable("T");
+        return new FunctionType(
+                List.of(Types.array(T)),
+                List.of(T)
+        );
     }
 
     @Override

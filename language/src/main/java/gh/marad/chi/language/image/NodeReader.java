@@ -2,8 +2,8 @@ package gh.marad.chi.language.image;
 
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlotKind;
-import gh.marad.chi.core.FnType;
-import gh.marad.chi.core.VariantType;
+import gh.marad.chi.core.types.FunctionType;
+import gh.marad.chi.core.types.ProductType;
 import gh.marad.chi.language.ChiLanguage;
 import gh.marad.chi.language.EffectHandlers;
 import gh.marad.chi.language.builtin.collections.*;
@@ -99,6 +99,7 @@ public class NodeReader {
             case IfExpr -> readIfExpr();
             case LambdaValue -> readLambdaValue();
             case WriteModuleVariable -> readWriteModuleVariable();
+            case DefineModuleVariable -> readDefineModuleVariable();
             case WriteOuterVariable -> readWriteOuterVariable();
             case WriteLocalArgument -> readWriteLocalArgument();
             case InvokeFunction -> readInvokeFunction();
@@ -110,7 +111,6 @@ public class NodeReader {
             case IndexedAssignment -> readIndexedAssignment();
             case IsExpr -> readIsExpr();
             case ConstructObject -> readConstructObject();
-            case DefineVariantType -> readDefineVariantTypeNode();
             case DefinePackageFunction -> readDefinePackageFunction();
             case InvokeEffect -> readInvokeEffect();
             case HandleEffect -> readHandleEffect();
@@ -385,11 +385,12 @@ public class NodeReader {
         var moduleName = stream.readUTF();
         var packageName = stream.readUTF();
         var variableName = stream.readUTF();
-        var type = TypeWriter.readType(stream);
-        var isPublic = stream.readBoolean();
-        var isMutable = stream.readBoolean();
         var value = readNode();
-        return WriteModuleVariableNodeGen.create(value, moduleName ,packageName, variableName, type, isPublic, isMutable);
+        return WriteModuleVariableNodeGen.create(value, moduleName ,packageName, variableName);
+    }
+
+    public ChiNode readDefineModuleVariable() throws IOException {
+        throw new TODO();
     }
 
     public ChiNode readWriteOuterVariable() throws IOException {
@@ -449,21 +450,16 @@ public class NodeReader {
 
     public ChiNode readConstructObject() throws IOException {
         var type = TypeWriter.readType(stream);
-        if (type instanceof VariantType variantType) {
-            return new ConstructChiObject(variantType);
+        var fieldCount = stream.readShort();
+        var fieldNames = new String[fieldCount];
+        for (int i = 0; i < fieldCount; i++) {
+            fieldNames[i] = stream.readUTF();
+        }
+        if (type instanceof ProductType variantType) {
+            return new ConstructChiObject(variantType, fieldNames);
         } else {
             throw new TODO("Expected variant type!");
         }
-    }
-
-    public DefineVariantTypeNode readDefineVariantTypeNode() throws IOException {
-        var type = (VariantType) TypeWriter.readType(stream);
-        int variantCount = stream.readShort();
-        var variants = new ArrayList<VariantType.Variant>(variantCount);
-        for (int i = 0; i < variantCount; i++) {
-            variants.add(TypeWriter.readVariant(stream));
-        }
-        return new DefineVariantTypeNode(type, variants);
     }
 
     private ChiNode readDefinePackageFunction() throws IOException {
@@ -474,7 +470,7 @@ public class NodeReader {
         var isPublic = stream.readBoolean();
         var function = readNode();
         return DefinePackageFunctionFromNodeGen.create(
-                function, moduleName, packageName, functionName, (FnType) type, isPublic
+                function, moduleName, packageName, functionName, (FunctionType) type, isPublic
         );
     }
 

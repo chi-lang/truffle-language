@@ -49,7 +49,6 @@ public enum NodeId {
     IndexedAssignment,
     IsExpr,
     ConstructObject,
-    DefineVariantType,
     DefinePackageFunction,
     InvokeEffect,
     HandleEffect,
@@ -119,7 +118,7 @@ public enum NodeId {
     ArrayRemoveBuiltin,
     ArrayClearBuiltin,
     ReturnNode,
-    ReturnUnitNode, ExitProcessBuiltin;
+    ReturnUnitNode, ExitProcessBuiltin, DefineModuleVariable;
 
 
 

@@ -6,7 +6,8 @@ import com.oracle.truffle.api.dsl.TypeSystem;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.strings.TruffleString;
-import gh.marad.chi.core.Type;
+import gh.marad.chi.core.types.Type;
+import gh.marad.chi.core.types.Types;
 import gh.marad.chi.language.runtime.*;
 
 @TypeSystem({long.class, float.class, boolean.class, TruffleString.class, ChiFunction.class, ChiObject.class, ChiArray.class, ChiHostSymbol.class})
@@ -15,13 +16,13 @@ public class ChiTypes {
     @CompilerDirectives.TruffleBoundary
     public static Type getType(Object object) {
         if(object instanceof Long) {
-            return Type.getIntType();
+            return Types.getInt();
         } else if (object instanceof Float) {
-            return Type.getFloatType();
+            return Types.getFloat();
         } else if (object instanceof Boolean) {
-            return Type.getBool();
+            return Types.getBool();
         } else if (object instanceof TruffleString) {
-            return Type.getString();
+            return Types.getString();
         } else if (object instanceof ChiFunction) {
             throw new TODO("Determining function type is unsupported! (yet?)");
         } else if (object instanceof ChiObject o) {
@@ -29,7 +30,7 @@ public class ChiTypes {
         } else if (object instanceof ChiArray a) {
             return a.getType();
         }
-        return Type.getAny();
+        return Types.getAny();
     }
 
     public static Object unwrapHostSymbol(Object o) {
@@ -116,6 +117,6 @@ public class ChiTypes {
 
     @ImplicitCast
     public static ChiArray toChiArray(Object[] array) {
-        return new ChiArray(array, Type.getAny());
+        return new ChiArray(array, Types.getAny());
     }
 }

@@ -3,7 +3,7 @@ package gh.marad.chi.language.nodes.function;
 import com.oracle.truffle.api.Assumption;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import gh.marad.chi.core.Type;
+import gh.marad.chi.core.types.Type;
 import gh.marad.chi.language.ChiContext;
 import gh.marad.chi.language.nodes.ChiNodeVisitor;
 import gh.marad.chi.language.nodes.expr.ExpressionNode;
@@ -32,7 +32,7 @@ public class GetDefinedFunction extends ExpressionNode {
 
         var context = ChiContext.get(this);
         var module = context.modules.getOrCreateModule(moduleName);
-        var lookupResult = module.findFunctionOrNull(packageName, functionName, paramTypes);
+        var lookupResult = module.findFunctionOrNull(packageName, functionName);
         if (lookupResult == null) {
             CompilerDirectives.transferToInterpreter();
             throw new RuntimeException("Function '%s' was not found in package %s/%s".formatted(functionName, moduleName, packageName));

@@ -6,29 +6,36 @@ import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.UnknownIdentifierException;
 import com.oracle.truffle.api.interop.UnsupportedMessageException;
 import com.oracle.truffle.api.interop.UnsupportedTypeException;
-import gh.marad.chi.core.VariantType;
+import gh.marad.chi.core.types.ProductType;
+import gh.marad.chi.core.types.Type;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.ChiContext;
 import gh.marad.chi.language.ChiLanguage;
 import gh.marad.chi.language.nodes.ChiNodeVisitor;
 import gh.marad.chi.language.nodes.expr.ExpressionNode;
 
-import java.util.Objects;
-
 public class ConstructChiObject extends ExpressionNode {
     private final String[] fieldNames;
     private final InteropLibrary interopLibrary;
-    public final VariantType type;
+    public final ProductType type;
 
     // TODO this should only have variant type identifier, and types should be defined in central place
     // TODO runtime should also have some different representation of the type that references the Chi type
     //      because serialization of VariantType that has fields of other VariantTypes is VERY HEAVY
 
-    public ConstructChiObject(VariantType type) {
-        this.fieldNames = Objects.requireNonNull(type.getVariant()).getFields().stream()
-                                 .map(VariantType.VariantField::getName).toList().toArray(new String[0]);
+    public ConstructChiObject(ProductType type, String[] fields) {
+//        this.fieldNames = typeInfo.getFields().stream().map(VariantField::getName).toList().toArray(new String[0]);
+        this.fieldNames = fields;
         this.type = type;
         interopLibrary = InteropLibrary.getUncached();
+    }
+
+    public String[] getFieldNames() {
+        return fieldNames;
+    }
+
+    public Type getType() {
+        return type;
     }
 
     @Override

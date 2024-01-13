@@ -7,7 +7,8 @@ import com.oracle.truffle.api.interop.InvalidArrayIndexException;
 import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
-import gh.marad.chi.core.Type;
+import gh.marad.chi.core.types.Type;
+import gh.marad.chi.core.types.Types;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -67,7 +68,7 @@ public class ChiArray implements ChiValue {
     }
 
     public Type getType() {
-        return Type.array(elementType);
+        return Types.array(elementType);
     }
 
     public Type getElementType() {

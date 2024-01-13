@@ -6,8 +6,9 @@ import com.oracle.truffle.api.interop.UnknownIdentifierException;
 import com.oracle.truffle.api.interop.UnsupportedMessageException;
 import com.oracle.truffle.api.interop.UnsupportedTypeException;
 import com.oracle.truffle.api.strings.TruffleString;
-import gh.marad.chi.core.FnType;
-import gh.marad.chi.core.Type;
+import gh.marad.chi.core.types.FunctionType;
+import gh.marad.chi.core.types.TypeVariable;
+import gh.marad.chi.core.types.Types;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.builtin.lang.interop.LangInteropBuiltin;
 import gh.marad.chi.language.image.NodeId;
@@ -27,12 +28,12 @@ public class WriteMemberBuiltin extends LangInteropBuiltin {
     }
 
     @Override
-    public FnType type() {
-        return Type.genericFn(
-                List.of(Type.typeParameter("T")),   // type params
-                Type.typeParameter("T"),            // return value
-                // receiver, member, value
-                Type.getAny(), Type.getString(), Type.typeParameter("T"));
+    public FunctionType type() {
+        var T = new TypeVariable("T");
+        return new FunctionType(
+                List.of(Types.getAny(), Types.getString(), T, T),
+                List.of(T)
+        );
     }
 
     @Override

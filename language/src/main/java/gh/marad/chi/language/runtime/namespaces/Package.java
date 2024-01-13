@@ -2,24 +2,24 @@ package gh.marad.chi.language.runtime.namespaces;
 
 import com.oracle.truffle.api.Assumption;
 import com.oracle.truffle.api.CompilerDirectives;
-import gh.marad.chi.core.FnType;
-import gh.marad.chi.core.Type;
-import gh.marad.chi.core.VariantType;
+import gh.marad.chi.core.namespace.TypeInfo;
+import gh.marad.chi.core.types.FunctionType;
+import gh.marad.chi.core.types.Type;
 import gh.marad.chi.language.runtime.ChiFunction;
 
 import java.util.*;
 
 public class Package {
     private final String name;
-    private final HashMap<FunctionKey, FunctionLookupResult> functions;
+    private final HashMap<String, FunctionLookupResult> functions;
     private final HashMap<String, Variable> variables;
-    private final HashMap<String, VariantTypeDescriptor> variantTypes;
+    private final HashMap<String, TypeInfo> types;
 
     public Package(String name) {
         this.name = name;
         this.functions = new HashMap<>();
         this.variables = new HashMap<>();
-        this.variantTypes = new HashMap<>();
+        this.types = new HashMap<>();
     }
 
     public String getName() {
@@ -32,31 +32,28 @@ public class Package {
     }
 
     @CompilerDirectives.TruffleBoundary
-    public void defineFunction(ChiFunction function, FnType type, boolean isPublic) {
+    public void defineFunction(ChiFunction function, FunctionType type, boolean isPublic) {
         defineNamedFunction(function.getExecutableName(), function, type, isPublic);
     }
 
     @CompilerDirectives.TruffleBoundary
-    public void defineNamedFunction(String name, ChiFunction function, FnType type, boolean isPublic) {
-        var paramTypes = type.getParamTypes().toArray(new Type[0]);
-        var key = new FunctionKey(name, Objects.hash((Object[]) paramTypes));
-        var oldDefinition = functions.get(key);
+    public void defineNamedFunction(String name, ChiFunction function, FunctionType type, boolean isPublic) {
+        var oldDefinition = functions.get(name);
         if (oldDefinition != null) {
             oldDefinition.assumption.invalidate();
         }
-        functions.put(key, new FunctionLookupResult(function, type, isPublic, Assumption.create("function redefined")));
+        functions.put(name, new FunctionLookupResult(function, type, isPublic, Assumption.create("function redefined")));
     }
 
     @CompilerDirectives.TruffleBoundary
-    public FunctionLookupResult findFunctionOrNull(String name, Type[] paramTypes) {
-        var key = new FunctionKey(name, Objects.hash((Object[]) paramTypes));
-        return functions.get(key);
+    public FunctionLookupResult findFunctionOrNull(String name) {
+        return functions.get(name);
     }
 
     @CompilerDirectives.TruffleBoundary
     public FunctionLookupResult findSingleFunctionOrNull(String name) {
         return functions.entrySet().stream()
-                        .filter(it -> it.getKey().name.equals(name))
+                        .filter(it -> it.getKey().equals(name))
                         .findFirst()
                         .map(Map.Entry::getValue)
                         .orElse(null);
@@ -73,6 +70,14 @@ public class Package {
     }
 
     @CompilerDirectives.TruffleBoundary
+    public void setVariable(String name, Object value) {
+        var variable = variables.get(name);
+        if (variable != null) {
+            variable.value = value;
+        }
+    }
+
+    @CompilerDirectives.TruffleBoundary
     public Object findVariableOrNull(String name) {
         var variable = variables.get(name);
         if (variable == null) return null;
@@ -80,19 +85,18 @@ public class Package {
     }
 
     @CompilerDirectives.TruffleBoundary
-    public Collection<VariantTypeDescriptor> listVariantTypes() {
-        return variantTypes.values();
+    public void defineType(TypeInfo typeInfo) {
+        types.put(typeInfo.getName(), typeInfo);
     }
 
     @CompilerDirectives.TruffleBoundary
-    public void defineVariantType(VariantType variantType, List<VariantType.Variant> variants) {
-        variantTypes.put(variantType.getName(),
-                new VariantTypeDescriptor(variantType, variants));
+    public TypeInfo getTypeOrNull(String name) {
+        return types.get(name);
     }
 
     @CompilerDirectives.TruffleBoundary
-    public VariantTypeDescriptor findVariantTypeOrNull(String name) {
-        return variantTypes.get(name);
+    public Collection<TypeInfo> listTypes() {
+        return types.values();
     }
 
     public void invalidate() {
@@ -102,17 +106,62 @@ public class Package {
     }
 
 
-    public record FunctionKey(String name, int paramTypesHash) {
-    }
-
     public record FunctionLookupResult(
             ChiFunction function,
-            FnType type,
+            FunctionType type,
             boolean isPublic,
             Assumption assumption) {
     }
 
-    public record Variable(String name, Object value, Type type, boolean isPublic, boolean isMutable) {}
+//    public record Variable(String name, Object value, Type type, boolean isPublic, boolean isMutable) {
+//    }
 
-    public record VariantTypeDescriptor(VariantType variantType, List<VariantType.Variant> variants) {}
+    public final class Variable {
+        final String name;
+        Object value;
+        Type type;
+        boolean isPublic;
+        boolean isMutable;
+
+        public String getName() {
+            return name;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public Type getType() {
+            return type;
+        }
+
+        public boolean isPublic() {
+            return isPublic;
+        }
+
+        public boolean isMutable() {
+            return isMutable;
+        }
+
+        public Variable(String name, Object value, Type type, boolean isPublic, boolean isMutable) {
+            this.name = name;
+            this.value = value;
+            this.type = type;
+            this.isPublic = isPublic;
+            this.isMutable = isMutable;
+        }
+
+        @Override
+        public boolean equals(Object object) {
+            if (this == object) return true;
+            if (object == null || getClass() != object.getClass()) return false;
+            Variable variable = (Variable) object;
+            return isPublic == variable.isPublic && isMutable == variable.isMutable && Objects.equals(name, variable.name) && Objects.equals(value, variable.value) && Objects.equals(type, variable.type);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(name, value, type, isPublic, isMutable);
+        }
+    }
 }
