@@ -539,43 +539,6 @@ public class NodeSerializationTest {
     }
 
     @Test
-    void testDefineVariantTypeNodeSerialization() throws Exception {
-        fail("this will be reworked");
-//        // given
-//        var variants = List.of(
-//                new VariantType.Variant(
-//                        true, // public
-//                        "variantName",
-//                        List.of(
-//                                new VariantType.VariantField(
-//                                        true, // public
-//                                        "fieldName",
-//                                        Type.getIntType()
-//                                )
-//                        )
-//                )
-//        );
-//        var type = new VariantType(
-//                "moduleName",
-//                "packageName",
-//                "typeName",
-//                List.of(), // generic type parameters
-//                Map.of(), // concrete parameter types
-//                null
-//        );
-//        var expected = new DefineVariantTypeNode(type, variants);
-//
-//        // when
-//        var result = serializeAndDeserialize(expected);
-//
-//        // then
-//        if (result instanceof DefineVariantTypeNode actual) {
-//            assertEquals(type, actual.type);
-//            assertIterableEquals(variants, actual.variants);
-//        } else fail();
-    }
-
-    @Test
     void testReturnNodeSerialization() throws Exception {
         // given
         var value = new LongValue(5);

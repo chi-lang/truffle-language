@@ -2,10 +2,8 @@ package gh.marad.chi.language.image;
 
 import com.oracle.truffle.api.CompilerDirectives;
 import gh.marad.chi.core.namespace.TypeInfo;
-import gh.marad.chi.core.types.Type;
 import gh.marad.chi.language.ChiContext;
 import gh.marad.chi.language.nodes.FnRootNode;
-import gh.marad.chi.language.nodes.objects.DefineVariantTypeNode;
 import gh.marad.chi.language.runtime.StdStreams;
 import gh.marad.chi.language.runtime.TODO;
 import gh.marad.chi.language.runtime.namespaces.Module;
