@@ -485,7 +485,10 @@ public class Converter {
         fnArgs = new HashMap<>();
 
 
+        var prevInside = insideFunction;
+        insideFunction = true;
         var result = f.get();
+        insideFunction = prevInside;
 
         currentFdBuilder = previousFdBuilder;
         localSlots = previousLocalSlots;
