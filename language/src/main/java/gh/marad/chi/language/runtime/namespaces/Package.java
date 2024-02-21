@@ -2,8 +2,8 @@ package gh.marad.chi.language.runtime.namespaces;
 
 import com.oracle.truffle.api.Assumption;
 import com.oracle.truffle.api.CompilerDirectives;
-import gh.marad.chi.core.namespace.TypeInfo;
-import gh.marad.chi.core.types.FunctionType;
+import gh.marad.chi.core.TypeAlias;
+import gh.marad.chi.core.types.Function;
 import gh.marad.chi.core.types.Type;
 import gh.marad.chi.language.runtime.ChiFunction;
 
@@ -13,7 +13,7 @@ public class Package {
     private final String name;
     private final HashMap<String, FunctionLookupResult> functions;
     private final HashMap<String, Variable> variables;
-    private final HashMap<String, TypeInfo> types;
+    private final HashMap<String, TypeAlias> types;
 
     public Package(String name) {
         this.name = name;
@@ -32,12 +32,12 @@ public class Package {
     }
 
     @CompilerDirectives.TruffleBoundary
-    public void defineFunction(ChiFunction function, FunctionType type, boolean isPublic) {
+    public void defineFunction(ChiFunction function, Function type, boolean isPublic) {
         defineNamedFunction(function.getExecutableName(), function, type, isPublic);
     }
 
     @CompilerDirectives.TruffleBoundary
-    public void defineNamedFunction(String name, ChiFunction function, FunctionType type, boolean isPublic) {
+    public void defineNamedFunction(String name, ChiFunction function, Function type, boolean isPublic) {
         var oldDefinition = functions.get(name);
         if (oldDefinition != null) {
             oldDefinition.assumption.invalidate();
@@ -85,17 +85,17 @@ public class Package {
     }
 
     @CompilerDirectives.TruffleBoundary
-    public void defineType(TypeInfo typeInfo) {
-        types.put(typeInfo.getName(), typeInfo);
+    public void defineType(TypeAlias typeAlias) {
+        types.put(typeAlias.getTypeId().getName(), typeAlias);
     }
 
     @CompilerDirectives.TruffleBoundary
-    public TypeInfo getTypeOrNull(String name) {
+    public TypeAlias getTypeOrNull(String name) {
         return types.get(name);
     }
 
     @CompilerDirectives.TruffleBoundary
-    public Collection<TypeInfo> listTypes() {
+    public Collection<TypeAlias> listTypes() {
         return types.values();
     }
 
@@ -108,7 +108,7 @@ public class Package {
 
     public record FunctionLookupResult(
             ChiFunction function,
-            FunctionType type,
+            Function type,
             boolean isPublic,
             Assumption assumption) {
     }

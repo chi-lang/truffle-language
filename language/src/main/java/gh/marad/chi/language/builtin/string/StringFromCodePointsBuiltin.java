@@ -3,8 +3,8 @@ package gh.marad.chi.language.builtin.string;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.strings.TruffleString;
-import gh.marad.chi.core.types.FunctionType;
-import gh.marad.chi.core.types.Types;
+import gh.marad.chi.core.types.Function;
+import gh.marad.chi.core.types.Type;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.ChiTypesGen;
 import gh.marad.chi.language.builtin.Builtin;
@@ -15,8 +15,8 @@ public class StringFromCodePointsBuiltin extends Builtin {
     private TruffleString.FromJavaStringNode node = TruffleString.FromJavaStringNode.create();
 
     @Override
-    public FunctionType type() {
-        return Types.fn(Types.array(Types.getInt()), Types.getString());
+    public Function type() {
+        return Type.fn(Type.array(Type.getInt()), Type.getString());
     }
 
     @Override

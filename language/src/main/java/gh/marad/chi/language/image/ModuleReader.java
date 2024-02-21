@@ -4,13 +4,12 @@ import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlotKind;
-import gh.marad.chi.core.types.FunctionType;
+import gh.marad.chi.core.types.Function;
 import gh.marad.chi.language.ChiContext;
 import gh.marad.chi.language.ChiLanguage;
 import gh.marad.chi.language.nodes.FnRootNode;
 import gh.marad.chi.language.runtime.ChiFunction;
 import gh.marad.chi.language.runtime.StdStreams;
-import gh.marad.chi.language.runtime.TODO;
 import gh.marad.chi.language.runtime.namespaces.Module;
 
 import java.io.DataInputStream;
@@ -41,7 +40,7 @@ public class ModuleReader {
         // read types
         int typeCount = stream.readShort();
         for (int i = 0; i < typeCount; i++) {
-            var typeInfo = TypeWriter.readTypeInfo(stream);
+            var typeInfo = TypeWriter.readTypeAlias(stream);
             module.defineType(packageName, typeInfo);
         }
 
@@ -49,7 +48,7 @@ public class ModuleReader {
         var functionCount = stream.readShort();
         for (int i = 0; i < functionCount; i++) {
             var functionName = stream.readUTF();
-            var type = (FunctionType) TypeWriter.readType(stream);
+            var type = (Function) TypeWriter.readType(stream);
             var isPublic = stream.readBoolean();
             var functionBody = nodeReader.readNode();
 

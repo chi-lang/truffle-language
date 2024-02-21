@@ -8,10 +8,10 @@ import com.oracle.truffle.api.instrumentation.ProvidedTags;
 import com.oracle.truffle.api.instrumentation.StandardTags;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.object.Shape;
+import gh.marad.chi.core.TypeAlias;
 import gh.marad.chi.core.analyzer.Level;
 import gh.marad.chi.core.analyzer.Message;
 import gh.marad.chi.core.compiler.Compiler;
-import gh.marad.chi.core.namespace.TypeInfo;
 import gh.marad.chi.core.types.Type;
 import gh.marad.chi.language.compilation.CompilationFailed;
 import gh.marad.chi.language.runtime.ChiObject;
@@ -75,8 +75,9 @@ public class ChiLanguage extends TruffleLanguage<ChiContext> {
         // add defined types
         var pkg = compiled.getProgram().getPackageDefinition();
         var module = context.modules.getOrCreateModule(pkg.getModuleName());
-        for (TypeInfo definedType : compiled.getProgram().getDefinedTypes()) {
-            module.defineType(pkg.getPackageName(), definedType);
+
+        for (TypeAlias typeAlias : compiled.getProgram().getTypeAliases()) {
+            module.defineType(pkg.getPackageName(), typeAlias);
         }
 
         // convert code

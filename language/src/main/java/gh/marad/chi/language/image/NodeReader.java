@@ -2,8 +2,8 @@ package gh.marad.chi.language.image;
 
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlotKind;
-import gh.marad.chi.core.types.FunctionType;
-import gh.marad.chi.core.types.ProductType;
+import gh.marad.chi.core.types.Function;
+import gh.marad.chi.core.types.Record;
 import gh.marad.chi.language.ChiLanguage;
 import gh.marad.chi.language.EffectHandlers;
 import gh.marad.chi.language.builtin.collections.*;
@@ -450,9 +450,9 @@ public class NodeReader {
     }
 
     public ChiNode readIsExpr() throws IOException {
-        var typeName = stream.readUTF();
+        var type = TypeWriter.readType(stream);
         var value = readNode();
-        return IsNodeGen.create(value, typeName);
+        return IsNodeGen.create(value, type);
     }
 
     public ChiNode readConstructObject() throws IOException {
@@ -462,7 +462,7 @@ public class NodeReader {
         for (int i = 0; i < fieldCount; i++) {
             fieldNames[i] = stream.readUTF();
         }
-        if (type instanceof ProductType variantType) {
+        if (type instanceof Record variantType) {
             return new ConstructChiObject(variantType, fieldNames);
         } else {
             throw new TODO("Expected variant type!");
@@ -477,7 +477,7 @@ public class NodeReader {
         var isPublic = stream.readBoolean();
         var function = readNode();
         return DefinePackageFunctionFromNodeGen.create(
-                function, moduleName, packageName, functionName, (FunctionType) type, isPublic
+                function, moduleName, packageName, functionName, (Function) type, isPublic
         );
     }
 

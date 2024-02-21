@@ -3,8 +3,8 @@ package gh.marad.chi.language.builtin.lang.interop.members;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.strings.TruffleString;
-import gh.marad.chi.core.types.FunctionType;
-import gh.marad.chi.core.types.Types;
+import gh.marad.chi.core.types.Function;
+import gh.marad.chi.core.types.Type;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.builtin.lang.interop.LangInteropBuiltin;
 import gh.marad.chi.language.image.NodeId;
@@ -21,8 +21,8 @@ public class HasMemberReadSideEffectsBuiltin extends LangInteropBuiltin {
     }
 
     @Override
-    public FunctionType type() {
-        return Types.fn(Types.getAny(), Types.getString(), Types.getBool());
+    public Function type() {
+        return Type.fn(Type.getAny(), Type.getString(), Type.getBool());
     }
 
     @Override

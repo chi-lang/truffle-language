@@ -5,8 +5,8 @@ import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.StopIterationException;
 import com.oracle.truffle.api.interop.UnsupportedMessageException;
 import com.oracle.truffle.api.strings.TruffleString;
-import gh.marad.chi.core.types.FunctionType;
-import gh.marad.chi.core.types.Types;
+import gh.marad.chi.core.types.Function;
+import gh.marad.chi.core.types.Type;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.builtin.lang.interop.LangInteropBuiltin;
 import gh.marad.chi.language.image.NodeId;
@@ -22,8 +22,8 @@ public class GetMembersBuiltin extends LangInteropBuiltin {
     }
 
     @Override
-    public FunctionType type() {
-        return Types.fn(Types.getAny(), Types.getBool(), Types.array(Types.getString()));
+    public Function type() {
+        return Type.fn(Type.getAny(), Type.getBool(), Type.array(Type.getString()));
     }
 
     @Override
@@ -50,7 +50,7 @@ public class GetMembersBuiltin extends LangInteropBuiltin {
                     throw new TODO(e);
                 }
             }
-            return new ChiArray(data, Types.getString());
+            return new ChiArray(data, Type.getString());
         } catch (UnsupportedMessageException e) {
             throw new TODO(e);
         }

@@ -329,7 +329,7 @@ public class ImageWritingVisitor implements ChiNodeVisitor {
     @Override
     public void visitIs(IsNode isNode) throws IOException {
         writeNodeId(NodeId.IsExpr);
-        stream.writeUTF(isNode.getTypeName());
+        TypeWriter.writeType(isNode.getType(), stream);
     }
 
     @Override

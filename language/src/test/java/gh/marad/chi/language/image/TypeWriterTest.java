@@ -110,6 +110,7 @@ class TypeWriterTest {
         var typeInfo = new TypeInfo(
                 "moduleName", "packageName", "TypeName",
                 type,
+                Types.getAny(),
                 true,
                 List.of(new VariantField("field", Types.getInt(), false))
         );
@@ -117,9 +118,9 @@ class TypeWriterTest {
         // when
         var byteArrayStream = new ByteArrayOutputStream();
         var outputStream = new DataOutputStream(byteArrayStream);
-        TypeWriter.writeTypeInfo(typeInfo, outputStream);
+        TypeWriter.writeTypeAlias(typeInfo, outputStream);
         var inputStream = new DataInputStream(new ByteArrayInputStream(byteArrayStream.toByteArray()));
-        var result = TypeWriter.readTypeInfo(inputStream);
+        var result = TypeWriter.readTypeAlias(inputStream);
 
         // then
         assertEquals(typeInfo, result);

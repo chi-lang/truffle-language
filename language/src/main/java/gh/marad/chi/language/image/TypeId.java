@@ -7,10 +7,9 @@ public enum TypeId {
     Int,
     String,
     Unit,
-    Simple,
     Fn,
     TypeVariable,
-    Product,
+    Record,
     Sum
     ;
 

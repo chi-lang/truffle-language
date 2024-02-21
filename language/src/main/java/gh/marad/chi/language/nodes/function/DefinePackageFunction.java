@@ -1,7 +1,7 @@
 package gh.marad.chi.language.nodes.function;
 
 import com.oracle.truffle.api.frame.VirtualFrame;
-import gh.marad.chi.core.types.FunctionType;
+import gh.marad.chi.core.types.Function;
 import gh.marad.chi.language.ChiContext;
 import gh.marad.chi.language.nodes.ChiNodeVisitor;
 import gh.marad.chi.language.nodes.expr.ExpressionNode;
@@ -11,11 +11,11 @@ public class DefinePackageFunction extends ExpressionNode {
     private final String moduleName;
     private final String packageName;
     private final ChiFunction function;
-    private final FunctionType type;
+    private final Function type;
 
     private final boolean isPublic;
 
-    public DefinePackageFunction(String moduleName, String packageName, ChiFunction function, FunctionType type, boolean isPublic) {
+    public DefinePackageFunction(String moduleName, String packageName, ChiFunction function, Function type, boolean isPublic) {
         this.moduleName = moduleName;
         this.packageName = packageName;
         this.function = function;

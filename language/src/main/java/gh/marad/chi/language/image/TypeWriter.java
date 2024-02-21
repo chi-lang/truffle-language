@@ -1,8 +1,8 @@
 package gh.marad.chi.language.image;
 
-import gh.marad.chi.core.namespace.TypeInfo;
-import gh.marad.chi.core.namespace.VariantField;
+import gh.marad.chi.core.TypeAlias;
 import gh.marad.chi.core.types.*;
+import gh.marad.chi.core.types.Record;
 import gh.marad.chi.language.runtime.TODO;
 
 import java.io.DataInputStream;
@@ -13,42 +13,24 @@ import java.util.Arrays;
 import java.util.List;
 
 public class TypeWriter {
-    public static void writeTypeInfo(TypeInfo typeInfo, DataOutputStream stream) throws IOException {
-        stream.writeUTF(typeInfo.getModuleName());
-        stream.writeUTF(typeInfo.getPackageName());
-        stream.writeUTF(typeInfo.getName());
-        writeType(typeInfo.getType(), stream);
-        stream.writeBoolean(typeInfo.isPublic());
-        stream.writeByte(typeInfo.getFields().size());
-        for (VariantField field : typeInfo.getFields()) {
-            stream.writeUTF(field.getName());
-            writeType(field.getType(), stream);
-            stream.writeBoolean(field.getPublic());
-        }
+
+    public static void writeTypeAlias(TypeAlias typeAlias, DataOutputStream stream) throws IOException {
+        stream.writeUTF(typeAlias.getTypeId().getModuleName());
+        stream.writeUTF(typeAlias.getTypeId().getPackageName());
+        stream.writeUTF(typeAlias.getTypeId().getName());
+        writeType(typeAlias.getType(), stream);
     }
 
-    public static TypeInfo readTypeInfo(DataInputStream stream) throws IOException {
-        return new TypeInfo(
-                stream.readUTF(),
-                stream.readUTF(),
-                stream.readUTF(),
-                readType(stream),
-                stream.readBoolean(),
-                readFields(stream)
+    public static TypeAlias readTypeAlias(DataInputStream stream) throws IOException {
+
+        return new TypeAlias(
+                new gh.marad.chi.core.types.TypeId(
+                        stream.readUTF(),
+                        stream.readUTF(),
+                        stream.readUTF()
+                ),
+                readType(stream)
         );
-    }
-
-    private static List<VariantField> readFields(DataInputStream stream) throws IOException {
-        var count = stream.readByte();
-        var result = new ArrayList<VariantField>(count);
-        for (int i = 0; i < count; i++) {
-            result.add(new VariantField(
-                    stream.readUTF(),
-                    readType(stream),
-                    stream.readBoolean()
-            ));
-        }
-        return result;
     }
 
     public static void writeTypes(List<Type> types, DataOutputStream stream) throws IOException {
@@ -65,61 +47,83 @@ public class TypeWriter {
         }
     }
 
-    public static void writeTypeVariables(List<TypeVariable> typeVars, DataOutputStream stream) throws IOException {
+    public static void writeStrings(List<String> strings, DataOutputStream stream) throws IOException {
+        stream.writeByte(strings.size());
+        for (String string : strings) {
+            stream.writeUTF(string);
+        }
+    }
+
+    public static void writeVariables(List<Variable> typeVars, DataOutputStream stream) throws IOException {
         stream.writeByte(typeVars.size());
-        for (TypeVariable typeVar : typeVars) {
+        for (Variable typeVar : typeVars) {
             stream.writeUTF(typeVar.getName());
+            stream.writeShort(typeVar.getLevel());
         }
     }
 
     public static void writeType(Type type, DataOutputStream stream) throws IOException {
-        if (type instanceof SimpleType t) {
-            if (Types.getAny().equals(type)) {
+        if (type instanceof Primitive t) {
+            if (Type.getAny().equals(type)) {
                 stream.writeByte(TypeId.Any.id());
-            } else if (Types.getBool().equals(type)) {
+            } else if (Type.getBool().equals(type)) {
                 stream.writeByte(TypeId.Bool.id());
-            } else if (Types.getFloat().equals(type)) {
+            } else if (Type.getFloat().equals(type)) {
                 stream.writeByte(TypeId.Float.id());
-            } else if (Types.getInt().equals(type)) {
+            } else if (Type.getInt().equals(type)) {
                 stream.writeByte(TypeId.Int.id());
-            } else if (Types.getString().equals(type)) {
+            } else if (Type.getString().equals(type)) {
                 stream.writeByte(TypeId.String.id());
-            } else if (Types.getUnit().equals(type)) {
+            } else if (Type.getUnit().equals(type)) {
                 stream.writeByte(TypeId.Unit.id());
-            } else {
-                stream.writeByte(TypeId.Simple.id());
-                stream.writeUTF(t.getModuleName());
-                stream.writeUTF(t.getPackageName());
-                stream.writeUTF(t.getName());
             }
-        } else if (type instanceof ProductType t) {
-            stream.writeByte(TypeId.Product.id());
-            stream.writeUTF(t.getModuleName());
-            stream.writeUTF(t.getPackageName());
-            stream.writeUTF(t.getName());
-            writeTypes(t.getTypes(), stream);
-            writeTypes(t.getTypeParams(), stream);
-            writeTypeVariables(t.getTypeSchemeVariables(), stream);
-        } else if (type instanceof SumType t) {
+        } else if (type instanceof Record t) {
+            stream.writeByte(TypeId.Record.id());
+            writeTypeId(t.getTypeId(), stream);
+            stream.writeShort(t.getFields().size());
+            for (var field : t.getFields()) {
+                stream.writeUTF(field.getName());
+                writeType(field.getType(), stream);
+            }
+            writeStrings(t.typeParams(), stream);
+        } else if (type instanceof Sum t) {
             stream.writeByte(TypeId.Sum.id());
-            stream.writeUTF(t.getModuleName());
-            stream.writeUTF(t.getPackageName());
-            stream.writeUTF(t.getName());
-            writeTypes(t.getTypeParams(), stream);
-            stream.writeShort(t.getSubtypes().size());
-            for (String subtype : t.getSubtypes()) {
-                stream.writeUTF(subtype);
-            }
-            writeTypeVariables(t.typeSchemeVariables(), stream);
-        } else if (type instanceof FunctionType t) {
+            writeTypeId(t.getTypeId(), stream);
+            writeType(t.getLhs(), stream);
+            writeType(t.getRhs(), stream);
+            writeStrings(t.typeParams(), stream);
+        } else if (type instanceof Function t) {
             stream.writeByte(TypeId.Fn.id());
             writeTypes(t.getTypes(), stream);
-            writeTypeVariables(t.getTypeSchemeVariables(), stream);
-        } else if (type instanceof TypeVariable t) {
+            writeStrings(t.getTypeParams(), stream);
+        } else if (type instanceof Variable t) {
             stream.writeByte(TypeId.TypeVariable.id());
             stream.writeUTF(t.getName());
+            stream.writeShort(t.getLevel());
         } else {
             throw new TODO("Unsupported type " + type);
+        }
+    }
+
+    public static void writeTypeId(gh.marad.chi.core.types.TypeId id, DataOutputStream stream) throws IOException {
+        var hasId = id != null;
+        stream.writeBoolean(hasId);
+        if (hasId) {
+            stream.writeUTF(id.getModuleName());
+            stream.writeUTF(id.getPackageName());
+            stream.writeUTF(id.getName());
+        }
+    }
+
+    public static gh.marad.chi.core.types.TypeId readTypeId(DataInputStream stream) throws IOException {
+        if (stream.readBoolean()) {
+            return new gh.marad.chi.core.types.TypeId(
+                    stream.readUTF(),
+                    stream.readUTF(),
+                    stream.readUTF()
+            );
+        } else {
+            return null;
         }
     }
 
@@ -133,53 +137,44 @@ public class TypeWriter {
         return types;
     }
 
-    public static List<TypeVariable> readTypeVariables(DataInputStream stream) throws IOException {
-        var count = stream.readByte();
-        var typeVars = new ArrayList<TypeVariable>();
-        for (int i = 0; i < count; i++) {
-            typeVars.add(new TypeVariable(stream.readUTF()));
-        }
-        return typeVars;
-    }
-
-
     public static Type readType(DataInputStream stream) throws IOException {
         var typeId = TypeId.fromId(stream.readByte());
         return switch (typeId) {
-            case Any -> Types.getAny();
-            case Bool -> Types.getBool();
-            case Float -> Types.getFloat();
-            case Int -> Types.getInt();
-            case String -> Types.getString();
-            case Unit -> Types.getUnit();
-            case Simple -> new SimpleType(
-                    stream.readUTF(),
-                    stream.readUTF(),
-                    stream.readUTF()
-            );
-            case Product -> new ProductType(
-                    stream.readUTF(),
-                    stream.readUTF(),
-                    stream.readUTF(),
+            case Any -> Type.getAny();
+            case Bool -> Type.getBool();
+            case Float -> Type.getFloat();
+            case Int -> Type.getInt();
+            case String -> Type.getString();
+            case Unit -> Type.getUnit();
+            case Record ->
+                new Record(readTypeId(stream), readFields(stream), readStrings(stream));
+
+            case Sum ->
+                    new Sum(
+                            readTypeId(stream),
+                            readType(stream),
+                            readType(stream),
+                            readStrings(stream));
+
+            case Fn -> new Function(
                     Arrays.stream(readTypes(stream)).toList(),
-                    Arrays.stream(readTypes(stream)).toList(),
-                    readTypeVariables(stream)
+                    readStrings(stream)
             );
-            case Sum -> new SumType(
-                    stream.readUTF(),
-                    stream.readUTF(),
-                    stream.readUTF(),
-                    Arrays.stream(readTypes(stream)).toList(),
-                    readStrings(stream),
-                    readTypeVariables(stream)
-            );
-            case Fn -> new FunctionType(
-                    Arrays.stream(readTypes(stream)).toList(),
-                    readTypeVariables(stream)
-            );
-            case TypeVariable -> new TypeVariable(stream.readUTF());
+            case TypeVariable -> new Variable(stream.readUTF(), stream.readShort());
             default -> throw new IllegalStateException("Unexpected value: " + typeId);
         };
+    }
+
+    private static List<Record.Field> readFields(DataInputStream stream) throws IOException {
+        var fieldCount = stream.readShort();
+        var fields = new ArrayList<Record.Field>(fieldCount);
+        for (int i = 0; i < fieldCount; i++) {
+            fields.add(new Record.Field(
+                    stream.readUTF(),
+                    readType(stream)
+            ));
+        }
+        return fields;
     }
 
     private static List<String> readStrings(DataInputStream stream) throws IOException {

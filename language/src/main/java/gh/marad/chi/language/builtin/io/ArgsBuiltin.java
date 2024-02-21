@@ -2,8 +2,8 @@ package gh.marad.chi.language.builtin.io;
 
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.strings.TruffleString;
-import gh.marad.chi.core.types.FunctionType;
-import gh.marad.chi.core.types.Types;
+import gh.marad.chi.core.types.Function;
+import gh.marad.chi.core.types.Type;
 import gh.marad.chi.language.ChiContext;
 import gh.marad.chi.language.builtin.Builtin;
 import gh.marad.chi.language.image.NodeId;
@@ -18,12 +18,12 @@ public class ArgsBuiltin extends Builtin {
         for (var i = 0; i < args.length; i++) {
             truffleStrings[i] = TruffleString.fromJavaStringUncached(args[i], TruffleString.Encoding.UTF_8);
         }
-        return new ChiArray(truffleStrings, Types.getString());
+        return new ChiArray(truffleStrings, Type.getString());
     }
 
     @Override
-    public FunctionType type() {
-        return Types.fn(Types.array(Types.getString()));
+    public Function type() {
+        return Type.fn(Type.array(Type.getString()));
     }
 
     @Override

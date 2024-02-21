@@ -3,8 +3,8 @@ package gh.marad.chi.language.builtin.lang.interop.array;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.UnsupportedMessageException;
-import gh.marad.chi.core.types.FunctionType;
-import gh.marad.chi.core.types.Types;
+import gh.marad.chi.core.types.Function;
+import gh.marad.chi.core.types.Type;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.builtin.lang.interop.LangInteropBuiltin;
 import gh.marad.chi.language.image.NodeId;
@@ -19,8 +19,8 @@ public class HasArrayElementsBuiltin extends LangInteropBuiltin {
     }
 
     @Override
-    public FunctionType type() {
-        return Types.fn(Types.getAny(), Types.getBool(), Types.array(Types.getString()));
+    public Function type() {
+        return Type.fn(Type.getAny(), Type.getBool(), Type.array(Type.getString()));
     }
 
     @Override

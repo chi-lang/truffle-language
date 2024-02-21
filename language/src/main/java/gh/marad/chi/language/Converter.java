@@ -5,8 +5,6 @@ import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.oracle.truffle.api.nodes.RootNode;
 import gh.marad.chi.core.*;
-import gh.marad.chi.core.namespace.TypeInfo;
-import gh.marad.chi.core.namespace.VariantField;
 import gh.marad.chi.core.types.*;
 import gh.marad.chi.language.nodes.ChiNode;
 import gh.marad.chi.language.nodes.FnRootNode;
@@ -72,13 +70,15 @@ public class Converter {
         currentPackage = program.getPackageDefinition().getPackageName();
         var body = new ArrayList<ChiNode>();
 
-        for (TypeInfo typeInfo : program.getDefinedTypes()) {
-            if (typeInfo.getType() instanceof SimpleType) {
-                body.add(defineConstructedObject(typeInfo));
-            } else if (typeInfo.getType() instanceof ProductType) {
-                body.add(defineConstructor(typeInfo));
-            }
-        }
+        // definicje konstruktorów i objectów - nie są potrzebne bo to można robić ręcznie
+        // lub może to zrobić kompilator automatycznie
+//        for (TypeInfo typeInfo : program.getDefinedType()) {
+//            if (typeInfo.getType() instanceof SimpleType) {
+//                body.add(defineConstructedObject(typeInfo));
+//            } else if (typeInfo.getType() instanceof ProductType) {
+//                body.add(defineConstructor(typeInfo));
+//            }
+//        }
 
         for (Expression expr : program.getExpressions()) {
             var node = convertExpression(expr);
@@ -96,59 +96,59 @@ public class Converter {
         }
     }
 
-    private ChiNode defineConstructedObject(TypeInfo typeInfo) {
-        var fieldNames = typeInfo.getFields().stream().map(VariantField::getName).toList().toArray(new String[0]);
-        var constructorFunction = createFunctionFromNode(
-                new ConstructChiObject(typeInfo.getType(), fieldNames), typeInfo.getName());
-        var valueFunction = new InvokeFunction(new LambdaValue(constructorFunction), new ChiNode[0]);
-        return DefineModuleVariableNodeGen.create(
-                valueFunction,
-                typeInfo.getModuleName(),
-                typeInfo.getPackageName(),
-                typeInfo.getName(),
-                typeInfo.getType(),
-                typeInfo.isPublic(),
-                false
-                );
-    }
-    private ChiNode defineConstructor(TypeInfo typeInfo) {
-
-        var fieldNames = typeInfo.getFields().stream().map(VariantField::getName).toList().toArray(new String[0]);
-        var constructorFunction = createFunctionFromNode(
-                new ConstructChiObject(typeInfo.getType(), fieldNames), typeInfo.getName());
-
-        if (typeInfo.getFields().isEmpty()) {
-            return DefineModuleVariableNodeGen.create(
-                    new InvokeFunction(new LambdaValue(constructorFunction), new ChiNode[0]),
-                    typeInfo.getModuleName(),
-                    typeInfo.getPackageName(),
-                    typeInfo.getName(),
-                    typeInfo.getType(),
-                    typeInfo.isPublic(),
-                    true
-            );
-        } else {
-            var types = new ArrayList<Type>();
-            for (VariantField field : typeInfo.getFields()) {
-                types.add(field.getType());
-            }
-            types.add(typeInfo.getType());
-            var fnType = new FunctionType(
-                    types,
-                    types.stream()
-                         .filter(it -> it instanceof TypeVariable)
-                         .map(it -> (TypeVariable) it)
-                         .toList()
-            );
-            return new DefinePackageFunction(
-                    typeInfo.getModuleName(),
-                    typeInfo.getPackageName(),
-                    new ChiFunction(constructorFunction),
-                    fnType,
-                    typeInfo.isPublic()
-            );
-        }
-    }
+//    private ChiNode defineConstructedObject(TypeInfo typeInfo) {
+//        var fieldNames = typeInfo.getFields().stream().map(VariantField::getName).toList().toArray(new String[0]);
+//        var constructorFunction = createFunctionFromNode(
+//                new ConstructChiObject(typeInfo.getType(), fieldNames), typeInfo.getName());
+//        var valueFunction = new InvokeFunction(new LambdaValue(constructorFunction), new ChiNode[0]);
+//        return DefineModuleVariableNodeGen.create(
+//                valueFunction,
+//                typeInfo.getModuleName(),
+//                typeInfo.getPackageName(),
+//                typeInfo.getName(),
+//                typeInfo.getType(),
+//                typeInfo.isPublic(),
+//                false
+//                );
+//    }
+//    private ChiNode defineConstructor(TypeInfo typeInfo) {
+//
+//        var fieldNames = typeInfo.getFields().stream().map(VariantField::getName).toList().toArray(new String[0]);
+//        var constructorFunction = createFunctionFromNode(
+//                new ConstructChiObject(typeInfo.getType(), fieldNames), typeInfo.getName());
+//
+//        if (typeInfo.getFields().isEmpty()) {
+//            return DefineModuleVariableNodeGen.create(
+//                    new InvokeFunction(new LambdaValue(constructorFunction), new ChiNode[0]),
+//                    typeInfo.getModuleName(),
+//                    typeInfo.getPackageName(),
+//                    typeInfo.getName(),
+//                    typeInfo.getType(),
+//                    typeInfo.isPublic(),
+//                    true
+//            );
+//        } else {
+//            var types = new ArrayList<Type>();
+//            for (VariantField field : typeInfo.getFields()) {
+//                types.add(field.getType());
+//            }
+//            types.add(typeInfo.getType());
+//            var fnType = new Function(
+//                    types,
+//                    types.stream()
+//                         .filter(it -> it instanceof TypeVariable)
+//                         .map(it -> (TypeVariable) it)
+//                         .toList()
+//            );
+//            return new DefinePackageFunction(
+//                    typeInfo.getModuleName(),
+//                    typeInfo.getPackageName(),
+//                    new ChiFunction(constructorFunction),
+//                    fnType,
+//                    typeInfo.isPublic()
+//            );
+//        }
+//    }
 
     public ChiNode convertExpression(Expression expr) {
         if (expr instanceof Atom atom) {
@@ -214,16 +214,16 @@ public class Converter {
     }
 
     private ChiNode convertAtom(Atom atom) {
-        if (atom.getType() == Types.getInt()) {
+        if (atom.getType() == Type.getInt()) {
             return new LongValue(Long.parseLong(atom.getValue()));
         }
-        if (atom.getType() == Types.getFloat()) {
+        if (atom.getType() == Type.getFloat()) {
             return new FloatValue(Float.parseFloat(atom.getValue()));
         }
-        if (atom.getType() == Types.getString()) {
+        if (atom.getType() == Type.getString()) {
             return new StringValue(atom.getValue());
         }
-        if (atom.getType() == Types.getBool()) {
+        if (atom.getType() == Type.getBool()) {
             return new BooleanValue(Boolean.parseBoolean(atom.getValue()));
         }
         throw new TODO("Unhandled atom type: %s".formatted(atom.getType()));
@@ -241,10 +241,10 @@ public class Converter {
             return convertModuleFunctionDefinitionFromFunctionNode(
                     nameDeclaration.getName(),
                     convertFnExpr(fn, nameDeclaration.getName()),
-                    (FunctionType) fn.getType(),
+                    (Function) fn.getType(),
                     nameDeclaration.getPublic()
             );
-        } else if (!insideFunction && nameDeclaration.getValue().getType() instanceof FunctionType fnType) {
+        } else if (!insideFunction && nameDeclaration.getValue().getType() instanceof Function fnType) {
             return convertModuleFunctionDefinitionFromFunctionNode(
                     nameDeclaration.getName(),
                     convertExpression(nameDeclaration.getValue()),
@@ -372,7 +372,7 @@ public class Converter {
         }
 
         var body = new ArrayList<>(block.getBody().stream().map(this::convertExpression).toList());
-        if (returnType == Types.getUnit()) {
+        if (returnType == Type.getUnit()) {
             body.add(new UnitValue());
         }
         return new BlockExpr(body.toArray(new ChiNode[0]));
@@ -414,11 +414,11 @@ public class Converter {
 
     private ChiNode convertCast(Cast cast) {
         var value = convertExpression(cast.getExpression());
-        if (cast.getTargetType() == Types.getInt()) {
+        if (cast.getTargetType() == Type.getInt()) {
             return CastToLongExprNodeGen.create(value);
-        } else if (cast.getTargetType() == Types.getFloat()) {
+        } else if (cast.getTargetType() == Type.getFloat()) {
             return CastToFloatNodeGen.create(value);
-        } else if (cast.getTargetType() == Types.getString()) {
+        } else if (cast.getTargetType() == Type.getString()) {
             return CastToStringNodeGen.create(value);
         } else {
             return value;
@@ -446,7 +446,7 @@ public class Converter {
         return convertFnExpr(fn, "[lambda]");
     }
 
-    private ChiNode convertModuleFunctionDefinitionFromFunctionNode(String name, ChiNode fnExprNode, FunctionType type, boolean isPublic) {
+    private ChiNode convertModuleFunctionDefinitionFromFunctionNode(String name, ChiNode fnExprNode, Function type, boolean isPublic) {
         return DefinePackageFunctionFromNodeGen.create(fnExprNode, currentModule, currentPackage, name, type, isPublic);
     }
 
@@ -499,10 +499,10 @@ public class Converter {
 
     private ChiNode convertFnCall(FnCall fnCall) {
         var functionExpr = fnCall.getFunction();
-        FunctionType fnType = (FunctionType) functionExpr.getType();
-        var argTypes = new ArrayList<Type>();
-        argTypes.addAll(fnType.getTypes());
-        argTypes.remove(argTypes.size()-1); // remove return type
+        Function fnType = (Function) functionExpr.getType();
+        var argType = new ArrayList<Type>();
+        argType.addAll(fnType.getTypes());
+        argType.remove(argType.size()-1); // remove return type
 
         ChiNode[] arguments = new ChiNode[fnCall.getParameters().size()];
         var i = 0;
@@ -515,7 +515,7 @@ public class Converter {
                     symbol.getModuleName(),
                     symbol.getPackageName(),
                     symbol.getName(),
-                    argTypes.toArray(new Type[0]));
+                    argType.toArray(new Type[0]));
             return new InvokeFunction(function, arguments);
         } else {
             var function = convertExpression(functionExpr);
@@ -530,7 +530,7 @@ public class Converter {
     }
 
     private ChiNode convertIs(Is is) {
-        return IsNodeGen.create(convertExpression(is.getValue()), is.getTypeOrVariant());
+        return IsNodeGen.create(convertExpression(is.getValue()), is.getType());
     }
 
     private ChiNode convertEffectDefinition(EffectDefinition definition) {
@@ -541,7 +541,7 @@ public class Converter {
                     return new FnRootNode(language, currentFdBuilder.build(), block, definition.getName());
                 });
         var callTarget = rootNode.getCallTarget();
-        var fnType = (FunctionType) definition.getType();
+        var fnType = (Function) definition.getType();
         return new DefinePackageFunction(
                 currentModule, currentPackage,
                 new ChiFunction(callTarget),

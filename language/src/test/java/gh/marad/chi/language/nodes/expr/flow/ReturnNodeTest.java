@@ -8,6 +8,19 @@ import org.junit.jupiter.api.Test;
 class ReturnNodeTest {
 
     @Test
+    void hello() {
+        var ctx = TestContext.create();
+        ctx.eval("chi", """
+                fn readString(s: string): string { s }
+                fn eval(s: string) {}
+                fn load(filePath: string): any {
+                   val code = readString(filePath)
+                   eval(code)
+                }
+                """.stripIndent());
+    }
+
+    @Test
     void testBasicReturn() {
         var ctx = TestContext.create();
         var value = ctx.eval("chi", """

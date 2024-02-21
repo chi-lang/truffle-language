@@ -1,7 +1,7 @@
 package gh.marad.chi.language.image;
 
 import com.oracle.truffle.api.CompilerDirectives;
-import gh.marad.chi.core.namespace.TypeInfo;
+import gh.marad.chi.core.TypeAlias;
 import gh.marad.chi.language.ChiContext;
 import gh.marad.chi.language.nodes.FnRootNode;
 import gh.marad.chi.language.runtime.StdStreams;
@@ -48,8 +48,8 @@ public class ModuleWriter {
         // write types
         var types = module.listTypes(packageName);
         stream.writeShort(types.size());
-        for (TypeInfo type : types) {
-            TypeWriter.writeTypeInfo(type, stream);
+        for (TypeAlias type : types) {
+            TypeWriter.writeTypeAlias(type, stream);
         }
 
         // write package functions

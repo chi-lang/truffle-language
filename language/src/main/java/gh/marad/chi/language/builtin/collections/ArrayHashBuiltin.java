@@ -1,9 +1,9 @@
 package gh.marad.chi.language.builtin.collections;
 
 import com.oracle.truffle.api.frame.VirtualFrame;
-import gh.marad.chi.core.types.FunctionType;
-import gh.marad.chi.core.types.TypeVariable;
-import gh.marad.chi.core.types.Types;
+import gh.marad.chi.core.types.Function;
+import gh.marad.chi.core.types.Variable;
+import gh.marad.chi.core.types.Type;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.image.NodeId;
 
@@ -18,11 +18,11 @@ public class ArrayHashBuiltin extends CollectionsArrayBuiltin {
     }
 
     @Override
-    public FunctionType type() {
-        var T = new TypeVariable("T");
-        return new FunctionType(
-                List.of(Types.array(T), Types.getInt()),
-                List.of(T)
+    public Function type() {
+        var T = new Variable("T", 0);
+        return new Function(
+                List.of(Type.array(T), Type.getInt()),
+                List.of("T")
         );
     }
 

@@ -2,8 +2,8 @@ package gh.marad.chi.language.builtin.lang;
 
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import gh.marad.chi.core.types.FunctionType;
-import gh.marad.chi.core.types.Types;
+import gh.marad.chi.core.types.Function;
+import gh.marad.chi.core.types.Type;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.builtin.Builtin;
 import gh.marad.chi.language.image.NodeId;
@@ -16,8 +16,8 @@ public class ExitProcessBuiltin extends Builtin {
     private ExitProcessBuiltin() {}
 
     @Override
-    public FunctionType type() {
-        return Types.fn(Types.getInt(), Types.getUnit());
+    public Function type() {
+        return Type.fn(Type.getInt(), Type.getUnit());
     }
 
     @Override

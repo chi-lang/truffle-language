@@ -5,9 +5,9 @@ import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.nodes.Node;
+import gh.marad.chi.core.TypeAlias;
 import gh.marad.chi.core.namespace.GlobalCompilationNamespace;
 import gh.marad.chi.core.namespace.Symbol;
-import gh.marad.chi.core.namespace.TypeInfo;
 import gh.marad.chi.language.builtin.Builtin;
 import gh.marad.chi.language.builtin.Prelude;
 import gh.marad.chi.language.builtin.collections.*;
@@ -65,8 +65,8 @@ public class ChiContext {
                 var desc = ns.getOrCreatePackage(module.getName(), pkg);
 
                 // define types
-                for (TypeInfo typeInfo : module.listTypes(pkg)) {
-                    desc.getTypes().add(typeInfo);
+                for (TypeAlias typeAlias : module.listTypes(pkg)) {
+                    desc.getTypes().add(typeAlias);
                 }
 
                 // define package functions

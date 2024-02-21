@@ -1,8 +1,8 @@
 package gh.marad.chi.language.runtime.namespaces;
 
 import com.oracle.truffle.api.CompilerDirectives;
-import gh.marad.chi.core.namespace.TypeInfo;
-import gh.marad.chi.core.types.FunctionType;
+import gh.marad.chi.core.TypeAlias;
+import gh.marad.chi.core.types.Function;
 import gh.marad.chi.core.types.Type;
 import gh.marad.chi.language.runtime.ChiFunction;
 
@@ -39,13 +39,13 @@ public class Module {
     }
 
     @CompilerDirectives.TruffleBoundary
-    public void defineFunction(String packageName, ChiFunction function, FunctionType type, boolean isPublic) {
+    public void defineFunction(String packageName, ChiFunction function, Function type, boolean isPublic) {
         getOrCreatePackage(packageName)
                 .defineFunction(function, type, isPublic);
     }
 
     @CompilerDirectives.TruffleBoundary
-    public void defineNamedFunction(String packageName, String name, ChiFunction function, FunctionType type, boolean isPublic) {
+    public void defineNamedFunction(String packageName, String name, ChiFunction function, Function type, boolean isPublic) {
         getOrCreatePackage(packageName)
                 .defineNamedFunction(name, function, type, isPublic);
     }
@@ -85,15 +85,15 @@ public class Module {
     }
 
 
-    public Collection<TypeInfo> listTypes(String packageName) {
+    public Collection<TypeAlias> listTypes(String packageName) {
         return getOrCreatePackage(packageName).listTypes();
     }
 
-    public void defineType(String packageName, TypeInfo typeInfo) {
-        getOrCreatePackage(packageName).defineType(typeInfo);
+    public void defineType(String packageName, TypeAlias typeAlias) {
+        getOrCreatePackage(packageName).defineType(typeAlias);
     }
 
-    public TypeInfo findTypeOrNull(String packageName, String typeName) {
+    public TypeAlias findTypeOrNull(String packageName, String typeName) {
         return getOrCreatePackage(packageName).getTypeOrNull(typeName);
     }
 
