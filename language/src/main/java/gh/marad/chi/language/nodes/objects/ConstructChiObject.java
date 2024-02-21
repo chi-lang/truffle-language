@@ -7,24 +7,32 @@ import com.oracle.truffle.api.interop.UnknownIdentifierException;
 import com.oracle.truffle.api.interop.UnsupportedMessageException;
 import com.oracle.truffle.api.interop.UnsupportedTypeException;
 import gh.marad.chi.core.types.Record;
-import gh.marad.chi.core.types.Type;
-import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.ChiContext;
 import gh.marad.chi.language.ChiLanguage;
+import gh.marad.chi.language.nodes.ChiNode;
 import gh.marad.chi.language.nodes.ChiNodeVisitor;
 import gh.marad.chi.language.nodes.expr.ExpressionNode;
 
 public class ConstructChiObject extends ExpressionNode {
     private final InteropLibrary interopLibrary;
-    public final Record type;
+    private final Record type;
+    private final String[] fields;
+    private final ChiNode[] values;
 
-    // TODO this should only have variant type identifier, and types should be defined in central place
-    // TODO runtime should also have some different representation of the type that references the Chi type
-    //      because serialization of VariantType that has fields of other VariantTypes is VERY HEAVY
-
-    public ConstructChiObject(Record type) {
+    public ConstructChiObject(Record type, String[] fields, ChiNode[] values) {
         this.type = type;
+        this.fields = fields;
+        this.values = values;
+        assert fields.length == values.length;
         interopLibrary = InteropLibrary.getUncached();
+    }
+
+    public String[] getFields() {
+        return fields;
+    }
+
+    public ChiNode[] getValues() {
+        return values;
     }
 
     public Record getType() {
@@ -35,10 +43,9 @@ public class ConstructChiObject extends ExpressionNode {
     public Object executeGeneric(VirtualFrame frame) {
         var env = ChiContext.get(this).getEnv();
         var object = ChiLanguage.createObject(type, env);
-        for (int i = 0; i < type.getFields().size(); i++) {
+        for (int i = 0; i < fields.length; i++) {
             try {
-                var field = type.getFields().get(i);
-                interopLibrary.writeMember(object, field.getName(), ChiArgs.getObject(frame, i));
+                interopLibrary.writeMember(object, fields[i], values[i].executeGeneric(frame));
             } catch (UnsupportedMessageException | UnsupportedTypeException | UnknownIdentifierException e) {
                 CompilerDirectives.transferToInterpreter();
                 throw new RuntimeException(e);
@@ -50,5 +57,8 @@ public class ConstructChiObject extends ExpressionNode {
     @Override
     public void accept(ChiNodeVisitor visitor) throws Exception {
         visitor.visitConstructChiObject(this);
+        for (ChiNode value : values) {
+            value.accept(visitor);
+        }
     }
 }

@@ -107,23 +107,23 @@ public class ChiObject extends DynamicObject implements ChiValue {
                                   @CachedLibrary("this") @Cached.Exclusive DynamicObjectLibrary objectLibrary,
                                   @CachedLibrary(limit = "3") @Cached.Exclusive InteropLibrary interopLibrary) {
         var sb = new StringBuilder();
-        if (type instanceof HasTypeId t) {
+        if (type instanceof HasTypeId t && t.getTypeId() != null) {
             sb.append(t.getTypeId().getName());
         }
-        sb.append("(");
+        sb.append("{ ");
         var index = 0;
         var fieldNames = objectLibrary.getKeyArray(this);
         for (var key : fieldNames) {
             var value = objectLibrary.getOrDefault(this, key, "");
             sb.append(key);
-            sb.append('=');
+            sb.append(": ");
             sb.append(interopLibrary.toDisplayString(value));
             if (index < fieldNames.length - 1) {
-                sb.append(',');
+                sb.append(", ");
             }
             index += 1;
         }
-        sb.append(")");
+        sb.append(" }");
         return sb.toString();
     }
 

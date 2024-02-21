@@ -502,12 +502,12 @@ public class NodeSerializationTest {
                 new gh.marad.chi.core.types.TypeId("moduleName", "packageName", "TypeName"),
                 List.of(new Record.Field("i", Type.getInt())),
                 List.of());
-        var expected = new ConstructChiObject(type);
+        var expected = new ConstructChiObject(type, new String[] { "i"}, new ChiNode[] { new LongValue(5) });
         // when
         var result = serializeAndDeserialize(expected);
         // then
         if (result instanceof ConstructChiObject actual) {
-            assertEquals(type, actual.type);
+            assertEquals(type, actual.getType());
         } else fail("Invalid node read!");
     }
 

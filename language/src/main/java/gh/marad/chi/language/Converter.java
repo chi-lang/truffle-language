@@ -6,6 +6,7 @@ import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.oracle.truffle.api.nodes.RootNode;
 import gh.marad.chi.core.*;
 import gh.marad.chi.core.types.*;
+import gh.marad.chi.core.types.Record;
 import gh.marad.chi.language.nodes.ChiNode;
 import gh.marad.chi.language.nodes.FnRootNode;
 import gh.marad.chi.language.nodes.IndexOperatorNodeGen;
@@ -48,7 +49,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public class Converter {
     private final ChiLanguage language;
@@ -208,6 +208,16 @@ public class Converter {
             } else {
                 return ReturnUnitNode.instance;
             }
+        } else if (expr instanceof CreateRecord createRecord) {
+            var fieldCount = createRecord.getFields().size();
+            var fieldNames = new String[fieldCount];
+            var fieldValues = new ChiNode[fieldCount];
+            for (int i = 0; i < createRecord.getFields().size(); i++) {
+                var field = createRecord.getFields().get(i);
+                fieldNames[i] = field.getName();
+                fieldValues[i] = convertExpression(field.getValue());
+            }
+            return new ConstructChiObject((Record) createRecord.getType(), fieldNames, fieldValues);
         }
 
         throw new TODO("Unhandled expression conversion: %s".formatted(expr));
