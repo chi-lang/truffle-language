@@ -457,13 +457,8 @@ public class NodeReader {
 
     public ChiNode readConstructObject() throws IOException {
         var type = TypeWriter.readType(stream);
-        var fieldCount = stream.readShort();
-        var fieldNames = new String[fieldCount];
-        for (int i = 0; i < fieldCount; i++) {
-            fieldNames[i] = stream.readUTF();
-        }
         if (type instanceof Record variantType) {
-            return new ConstructChiObject(variantType, fieldNames);
+            return new ConstructChiObject(variantType);
         } else {
             throw new TODO("Expected variant type!");
         }

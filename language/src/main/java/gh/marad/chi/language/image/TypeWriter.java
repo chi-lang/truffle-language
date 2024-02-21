@@ -48,7 +48,7 @@ public class TypeWriter {
     }
 
     public static void writeStrings(List<String> strings, DataOutputStream stream) throws IOException {
-        stream.writeByte(strings.size());
+        stream.writeShort(strings.size());
         for (String string : strings) {
             stream.writeUTF(string);
         }
@@ -100,6 +100,10 @@ public class TypeWriter {
             stream.writeByte(TypeId.TypeVariable.id());
             stream.writeUTF(t.getName());
             stream.writeShort(t.getLevel());
+        } else if (type instanceof Array t) {
+            stream.writeByte(TypeId.Array.id());
+            writeType(t.getElementType(), stream);
+            writeStrings(t.typeParams(), stream);
         } else {
             throw new TODO("Unsupported type " + type);
         }
@@ -160,6 +164,7 @@ public class TypeWriter {
                     Arrays.stream(readTypes(stream)).toList(),
                     readStrings(stream)
             );
+            case Array -> new Array(readType(stream), readStrings(stream));
             case TypeVariable -> new Variable(stream.readUTF(), stream.readShort());
             default -> throw new IllegalStateException("Unexpected value: " + typeId);
         };

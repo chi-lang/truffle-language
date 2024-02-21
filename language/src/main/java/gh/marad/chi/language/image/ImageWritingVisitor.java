@@ -336,11 +336,6 @@ public class ImageWritingVisitor implements ChiNodeVisitor {
     public void visitConstructChiObject(ConstructChiObject constructChiObject) throws IOException {
         writeNodeId(NodeId.ConstructObject);
         TypeWriter.writeType(constructChiObject.type, stream);
-        var fields = constructChiObject.getFieldNames();
-        stream.writeShort(fields.length);
-        for (String field : fields) {
-            stream.writeUTF(field);
-        }
     }
 
     @Override

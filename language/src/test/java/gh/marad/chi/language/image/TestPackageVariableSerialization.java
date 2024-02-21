@@ -36,7 +36,7 @@ public class TestPackageVariableSerialization {
             context.eval("chi", """
                     package modimage/test
                     
-                    data Foo = pub Bar | pub Baz(pub i:int)
+                    type Foo = int | float
                     
                     saveModule("modimage", "types.chim")
                     """.stripIndent());
@@ -50,8 +50,8 @@ public class TestPackageVariableSerialization {
             var result = context.eval("chi", """
                     import modimage/test { Foo }
                     
-                    var foo = Baz(5)
-                    foo.i
+                    var foo: Foo = 5
+                    foo
                     """.stripIndent());
 
             assertEquals(5, result.asInt());

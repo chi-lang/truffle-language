@@ -10,7 +10,8 @@ public enum TypeId {
     Fn,
     TypeVariable,
     Record,
-    Sum
+    Sum,
+    Array
     ;
 
     public static TypeId fromId(int typeId) {

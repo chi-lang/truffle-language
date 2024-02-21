@@ -3,8 +3,9 @@ package gh.marad.chi.language.image;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.strings.TruffleString;
-import gh.marad.chi.core.types.ProductType;
-import gh.marad.chi.core.types.Types;
+import gh.marad.chi.core.types.Record;
+import gh.marad.chi.core.types.Type;
+import gh.marad.chi.core.types.TypeId;
 import gh.marad.chi.language.ChiLanguage;
 import gh.marad.chi.language.runtime.ChiArray;
 import gh.marad.chi.language.runtime.ChiHostSymbol;
@@ -40,7 +41,7 @@ class ValueWriterTest {
     void testArrayValueSerialization() throws Exception {
         // given
         var data = new Long[] {5L, 3L, 4L};
-        var array = new ChiArray(data, Types.getInt());
+        var array = new ChiArray(data, Type.getInt());
 
         // when
         var result = serializeAndDeserialize(array);
@@ -55,9 +56,10 @@ class ValueWriterTest {
     @Test
     void testObjectSerialization() throws Exception {
         // given
-        var type = new ProductType("mod", "pkg", "Type",
-                List.of(Types.getInt()),
-                List.of(), List.of());
+        var type = new Record(
+                new TypeId("mod", "pkg", "Type"),
+                List.of(new Record.Field("i", Type.getInt())),
+                List.of());
         var obj = ChiLanguage.createObject(type, null);
         var interop = ChiObjectGen.InteropLibraryExports.Uncached.getUncached();
         interop.writeMember(obj, "Field", 5L);

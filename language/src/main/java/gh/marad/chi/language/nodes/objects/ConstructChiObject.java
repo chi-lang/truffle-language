@@ -6,6 +6,7 @@ import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.UnknownIdentifierException;
 import com.oracle.truffle.api.interop.UnsupportedMessageException;
 import com.oracle.truffle.api.interop.UnsupportedTypeException;
+import gh.marad.chi.core.types.Record;
 import gh.marad.chi.core.types.Type;
 import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.ChiContext;
@@ -14,25 +15,19 @@ import gh.marad.chi.language.nodes.ChiNodeVisitor;
 import gh.marad.chi.language.nodes.expr.ExpressionNode;
 
 public class ConstructChiObject extends ExpressionNode {
-    private final String[] fieldNames;
     private final InteropLibrary interopLibrary;
-    public final Type type;
+    public final Record type;
 
     // TODO this should only have variant type identifier, and types should be defined in central place
     // TODO runtime should also have some different representation of the type that references the Chi type
     //      because serialization of VariantType that has fields of other VariantTypes is VERY HEAVY
 
-    public ConstructChiObject(Type type, String[] fields) {
-        this.fieldNames = fields;
+    public ConstructChiObject(Record type) {
         this.type = type;
         interopLibrary = InteropLibrary.getUncached();
     }
 
-    public String[] getFieldNames() {
-        return fieldNames;
-    }
-
-    public Type getType() {
+    public Record getType() {
         return type;
     }
 
@@ -40,9 +35,10 @@ public class ConstructChiObject extends ExpressionNode {
     public Object executeGeneric(VirtualFrame frame) {
         var env = ChiContext.get(this).getEnv();
         var object = ChiLanguage.createObject(type, env);
-        for (int i = 0; i < fieldNames.length; i++) {
+        for (int i = 0; i < type.getFields().size(); i++) {
             try {
-                interopLibrary.writeMember(object, fieldNames[i], ChiArgs.getObject(frame, i));
+                var field = type.getFields().get(i);
+                interopLibrary.writeMember(object, field.getName(), ChiArgs.getObject(frame, i));
             } catch (UnsupportedMessageException | UnsupportedTypeException | UnknownIdentifierException e) {
                 CompilerDirectives.transferToInterpreter();
                 throw new RuntimeException(e);

@@ -30,7 +30,7 @@ public class ValueWriter {
             stream.writeByte(ValueId.String.id());
             stream.writeUTF(s.toJavaStringUncached());
         } else if (value instanceof ChiObject o) {
-            stream.writeByte(ValueId.Variant.id());
+            stream.writeByte(ValueId.Record.id());
             TypeWriter.writeType(o.getType(), stream);
             var interop = ChiObjectGen.InteropLibraryExports.Cached.getUncached();
             var members = ChiTypesGen.asChiArray(interop.getMembers(o)).getUnderlayingArrayList();
@@ -78,7 +78,7 @@ public class ValueWriter {
             case Int -> stream.readLong();
             case String -> TruffleString.fromJavaStringUncached(stream.readUTF(), TruffleString.Encoding.UTF_8);
             case Array -> readArray(stream, env);
-            case Variant -> readVariantType(stream, env);
+            case Record -> readVariantType(stream, env);
             case HostObject -> readHostObject(stream, env);
             default -> throw new IllegalStateException("Unexpected value: " + typeId);
         };

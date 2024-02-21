@@ -6,7 +6,7 @@ public enum ValueId {
     Int,
     String,
     Array,
-    Variant,
+    Record,
     HostObject,
     ;
 

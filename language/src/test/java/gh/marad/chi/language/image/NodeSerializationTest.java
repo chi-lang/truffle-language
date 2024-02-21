@@ -1,7 +1,7 @@
 package gh.marad.chi.language.image;
 
-import gh.marad.chi.core.types.ProductType;
-import gh.marad.chi.core.types.Types;
+import gh.marad.chi.core.types.Record;
+import gh.marad.chi.core.types.Type;
 import gh.marad.chi.language.nodes.*;
 import gh.marad.chi.language.nodes.expr.BlockExpr;
 import gh.marad.chi.language.nodes.expr.cast.*;
@@ -341,7 +341,7 @@ public class NodeSerializationTest {
         var moduleName = "moduleName";
         var packageName = "packageName";
         var variableName = "variableName";
-        var type = Types.getInt();
+        var type = Type.getInt();
         var expected = DefineModuleVariableNodeGen.create(value, moduleName, packageName, variableName, type, true, false);
         // when
         var result = serializeAndDeserialize(expected);
@@ -365,7 +365,7 @@ public class NodeSerializationTest {
         var moduleName = "moduleName";
         var packageName = "packageName";
         var variableName = "variableName";
-        var type = Types.getInt();
+        var type = Type.getInt();
         var expected = WriteModuleVariableNodeGen.create(value, moduleName, packageName, variableName);
         // when
         var result = serializeAndDeserialize(expected);
@@ -484,26 +484,25 @@ public class NodeSerializationTest {
     void testIsSerialization() throws Exception {
         // given
         var value = new LongValue(5);
-        var typeName = "int";
-        var expected = IsNodeGen.create(value, typeName);
+        var type = Type.getInt();
+        var expected = IsNodeGen.create(value, type);
         // when
         var result = serializeAndDeserialize(expected);
         // then
         if (result instanceof IsNode actual) {
             assertInstanceOf(LongValue.class, actual.getValue());
-            assertEquals(expected.getTypeName(), actual.getTypeName());
+            assertEquals(expected.getType(), actual.getType());
         } else fail("Invalid node read!");
     }
 
     @Test
     void testConstructChiObject() throws Exception {
         // given
-        var type = new ProductType("moduleName", "packageName", "TypeName",
-                List.of(Types.getInt()),
-                List.of(),
+        var type = new Record(
+                new gh.marad.chi.core.types.TypeId("moduleName", "packageName", "TypeName"),
+                List.of(new Record.Field("i", Type.getInt())),
                 List.of());
-        var fieldNames = new String[] { "i" };
-        var expected = new ConstructChiObject(type, fieldNames);
+        var expected = new ConstructChiObject(type);
         // when
         var result = serializeAndDeserialize(expected);
         // then
@@ -522,7 +521,7 @@ public class NodeSerializationTest {
                 "moduleName",
                 "packageName",
                 "functionName",
-                Types.fn(Types.getFloat(), Types.getInt()),
+                Type.fn(Type.getFloat(), Type.getInt()),
                 true // public
         );
         // when
