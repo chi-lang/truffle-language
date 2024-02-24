@@ -5,6 +5,7 @@ import com.oracle.truffle.api.CompilerDirectives;
 import gh.marad.chi.core.TypeAlias;
 import gh.marad.chi.core.types.Function;
 import gh.marad.chi.core.types.Type;
+import gh.marad.chi.core.types.TypeScheme;
 import gh.marad.chi.language.runtime.ChiFunction;
 
 import java.util.*;
@@ -32,12 +33,12 @@ public class Package {
     }
 
     @CompilerDirectives.TruffleBoundary
-    public void defineFunction(ChiFunction function, Function type, boolean isPublic) {
+    public void defineFunction(ChiFunction function, TypeScheme type, boolean isPublic) {
         defineNamedFunction(function.getExecutableName(), function, type, isPublic);
     }
 
     @CompilerDirectives.TruffleBoundary
-    public void defineNamedFunction(String name, ChiFunction function, Function type, boolean isPublic) {
+    public void defineNamedFunction(String name, ChiFunction function, TypeScheme type, boolean isPublic) {
         var oldDefinition = functions.get(name);
         if (oldDefinition != null) {
             oldDefinition.assumption.invalidate();
@@ -108,7 +109,7 @@ public class Package {
 
     public record FunctionLookupResult(
             ChiFunction function,
-            Function type,
+            TypeScheme type,
             boolean isPublic,
             Assumption assumption) {
     }

@@ -62,7 +62,7 @@ public class TypeWriter {
         }
     }
 
-    public static void writeType(Type type, DataOutputStream stream) throws IOException {
+    public static void writeType(TypeScheme type, DataOutputStream stream) throws IOException {
         if (type instanceof Primitive t) {
             if (Type.getAny().equals(type)) {
                 stream.writeByte(TypeId.Any.id());
