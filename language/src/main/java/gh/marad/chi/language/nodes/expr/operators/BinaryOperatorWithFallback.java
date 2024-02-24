@@ -8,6 +8,6 @@ public abstract class BinaryOperatorWithFallback extends BinaryOperator {
     @Fallback
     public void fallback(Object left, Object right) {
         CompilerDirectives.transferToInterpreter();
-        throw new RuntimeException("Unexpected %s and %s for operator".formatted(left, right));
+        throw new RuntimeException("Unexpected %s and %s for operator %s".formatted(left, right, getClass().getSimpleName()));
     }
 }
