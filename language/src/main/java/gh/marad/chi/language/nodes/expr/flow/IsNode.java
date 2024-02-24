@@ -24,7 +24,7 @@ public abstract class IsNode extends ExpressionNode {
         var type = object.getType();
 
         try {
-            UnificationKt.unify(List.of(new Constraint(getType(), type)));
+            UnificationKt.unify(List.of(new Constraint(getType(), type, null)));
             return true;
         } catch (Exception ex) {
             return false;
