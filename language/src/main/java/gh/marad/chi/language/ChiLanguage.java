@@ -67,9 +67,9 @@ public class ChiLanguage extends TruffleLanguage<ChiContext> {
                     var err = new PrintWriter(context.getEnv().err());
                     err.println(msgStr);
                     err.flush();
-                    throw new CompilationFailed(compiled.getMessages());
                 }
             }
+            throw new CompilationFailed(compiled.getMessages());
         }
 
         // add defined types
