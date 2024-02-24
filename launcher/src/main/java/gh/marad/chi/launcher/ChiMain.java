@@ -2,6 +2,7 @@ package gh.marad.chi.launcher;
 
 import org.docopt.Docopt;
 import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.PolyglotException;
 import org.graalvm.polyglot.Source;
 
 import java.io.File;
@@ -58,7 +59,13 @@ public class ChiMain {
             new Repl(context).loop();
         } else {
             var source = Source.newBuilder("chi", new File(file)).build();
-            context.eval(source);
+            try {
+                context.eval(source);
+            } catch (PolyglotException ex) {
+                if (!ex.getMessage().contains("Compilation failed")) {
+                    ex.printStackTrace();
+                }
+            }
         }
         context.close();
     }
