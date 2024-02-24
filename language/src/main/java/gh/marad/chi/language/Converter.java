@@ -11,6 +11,7 @@ import gh.marad.chi.language.nodes.ChiNode;
 import gh.marad.chi.language.nodes.FnRootNode;
 import gh.marad.chi.language.nodes.IndexOperatorNodeGen;
 import gh.marad.chi.language.nodes.IndexedAssignmentNodeGen;
+import gh.marad.chi.language.nodes.arrays.ConstructArrayNode;
 import gh.marad.chi.language.nodes.expr.BlockExpr;
 import gh.marad.chi.language.nodes.expr.ExpressionNode;
 import gh.marad.chi.language.nodes.expr.cast.CastToFloatNodeGen;
@@ -218,6 +219,13 @@ public class Converter {
                 fieldValues[i] = convertExpression(field.getValue());
             }
             return new ConstructChiObject((Record) createRecord.getType(), fieldNames, fieldValues);
+        } else if (expr instanceof CreateArray createArray) {
+            var valueNodes = new ChiNode[createArray.getValues().size()];
+            for (int i = 0; i < createArray.getValues().size(); i++) {
+                var value = createArray.getValues().get(i);
+                valueNodes[i] = convertExpression(value);
+            }
+            return new ConstructArrayNode(valueNodes, createArray.getType());
         }
 
         throw new TODO("Unhandled expression conversion: %s".formatted(expr));

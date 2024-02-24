@@ -10,6 +10,6 @@ public abstract class CollectionsArrayBuiltin extends Builtin {
 
     @Override
     public String getPackageName() {
-        return "collections.array";
+        return "lang.types.array";
     }
 }
