@@ -251,21 +251,21 @@ public class Converter {
             return convertModuleFunctionDefinitionFromFunctionNode(
                     nameDeclaration.getName(),
                     convertFnExpr(fn, nameDeclaration.getName()),
-                    (Function) fn.getType(),
+                    (Function) nameDeclaration.getType(),
                     nameDeclaration.getPublic()
             );
         } else if (!insideFunction && nameDeclaration.getValue().getType() instanceof Function fnType) {
             return convertModuleFunctionDefinitionFromFunctionNode(
                     nameDeclaration.getName(),
                     convertExpression(nameDeclaration.getValue()),
-                    fnType,
+                    (Function) nameDeclaration.getType(),
                     nameDeclaration.getPublic()
             );
         } else if (!insideFunction) {
             return DefineModuleVariableNodeGen.create(
                     convertExpression(nameDeclaration.getValue()),
                     currentModule, currentPackage, nameDeclaration.getName(),
-                    nameDeclaration.getValue().getType(),
+                    nameDeclaration.getType(),
                     nameDeclaration.getPublic(),
                     nameDeclaration.getMutable()
                     );
@@ -273,13 +273,9 @@ public class Converter {
             int slot = currentFdBuilder.addSlot(FrameSlotKind.Illegal, nameDeclaration.getName(), null);
             localSlots.put(nameDeclaration.getName(), slot);
             ChiNode valueExpr = convertExpression(nameDeclaration.getValue());
-            return DefineModuleVariableNodeGen.create(valueExpr,
-                    currentModule,
-                    currentPackage,
-                    nameDeclaration.getName(),
-                    nameDeclaration.getType(),
-                    nameDeclaration.getPublic(),
-                    nameDeclaration.getMutable());
+            return WriteLocalVariableNodeGen.create(valueExpr,
+                    slot,
+                    nameDeclaration.getName());
         }
     }
 
