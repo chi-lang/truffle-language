@@ -12,7 +12,7 @@ import gh.marad.chi.language.runtime.ChiArray;
 
 import java.util.ArrayList;
 
-public class SplitStringBuiltin extends Builtin {
+public class SplitStringBuiltin extends StringBuiltin {
     @Child
     private TruffleString.ToJavaStringNode toJava = TruffleString.ToJavaStringNode.create();
     @Child
@@ -22,16 +22,6 @@ public class SplitStringBuiltin extends Builtin {
     @Override
     public Function type() {
         return Type.fn(Type.getString(), Type.getString(), Type.getInt(), Type.array(Type.getString()));
-    }
-
-    @Override
-    public String getModuleName() {
-        return "std";
-    }
-
-    @Override
-    public String getPackageName() {
-        return "string";
     }
 
     @Override

@@ -8,23 +8,13 @@ import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.builtin.Builtin;
 import gh.marad.chi.language.image.NodeId;
 
-public class StringHashBuiltin extends Builtin {
+public class StringHashBuiltin extends StringBuiltin {
     @Child
     private TruffleString.HashCodeNode node = TruffleString.HashCodeNode.create();
 
     @Override
     public Function type() {
         return Type.fn(Type.getString(), Type.getInt());
-    }
-
-    @Override
-    public String getModuleName() {
-        return "std";
-    }
-
-    @Override
-    public String getPackageName() {
-        return "string";
     }
 
     @Override

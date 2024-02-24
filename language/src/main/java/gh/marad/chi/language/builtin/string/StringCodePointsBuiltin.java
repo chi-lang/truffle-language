@@ -9,7 +9,7 @@ import gh.marad.chi.language.builtin.Builtin;
 import gh.marad.chi.language.image.NodeId;
 import gh.marad.chi.language.runtime.ChiArray;
 
-public class StringCodePointsBuiltin extends Builtin {
+public class StringCodePointsBuiltin extends StringBuiltin {
     @Child
     private TruffleString.CodePointLengthNode codePointLength = TruffleString.CodePointLengthNode.create();
     @Child
@@ -18,16 +18,6 @@ public class StringCodePointsBuiltin extends Builtin {
     @Override
     public Function type() {
         return Type.fn(Type.getString(), Type.array(Type.getInt()));
-    }
-
-    @Override
-    public String getModuleName() {
-        return "std";
-    }
-
-    @Override
-    public String getPackageName() {
-        return "string";
     }
 
     @Override

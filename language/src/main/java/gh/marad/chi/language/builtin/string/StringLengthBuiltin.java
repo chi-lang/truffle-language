@@ -8,23 +8,13 @@ import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.builtin.Builtin;
 import gh.marad.chi.language.image.NodeId;
 
-public class StringLengthBuiltin extends Builtin {
+public class StringLengthBuiltin extends StringBuiltin {
     @Child
     private TruffleString.CodePointLengthNode node = TruffleString.CodePointLengthNode.create();
 
     @Override
     public Function type() {
         return Type.fn(Type.getString(), Type.getInt());
-    }
-
-    @Override
-    public String getModuleName() {
-        return "std";
-    }
-
-    @Override
-    public String getPackageName() {
-        return "string";
     }
 
     @Override

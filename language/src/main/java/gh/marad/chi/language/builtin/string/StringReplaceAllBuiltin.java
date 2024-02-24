@@ -9,7 +9,7 @@ import gh.marad.chi.language.ChiArgs;
 import gh.marad.chi.language.builtin.Builtin;
 import gh.marad.chi.language.image.NodeId;
 
-public class StringReplaceAllBuiltin extends Builtin {
+public class StringReplaceAllBuiltin extends StringBuiltin {
     @Child
     private TruffleString.ToJavaStringNode toJava = TruffleString.ToJavaStringNode.create();
     @Child
@@ -19,16 +19,6 @@ public class StringReplaceAllBuiltin extends Builtin {
     @Override
     public Function type() {
         return Type.fn(Type.getString(), Type.getString(), Type.getString(), Type.getString());
-    }
-
-    @Override
-    public String getModuleName() {
-        return "std";
-    }
-
-    @Override
-    public String getPackageName() {
-        return "string";
     }
 
     @Override

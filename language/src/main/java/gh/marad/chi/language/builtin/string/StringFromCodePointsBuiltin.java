@@ -10,23 +10,13 @@ import gh.marad.chi.language.ChiTypesGen;
 import gh.marad.chi.language.builtin.Builtin;
 import gh.marad.chi.language.image.NodeId;
 
-public class StringFromCodePointsBuiltin extends Builtin {
+public class StringFromCodePointsBuiltin extends StringBuiltin {
     @Child
     private TruffleString.FromJavaStringNode node = TruffleString.FromJavaStringNode.create();
 
     @Override
     public Function type() {
         return Type.fn(Type.array(Type.getInt()), Type.getString());
-    }
-
-    @Override
-    public String getModuleName() {
-        return "std";
-    }
-
-    @Override
-    public String getPackageName() {
-        return "string";
     }
 
     @Override
