@@ -3,7 +3,6 @@ package gh.marad.chi.language.runtime.namespaces;
 import com.oracle.truffle.api.Assumption;
 import com.oracle.truffle.api.CompilerDirectives;
 import gh.marad.chi.core.TypeAlias;
-import gh.marad.chi.core.types.Function;
 import gh.marad.chi.core.types.Type;
 import gh.marad.chi.core.types.TypeScheme;
 import gh.marad.chi.language.runtime.ChiFunction;
@@ -101,9 +100,7 @@ public class Package {
     }
 
     public void invalidate() {
-        functions.forEach((key, lookupResult) -> {
-            lookupResult.assumption.invalidate();
-        });
+        functions.forEach((key, lookupResult) -> lookupResult.assumption.invalidate());
     }
 
 
@@ -117,7 +114,7 @@ public class Package {
 //    public record Variable(String name, Object value, Type type, boolean isPublic, boolean isMutable) {
 //    }
 
-    public final class Variable {
+    public static final class Variable {
         final String name;
         Object value;
         Type type;

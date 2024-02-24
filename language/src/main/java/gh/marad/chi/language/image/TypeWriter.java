@@ -63,7 +63,7 @@ public class TypeWriter {
     }
 
     public static void writeType(TypeScheme type, DataOutputStream stream) throws IOException {
-        if (type instanceof Primitive t) {
+        if (type instanceof Primitive) {
             if (Type.getAny().equals(type)) {
                 stream.writeByte(TypeId.Any.id());
             } else if (Type.getBool().equals(type)) {
@@ -166,7 +166,6 @@ public class TypeWriter {
             );
             case Array -> new Array(readType(stream), readStrings(stream));
             case TypeVariable -> new Variable(stream.readUTF(), stream.readShort());
-            default -> throw new IllegalStateException("Unexpected value: " + typeId);
         };
     }
 
