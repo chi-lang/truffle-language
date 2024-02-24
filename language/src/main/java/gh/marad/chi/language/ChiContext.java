@@ -8,6 +8,7 @@ import com.oracle.truffle.api.nodes.Node;
 import gh.marad.chi.core.TypeAlias;
 import gh.marad.chi.core.namespace.GlobalCompilationNamespace;
 import gh.marad.chi.core.namespace.Symbol;
+import gh.marad.chi.core.types.PolyType;
 import gh.marad.chi.language.builtin.Builtin;
 import gh.marad.chi.language.builtin.Prelude;
 import gh.marad.chi.language.builtin.collections.*;
@@ -109,8 +110,9 @@ public class ChiContext {
     private void installBuiltin(Builtin node) {
         var rootNode = new FnRootNode(chiLanguage, FrameDescriptor.newBuilder().build(), node, node.name());
         var fn = new ChiFunction(rootNode.getCallTarget());
+        var type = node.type();
         modules.getOrCreateModule(node.getModuleName())
-               .defineFunction(node.getPackageName(), fn, node.type(), true);
+               .defineFunction(node.getPackageName(), fn, new PolyType(type.getLevel() - 1, type), true);
     }
 
     public TruffleLanguage.Env getEnv() {
