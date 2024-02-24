@@ -244,6 +244,9 @@ public class Converter {
         if (atom.getType() == Type.getBool()) {
             return new BooleanValue(Boolean.parseBoolean(atom.getValue()));
         }
+        if (atom.getType() == Type.getUnit()) {
+            return new UnitValue();
+        }
         throw new TODO("Unhandled atom type: %s".formatted(atom.getType()));
     }
 
