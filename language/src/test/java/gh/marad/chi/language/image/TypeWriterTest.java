@@ -121,11 +121,27 @@ class TypeWriterTest {
         assertEquals(typeInfo, result);
     }
 
-    private Type serializeAndDeserializeType(Type type) throws IOException {
+    @Test
+    public void testPolyTypeSerialization() throws IOException {
+        // given
+        var polyType = new PolyType(5, Type.fn(Type.getInt()));
+
+        // when
+        var byteArrayStream = new ByteArrayOutputStream();
+        var outputStream = new DataOutputStream(byteArrayStream);
+        TypeWriter.writeType(polyType, outputStream);
+        var inputStream = new DataInputStream(new ByteArrayInputStream(byteArrayStream.toByteArray()));
+        var result = TypeWriter.readTypeScheme(inputStream);
+
+        // then
+        assertEquals(polyType, result);
+    }
+
+    private TypeScheme serializeAndDeserializeType(Type type) throws IOException {
         var byteArrayStream = new ByteArrayOutputStream();
         var outputStream = new DataOutputStream(byteArrayStream);
         TypeWriter.writeType(type, outputStream);
         var inputStream = new DataInputStream(new ByteArrayInputStream(byteArrayStream.toByteArray()));
-        return TypeWriter.readType(inputStream);
+        return TypeWriter.readTypeScheme(inputStream);
     }
 }

@@ -48,11 +48,11 @@ public class ModuleReader {
         var functionCount = stream.readShort();
         for (int i = 0; i < functionCount; i++) {
             var functionName = stream.readUTF();
-            var type = (Function) TypeWriter.readType(stream);
-            var isPublic = stream.readBoolean();
-            var functionBody = nodeReader.readNode();
-
             try {
+                var type = TypeWriter.readTypeScheme(stream);
+                var isPublic = stream.readBoolean();
+                var functionBody = nodeReader.readNode();
+
                 var frameDescriptorBuilder = FrameDescriptor.newBuilder();
                 var localCounter = new LocalVarsCountingVisitor();
                 functionBody.accept(localCounter);
@@ -77,7 +77,7 @@ public class ModuleReader {
         for (int i = 0; i < variableCount; i++) {
             var name = stream.readUTF();
             var value = ValueWriter.readValue(stream, env);
-            var type = TypeWriter.readType(stream);
+            var type = TypeWriter.readTypeScheme(stream);
             var isPublic = stream.readBoolean();
             var isMutable = stream.readBoolean();
             module.defineVariable(packageName, name, value, type, isPublic, isMutable);

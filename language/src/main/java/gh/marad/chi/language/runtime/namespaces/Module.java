@@ -60,7 +60,7 @@ public class Module {
                 .listVariables();
     }
 
-    public void defineVariable(String packageName, String name, Object value, Type type, boolean isPublic, boolean isMutable) {
+    public void defineVariable(String packageName, String name, Object value, TypeScheme type, boolean isPublic, boolean isMutable) {
         getOrCreatePackage(packageName)
                 .defineVariable(name, value, type, isPublic, isMutable);
     }

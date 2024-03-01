@@ -1,5 +1,7 @@
 package gh.marad.chi.language.image;
 
+import gh.marad.chi.language.runtime.TODO;
+
 public enum TypeId {
     Any,
     Bool,
@@ -11,10 +13,13 @@ public enum TypeId {
     TypeVariable,
     Record,
     Sum,
-    Array
-    ;
+    Array,
+    TypeScheme;
 
     public static TypeId fromId(int typeId) {
+        if (typeId >= TypeId.values().length) {
+            throw new TODO("Unknown typeId: %d".formatted(typeId));
+        }
         return TypeId.values()[typeId];
     }
 

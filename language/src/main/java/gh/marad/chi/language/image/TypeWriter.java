@@ -104,6 +104,10 @@ public class TypeWriter {
             stream.writeByte(TypeId.Array.id());
             writeType(t.getElementType(), stream);
             writeStrings(t.typeParams(), stream);
+        } else if (type instanceof PolyType t) {
+            stream.writeByte(TypeId.TypeScheme.id());
+            stream.writeShort(t.getLevel());
+            writeType(t.getBody(), stream);
         } else {
             throw new TODO("Unsupported type " + type);
         }
@@ -131,17 +135,31 @@ public class TypeWriter {
         }
     }
 
+    public static TypeScheme[] readTypeSchemes(DataInputStream stream) throws IOException {
+        var count = stream.readByte();
+        var types = new TypeScheme[count];
+
+        for (byte i = 0; i < count; i++) {
+            types[i] = readTypeScheme(stream);
+        }
+        return types;
+    }
+
     public static Type[] readTypes(DataInputStream stream) throws IOException {
         var count = stream.readByte();
         var types = new Type[count];
 
         for (byte i = 0; i < count; i++) {
-            types[i] = readType(stream);
+            types[i] = (Type) readTypeScheme(stream);
         }
         return types;
     }
 
     public static Type readType(DataInputStream stream) throws IOException {
+        return (Type) readTypeScheme(stream);
+    }
+
+    public static TypeScheme readTypeScheme(DataInputStream stream) throws IOException {
         var typeId = TypeId.fromId(stream.readByte());
         return switch (typeId) {
             case Any -> Type.getAny();
@@ -166,6 +184,7 @@ public class TypeWriter {
             );
             case Array -> new Array(readType(stream), readStrings(stream));
             case TypeVariable -> new Variable(stream.readUTF(), stream.readShort());
+            case TypeScheme -> new PolyType(stream.readShort(), readType(stream));
         };
     }
 

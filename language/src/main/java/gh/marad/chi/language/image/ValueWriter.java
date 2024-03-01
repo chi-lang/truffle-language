@@ -59,7 +59,7 @@ public class ValueWriter {
 
     private static Object readVariantType(DataInputStream stream, TruffleLanguage.Env env) throws Exception {
         var interop = ChiObjectGen.InteropLibraryExports.Uncached.getUncached();
-        var type = (Record) TypeWriter.readType(stream);
+        var type = (Record) TypeWriter.readTypeScheme(stream);
         var obj = ChiLanguage.createObject(type, env);
         var fieldCount = stream.readInt();
         for (int i = 0; i < fieldCount; i++) {

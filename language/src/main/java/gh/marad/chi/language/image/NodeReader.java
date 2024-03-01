@@ -391,7 +391,7 @@ public class NodeReader {
         var moduleName = stream.readUTF();
         var packageName = stream.readUTF();
         var name = stream.readUTF();
-        var type = TypeWriter.readType(stream);
+        var type = TypeWriter.readTypeScheme(stream);
         var isPublic = stream.readBoolean();
         var isMutable = stream.readBoolean();
         var value = readNode();
@@ -456,7 +456,7 @@ public class NodeReader {
     }
 
     public ChiNode readConstructObject() throws IOException {
-        var type = TypeWriter.readType(stream);
+        var type = TypeWriter.readTypeScheme(stream);
         if (type instanceof Record t) {
             var fieldCount = stream.readShort();
             var fieldNames = new String[fieldCount];
@@ -477,7 +477,7 @@ public class NodeReader {
         var moduleName = stream.readUTF();
         var packageName = stream.readUTF();
         var functionName = stream.readUTF();
-        var type = TypeWriter.readType(stream);
+        var type = TypeWriter.readTypeScheme(stream);
         var isPublic = stream.readBoolean();
         var function = readNode();
         return DefinePackageFunctionFromNodeGen.create(

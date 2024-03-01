@@ -65,7 +65,7 @@ public class Package {
     }
 
     @CompilerDirectives.TruffleBoundary
-    public void defineVariable(String name, Object value, Type type, boolean isPublic, boolean isMutable) {
+    public void defineVariable(String name, Object value, TypeScheme type, boolean isPublic, boolean isMutable) {
         variables.put(name, new Variable(name, value, type, isPublic, isMutable));
     }
 
@@ -117,7 +117,7 @@ public class Package {
     public static final class Variable {
         final String name;
         Object value;
-        Type type;
+        TypeScheme type;
         boolean isPublic;
         boolean isMutable;
 
@@ -129,7 +129,7 @@ public class Package {
             return value;
         }
 
-        public Type getType() {
+        public TypeScheme getType() {
             return type;
         }
 
@@ -141,7 +141,7 @@ public class Package {
             return isMutable;
         }
 
-        public Variable(String name, Object value, Type type, boolean isPublic, boolean isMutable) {
+        public Variable(String name, Object value, TypeScheme type, boolean isPublic, boolean isMutable) {
             this.name = name;
             this.value = value;
             this.type = type;

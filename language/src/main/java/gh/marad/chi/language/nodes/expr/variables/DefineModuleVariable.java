@@ -4,6 +4,7 @@ import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
 import gh.marad.chi.core.types.Type;
+import gh.marad.chi.core.types.TypeScheme;
 import gh.marad.chi.language.ChiContext;
 import gh.marad.chi.language.nodes.ChiNode;
 import gh.marad.chi.language.nodes.ChiNodeVisitor;
@@ -12,7 +13,7 @@ import gh.marad.chi.language.nodes.expr.ExpressionNode;
 @NodeField(name = "moduleName", type = String.class)
 @NodeField(name = "packageName", type = String.class)
 @NodeField(name = "variableName", type = String.class)
-@NodeField(name = "type", type = Type.class)
+@NodeField(name = "type", type = TypeScheme.class)
 @NodeField(name = "isPublic", type = Boolean.class)
 @NodeField(name = "isMutable", type = Boolean.class)
 @NodeChild(value = "value", type = ChiNode.class)
@@ -23,7 +24,7 @@ public abstract class DefineModuleVariable extends ExpressionNode {
 
     public abstract String getVariableName();
 
-    public abstract Type getType();
+    public abstract TypeScheme getType();
     public abstract Boolean getIsPublic();
     public abstract Boolean getIsMutable();
 
