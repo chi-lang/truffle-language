@@ -259,17 +259,20 @@ public class Converter {
 
     private ChiNode convertNameDeclaration(NameDeclaration nameDeclaration) {
         if (!insideFunction && nameDeclaration.getValue() instanceof Fn fn) {
+            assert nameDeclaration.getType() != null;
             return convertModuleFunctionDefinitionFromFunctionNode(
                     nameDeclaration.getName(),
+                    // This is similar to the next block but this also preserves the function name
                     convertFnExpr(fn, nameDeclaration.getName()),
-                    (Function) nameDeclaration.getType(),
+                    new PolyType(0, nameDeclaration.getType()),
                     nameDeclaration.getPublic()
             );
         } else if (!insideFunction && nameDeclaration.getValue().getType() instanceof Function) {
+            assert nameDeclaration.getType() != null;
             return convertModuleFunctionDefinitionFromFunctionNode(
                     nameDeclaration.getName(),
                     convertExpression(nameDeclaration.getValue()),
-                    (Function) nameDeclaration.getType(),
+                    new PolyType(0, nameDeclaration.getType()),
                     nameDeclaration.getPublic()
             );
         } else if (!insideFunction) {
@@ -463,7 +466,7 @@ public class Converter {
         return convertFnExpr(fn, "[lambda]");
     }
 
-    private ChiNode convertModuleFunctionDefinitionFromFunctionNode(String name, ChiNode fnExprNode, Function type, boolean isPublic) {
+    private ChiNode convertModuleFunctionDefinitionFromFunctionNode(String name, ChiNode fnExprNode, TypeScheme type, boolean isPublic) {
         return DefinePackageFunctionFromNodeGen.create(fnExprNode, currentModule, currentPackage, name, type, isPublic);
     }
 
