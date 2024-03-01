@@ -547,7 +547,7 @@ public class Converter {
     }
 
     private ChiNode convertIs(Is is) {
-        return IsNodeGen.create(convertExpression(is.getValue()), is.getType());
+        return IsNodeGen.create(convertExpression(is.getValue()), is.getCheckedType());
     }
 
     private ChiNode convertEffectDefinition(EffectDefinition definition) {
