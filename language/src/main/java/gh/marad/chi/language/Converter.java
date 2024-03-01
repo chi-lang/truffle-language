@@ -97,60 +97,6 @@ public class Converter {
         }
     }
 
-//    private ChiNode defineConstructedObject(TypeInfo typeInfo) {
-//        var fieldNames = typeInfo.getFields().stream().map(VariantField::getName).toList().toArray(new String[0]);
-//        var constructorFunction = createFunctionFromNode(
-//                new ConstructChiObject(typeInfo.getType(), fieldNames), typeInfo.getName());
-//        var valueFunction = new InvokeFunction(new LambdaValue(constructorFunction), new ChiNode[0]);
-//        return DefineModuleVariableNodeGen.create(
-//                valueFunction,
-//                typeInfo.getModuleName(),
-//                typeInfo.getPackageName(),
-//                typeInfo.getName(),
-//                typeInfo.getType(),
-//                typeInfo.isPublic(),
-//                false
-//                );
-//    }
-//    private ChiNode defineConstructor(TypeInfo typeInfo) {
-//
-//        var fieldNames = typeInfo.getFields().stream().map(VariantField::getName).toList().toArray(new String[0]);
-//        var constructorFunction = createFunctionFromNode(
-//                new ConstructChiObject(typeInfo.getType(), fieldNames), typeInfo.getName());
-//
-//        if (typeInfo.getFields().isEmpty()) {
-//            return DefineModuleVariableNodeGen.create(
-//                    new InvokeFunction(new LambdaValue(constructorFunction), new ChiNode[0]),
-//                    typeInfo.getModuleName(),
-//                    typeInfo.getPackageName(),
-//                    typeInfo.getName(),
-//                    typeInfo.getType(),
-//                    typeInfo.isPublic(),
-//                    true
-//            );
-//        } else {
-//            var types = new ArrayList<Type>();
-//            for (VariantField field : typeInfo.getFields()) {
-//                types.add(field.getType());
-//            }
-//            types.add(typeInfo.getType());
-//            var fnType = new Function(
-//                    types,
-//                    types.stream()
-//                         .filter(it -> it instanceof TypeVariable)
-//                         .map(it -> (TypeVariable) it)
-//                         .toList()
-//            );
-//            return new DefinePackageFunction(
-//                    typeInfo.getModuleName(),
-//                    typeInfo.getPackageName(),
-//                    new ChiFunction(constructorFunction),
-//                    fnType,
-//                    typeInfo.isPublic()
-//            );
-//        }
-//    }
-
     public ChiNode convertExpression(Expression expr) {
         if (expr instanceof Atom atom) {
             return convertAtom(atom);
