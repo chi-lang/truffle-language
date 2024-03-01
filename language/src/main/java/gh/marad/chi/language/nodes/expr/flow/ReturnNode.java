@@ -24,7 +24,7 @@ public class ReturnNode extends ExpressionNode {
 
     @Override
     public void accept(ChiNodeVisitor visitor) throws Exception {
-        value.accept(visitor);
         visitor.visitReturnNode(this);
+        value.accept(visitor);
     }
 }
