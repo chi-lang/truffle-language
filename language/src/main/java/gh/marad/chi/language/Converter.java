@@ -265,7 +265,7 @@ public class Converter {
                     (Function) nameDeclaration.getType(),
                     nameDeclaration.getPublic()
             );
-        } else if (!insideFunction && nameDeclaration.getValue().getType() instanceof Function fnType) {
+        } else if (!insideFunction && nameDeclaration.getValue().getType() instanceof Function) {
             return convertModuleFunctionDefinitionFromFunctionNode(
                     nameDeclaration.getName(),
                     convertExpression(nameDeclaration.getValue()),
@@ -517,8 +517,8 @@ public class Converter {
     private ChiNode convertFnCall(FnCall fnCall) {
         var functionExpr = fnCall.getFunction();
         Function fnType = (Function) functionExpr.getType();
-        var argType = new ArrayList<Type>();
-        argType.addAll(fnType.getTypes());
+        assert fnType != null;
+        var argType = new ArrayList<>(fnType.getTypes());
         argType.remove(argType.size()-1); // remove return type
 
         ChiNode[] arguments = new ChiNode[fnCall.getParameters().size()];

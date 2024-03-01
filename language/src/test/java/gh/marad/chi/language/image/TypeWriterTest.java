@@ -87,7 +87,6 @@ class TypeWriterTest {
     @Test
     public void testSumTypeSerialization() throws IOException {
         // given
-        var T = new Variable("T", 0);
         var type = new Sum(
                 new TypeId("moduleName", "packageName", "TypeName"),
                 Type.getInt(),

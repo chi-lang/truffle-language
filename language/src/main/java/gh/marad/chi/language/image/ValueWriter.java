@@ -80,6 +80,7 @@ public class ValueWriter {
             case Array -> readArray(stream, env);
             case Record -> readVariantType(stream, env);
             case HostObject -> readHostObject(stream, env);
+            //noinspection UnnecessaryDefault
             default -> throw new IllegalStateException("Unexpected value: " + typeId);
         };
     }

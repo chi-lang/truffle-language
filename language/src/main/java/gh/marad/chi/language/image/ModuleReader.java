@@ -4,7 +4,6 @@ import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlotKind;
-import gh.marad.chi.core.types.Function;
 import gh.marad.chi.language.ChiContext;
 import gh.marad.chi.language.ChiLanguage;
 import gh.marad.chi.language.nodes.FnRootNode;

@@ -3,7 +3,6 @@ package gh.marad.chi.language.runtime.namespaces;
 import com.oracle.truffle.api.Assumption;
 import com.oracle.truffle.api.CompilerDirectives;
 import gh.marad.chi.core.TypeAlias;
-import gh.marad.chi.core.types.Type;
 import gh.marad.chi.core.types.TypeScheme;
 import gh.marad.chi.language.runtime.ChiFunction;
 

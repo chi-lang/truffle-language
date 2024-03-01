@@ -3,7 +3,6 @@ package gh.marad.chi.language.nodes.expr.variables;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
-import gh.marad.chi.core.types.Type;
 import gh.marad.chi.core.types.TypeScheme;
 import gh.marad.chi.language.ChiContext;
 import gh.marad.chi.language.nodes.ChiNode;

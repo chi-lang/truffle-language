@@ -135,16 +135,6 @@ public class TypeWriter {
         }
     }
 
-    public static TypeScheme[] readTypeSchemes(DataInputStream stream) throws IOException {
-        var count = stream.readByte();
-        var types = new TypeScheme[count];
-
-        for (byte i = 0; i < count; i++) {
-            types[i] = readTypeScheme(stream);
-        }
-        return types;
-    }
-
     public static Type[] readTypes(DataInputStream stream) throws IOException {
         var count = stream.readByte();
         var types = new Type[count];
