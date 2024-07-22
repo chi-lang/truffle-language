@@ -6,6 +6,7 @@ import gh.marad.chi.language.nodes.ChiNodeVisitor;
 import gh.marad.chi.language.nodes.FnRootNode;
 import gh.marad.chi.language.nodes.IndexOperatorNode;
 import gh.marad.chi.language.nodes.IndexedAssignmentNode;
+import gh.marad.chi.language.nodes.arrays.ConstructArrayNode;
 import gh.marad.chi.language.nodes.expr.BlockExpr;
 import gh.marad.chi.language.nodes.expr.cast.CastToFloat;
 import gh.marad.chi.language.nodes.expr.cast.CastToLongExpr;
@@ -404,6 +405,14 @@ public class ImageWritingVisitor implements ChiNodeVisitor {
     @Override
     public void visitReturnUnitNode(ReturnUnitNode returnUnitNode) throws Exception {
         writeNodeId(NodeId.ReturnUnitNode);
+    }
+
+    @Override
+    public void visitConstructArray(ConstructArrayNode constructArrayNode) throws IOException {
+        writeNodeId(NodeId.ConstructArray);
+        TypeWriter.writeType(constructArrayNode.getElementType(), stream);
+        var nodes = constructArrayNode.getValues();
+        stream.writeShort(nodes.length);
     }
 
     private void writeNodeId(NodeId nodeId) throws IOException {

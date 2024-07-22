@@ -12,3 +12,9 @@ graalvm/
 /bin/
 language/dependency-reduced-pom.xml
 antlr-*-complete.jar
+
+aoc-23/*
+language/*.chim
+language/*.log
+std.chim
+aoc.chim

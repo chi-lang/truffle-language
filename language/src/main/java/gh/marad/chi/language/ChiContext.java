@@ -15,7 +15,9 @@ import gh.marad.chi.language.builtin.collections.*;
 import gh.marad.chi.language.builtin.io.*;
 import gh.marad.chi.language.builtin.lang.*;
 import gh.marad.chi.language.builtin.lang.interop.LookupHostSymbolBuiltin;
+import gh.marad.chi.language.builtin.lang.interop.array.GetArraySize;
 import gh.marad.chi.language.builtin.lang.interop.array.HasArrayElementsBuiltin;
+import gh.marad.chi.language.builtin.lang.interop.array.ReadArrayElement;
 import gh.marad.chi.language.builtin.lang.interop.members.*;
 import gh.marad.chi.language.builtin.lang.interop.values.IsNullBuiltin;
 import gh.marad.chi.language.builtin.string.*;
@@ -180,7 +182,11 @@ public class ChiContext {
                 new ArrayAddAtBuiltin(),
                 new ArrayRemoveAtBuiltin(),
                 new ArrayClearBuiltin(),
+
+                // interop array
+                new GetArraySize(),
                 new HasArrayElementsBuiltin(),
+                new ReadArrayElement(),
                 // string
                 new StringLengthBuiltin(),
                 new StringCodePointAtBuiltin(),

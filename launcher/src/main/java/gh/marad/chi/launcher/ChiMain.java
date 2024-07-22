@@ -74,7 +74,7 @@ public class ChiMain {
         for (String module : modules) {
             var file = new File(module);
             if (!file.exists()) {
-                System.err.println("Path %s does not exist. Skipping it...");
+                System.err.println("Path %s does not exist. Skipping it...".formatted(file.toString()));
                 continue;
             }
 

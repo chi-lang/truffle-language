@@ -118,7 +118,7 @@ public enum NodeId {
     ArrayRemoveBuiltin,
     ArrayClearBuiltin,
     ReturnNode,
-    ReturnUnitNode, ExitProcessBuiltin, DefineModuleVariable;
+    ReturnUnitNode, ExitProcessBuiltin, DefineModuleVariable, ConstructArray;
 
 
 

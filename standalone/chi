@@ -42,6 +42,12 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+if [ -d "$CHI_HOME/mods" ]; then
+  PROGRAM_ARGS=("-m" "$CHI_HOME/mods")
+else
+  PROGRAM_ARGS=()
+fi
+
 
 PROGRAM_ARGS=()
 JAVA_ARGS=()

@@ -16,6 +16,7 @@ import gh.marad.chi.language.builtin.lang.interop.values.IsNullBuiltin;
 import gh.marad.chi.language.builtin.string.*;
 import gh.marad.chi.language.builtin.time.MillisBuiltin;
 import gh.marad.chi.language.nodes.*;
+import gh.marad.chi.language.nodes.arrays.ConstructArrayNode;
 import gh.marad.chi.language.nodes.expr.BlockExpr;
 import gh.marad.chi.language.nodes.expr.cast.*;
 import gh.marad.chi.language.nodes.expr.flow.IfExpr;
@@ -169,6 +170,7 @@ public class NodeReader {
             case ReturnNode -> readReturnNode();
             case ReturnUnitNode -> ReturnUnitNode.instance;
             case ExitProcessBuiltin -> ExitProcessBuiltin.instance;
+            case ConstructArray -> readConstructArray();
         };
     }
 
@@ -471,6 +473,16 @@ public class NodeReader {
         } else {
             throw new TODO("Expected variant type!");
         }
+    }
+
+    public ChiNode readConstructArray() throws IOException {
+        var elementType = TypeWriter.readType(stream);
+        var nodeCount = stream.readShort();
+        var values = new ChiNode[nodeCount];
+        for (int i = 0; i < nodeCount; i++) {
+            values[i] = readNode();
+        }
+        return new ConstructArrayNode(values, elementType);
     }
 
     private ChiNode readDefinePackageFunction() throws IOException {

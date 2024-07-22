@@ -9,6 +9,8 @@ import com.oracle.truffle.api.strings.TruffleString;
 import gh.marad.chi.core.types.Type;
 import gh.marad.chi.language.runtime.*;
 
+import java.util.ArrayList;
+
 @TypeSystem({long.class, float.class, boolean.class, TruffleString.class, ChiFunction.class, ChiObject.class, ChiArray.class, ChiHostSymbol.class})
 public class ChiTypes {
 
@@ -85,6 +87,11 @@ public class ChiTypes {
 
 
     @ImplicitCast
+    public static long toLong(byte b) {
+        return b;
+    }
+
+    @ImplicitCast
     public static long toLong(int i) {
         return i;
     }
@@ -117,5 +124,14 @@ public class ChiTypes {
     @ImplicitCast
     public static ChiArray toChiArray(Object[] array) {
         return new ChiArray(array, Type.getAny());
+    }
+
+    @ImplicitCast
+    public static ChiArray toChiArray(byte[] bytes) {
+        var array = new ChiArray(bytes.length, Type.getInt());
+        for (int i = 0; i < bytes.length; i++) {
+            array.add(bytes[i]);
+        }
+        return array;
     }
 }

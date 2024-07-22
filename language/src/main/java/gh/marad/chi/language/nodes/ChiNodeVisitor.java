@@ -1,6 +1,7 @@
 package gh.marad.chi.language.nodes;
 
 import gh.marad.chi.language.builtin.Builtin;
+import gh.marad.chi.language.nodes.arrays.ConstructArrayNode;
 import gh.marad.chi.language.nodes.expr.BlockExpr;
 import gh.marad.chi.language.nodes.expr.cast.CastToFloat;
 import gh.marad.chi.language.nodes.expr.cast.CastToLongExpr;
@@ -30,6 +31,8 @@ import gh.marad.chi.language.nodes.objects.ConstructChiObject;
 import gh.marad.chi.language.nodes.objects.ReadMember;
 import gh.marad.chi.language.nodes.objects.WriteMember;
 import gh.marad.chi.language.nodes.value.*;
+
+import java.io.IOException;
 
 public interface ChiNodeVisitor {
     void visitUnitValue(UnitValue unitValue) throws Exception;
@@ -89,5 +92,5 @@ public interface ChiNodeVisitor {
     void visitBuiltin(Builtin builtin) throws Exception;
     void visitReturnNode(ReturnNode returnNode) throws Exception;
     void visitReturnUnitNode(ReturnUnitNode returnUnitNode) throws Exception;
-
+    void visitConstructArray(ConstructArrayNode constructArrayNode) throws IOException;
 }

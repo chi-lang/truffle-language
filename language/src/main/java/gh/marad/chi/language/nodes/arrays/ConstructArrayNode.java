@@ -13,6 +13,14 @@ public class ConstructArrayNode extends ChiNode {
     private final ChiNode[] values;
     private final Type elementType;
 
+    public Type getElementType() {
+        return elementType;
+    }
+
+    public ChiNode[] getValues() {
+        return values;
+    }
+
     public ConstructArrayNode(ChiNode[] values, Type elementType) {
         this.values = values;
         this.elementType = elementType;
@@ -29,6 +37,9 @@ public class ConstructArrayNode extends ChiNode {
 
     @Override
     public void accept(ChiNodeVisitor visitor) throws Exception {
-        throw new TODO("Not implemented yet");
+        visitor.visitConstructArray(this);
+        for (int i = 0; i < values.length; i++) {
+            values[i].accept(visitor);
+        }
     }
 }

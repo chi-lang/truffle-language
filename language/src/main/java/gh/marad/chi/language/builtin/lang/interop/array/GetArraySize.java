@@ -10,28 +10,32 @@ import gh.marad.chi.language.builtin.lang.interop.LangInteropBuiltin;
 import gh.marad.chi.language.image.NodeId;
 import gh.marad.chi.language.runtime.TODO;
 
-public class HasArrayElementsBuiltin extends LangInteropBuiltin {
+public class GetArraySize extends LangInteropBuiltin {
     @Child
     private InteropLibrary library;
 
-    public HasArrayElementsBuiltin() {
+    public GetArraySize() {
         this.library = InteropLibrary.getFactory().createDispatched(3);
     }
 
     @Override
     public Function type() {
-        return Type.fn(Type.getAny(), Type.getBool());
+        return Type.fn(Type.getAny(), Type.getInt());
     }
 
     @Override
     public String name() {
-        return "hasArrayElements";
+        return "getArraySize";
     }
 
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         var receiver = ChiArgs.getObjectAndUnwrapHostSymbol(frame, 0);
-        return library.hasArrayElements(receiver);
+        try {
+            return library.getArraySize(receiver);
+        } catch (UnsupportedMessageException e) {
+            throw new TODO(e);
+        }
     }
 
     @Override

@@ -3,7 +3,11 @@ setlocal enabledelayedexpansion
 
 set "DIR=%~dp0"
 set "JAVA_ARGS="
-set "PROGRAM_ARGS="
+if exist "%CHI_HOME%" (
+    set "PROGRAM_ARGS=-m %CHI_HOME%\mods"
+) else (
+    set "PROGRAM_ARGS="
+)
 set "GRAALVM_DIR=%JAVA_HOME%\lib\graalvm"
 
 if exist "%GRAALVM_DIR%" (
